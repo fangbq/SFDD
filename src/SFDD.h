@@ -1,12 +1,23 @@
 #ifndef SFDD_H
 #define SFDD_H
 
-#include <vector>
 #include "define.h"
 
 using namespace std;
 
 class Element;
+
+class Vtree {
+public:
+    int var = -1;
+    Vtree* lt = NULL;
+    Vtree* rt = NULL;
+    int size = 0;
+public:
+    Vtree(int s, int e, VTREE_TYPE t = TRIVIAL_TREE);
+    void print(int indent = 0) const;
+};
+
 
 class SFDD {
 private:

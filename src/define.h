@@ -14,5 +14,10 @@ enum OPERATOR_TYPE {
     DISCONJUNCTION
 };
 
+enum VTREE_TYPE {
+    TRIVIAL_TREE,
+    RANDOM_TREE
+};
+
 
 #endif
