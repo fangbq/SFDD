@@ -9,41 +9,47 @@ class Element;
 
 class Vtree {
 public:
-    int var = -1;
+    int index = 0;  // index of vtree node
+    int var = 0;  // var number
     Vtree* lt = NULL;
     Vtree* rt = NULL;
     int size = 0;
 public:
-    Vtree(int s, int e, VTREE_TYPE t = TRIVIAL_TREE);
+    Vtree(int start_var_index, int end_var_index, vector<int> full_order, VTREE_TYPE t = TRIVIAL_TREE);
+    set<int>  get_variables() const;
     void print(int indent = 0) const;
 };
 
 
 class SFDD {
-private:
-    vector<Element> elements;
-    size_t size;
 public:
-    SFDD() { size = 0; }
-    SFDD(const SFDD& s) { elements = s.get_elements(); size = s.get_size(); }
-    size_t get_size() const { return size; }
-    vector<Element> get_elements() const { return elements; }
-    SFDD Xor(const SFDD& s) const;
-    SFDD Conjoin(const SFDD& s) const;
-    SFDD Disjoin(const SFDD& s) const;
+    int constant = 0;  // true: 1, false: -1, non-constant: 0
+    int lit = 0;  // constant:0, non-constant: x/-x
+    vector<Element> elements;
+    int vtree_index;  // respect to vtree node
+public:
+    SFDD() {}
+    int size() const { return elements.size(); }
+    bool terminal() const { return constant+lit; }
+    bool unsatisfiable() const { return constant==-1; }
+    bool equal(const SFDD & sfdd) const;
+    SFDD& reduced();  // reducing
+    SFDD expanded() const;
+    SFDD Intersection(const SFDD & s) const;
+    SFDD Xor(const SFDD & s) const;
+    SFDD And(const SFDD & s) const;
+    SFDD Or(const SFDD & s) const;
+    void print(int indent = 0) const;
 };
 
 
 class Element {
-private:
+public:
     SFDD prime;
     SFDD sub;
 public:
     Element() {}
     Element(const Element& e) { prime = e.prime; sub = e.sub; }
-    SFDD get_prime() const { return prime; }
-    SFDD get_sub() const { return sub; }
-    SFDD get_value() const;
 };
 
 
@@ -52,6 +58,8 @@ public:
     SFDD sfddVar(int i) const;
     SFDD sfddZero() const;
     SFDD sfddOne() const;
+    SFDD get_SFDD(const Vtree* v, const int var) const;
+    SFDD get_SFDD2(const Vtree* v, const int rht = -1) const;
 };
 
 

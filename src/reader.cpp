@@ -37,8 +37,3 @@ Reader::Reader(const char* pro_file) {
 	p_f.close();
     return;
 }
-
-SFDD Reader::get_SFDD() const {
-    SFDD sfdd;
-    return sfdd;
-}

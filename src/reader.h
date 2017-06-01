@@ -13,7 +13,6 @@ public:
     vector<vector<int> > fml;
 public:
     Reader(const char* pro_file);
-    SFDD get_SFDD() const;
 };
 
 #endif
