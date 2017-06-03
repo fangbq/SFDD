@@ -63,6 +63,19 @@ bool SFDD::equal(const SFDD & sfdd) const {
 }
 
 SFDD& SFDD::reduced() {
+    if (terminal()) return *this;
+    bool valid = false;
+    for (vector<Element>::iterator e = elements.begin(); \
+    e != elements.end(); ++e) {
+        // 1.1 removes those elements that primes are false
+        if (e->prime.reduced().zero())
+            elements.erase(e);
+        else if (!e->sub.reduced().zero())
+            valid = true;
+    }
+    // 1.2 return false if all elements' subs are false
+    if (!valid) elements.clear();
+    if (size()==0) constant = -1;
     return *this;
 }
 
@@ -82,6 +95,7 @@ SFDD SFDD::expanded() const {
 
 SFDD SFDD::Intersection(const SFDD & sfdd) const {
     SFDD new_sfdd;
+    new_sfdd.vtree_index = vtree_index;
     if (terminal() && sfdd.terminal()) {
         // base case
         if (equal(sfdd) || sfdd.lit < 0)
@@ -90,7 +104,6 @@ SFDD SFDD::Intersection(const SFDD & sfdd) const {
             new_sfdd = sfdd;
         else
             new_sfdd.constant = -1;
-        // else do nothing and new_sfdd is empty
     } else {
         SFDD expanded_sfdd1 = expanded();
         SFDD expanded_sfdd2 = sfdd.expanded();
@@ -99,19 +112,51 @@ SFDD SFDD::Intersection(const SFDD & sfdd) const {
             for (vector<Element>::const_iterator e2 = expanded_sfdd2.elements.begin();
             e2 != expanded_sfdd2.elements.end(); ++e2) {
                 Element new_e;
-                new_e.prime = e1->prime.Intersection(e2->prime);
-                new_e.sub = e1->sub.Intersection(e2->sub);
-                if (!new_e.prime.unsatisfiable())
+                new_e.prime = e1->prime.Intersection(e2->prime).reduced();
+                if (!new_e.prime.zero()) {
+                    new_e.sub = e1->sub.Intersection(e2->sub).reduced();
                     new_sfdd.elements.push_back(new_e);
+                }
             }
         }
     } 
-    return new_sfdd;
+    return new_sfdd.reduced();
 }
 
 SFDD SFDD::Xor(const SFDD & sfdd) const {
     SFDD new_sfdd;
-    return new_sfdd;
+    new_sfdd.vtree_index = vtree_index;
+    if (terminal() && sfdd.terminal()) {
+        // base case
+        if (equal(sfdd)) {
+            new_sfdd.constant = -1;
+        } else if (zero() || sfdd.zero()) {
+            new_sfdd.constant = max(constant, sfdd.constant);
+            new_sfdd.lit = lit+sfdd.lit;
+        } else if (one() || sfdd.one()) {
+            new_sfdd.constant = min(constant, sfdd.constant);
+            new_sfdd.lit = lit+sfdd.lit;
+        } else {
+            new_sfdd.constant = 1;
+            new_sfdd.lit = 0;
+        }
+    } else {
+        SFDD expanded_sfdd1 = expanded();
+        SFDD expanded_sfdd2 = sfdd.expanded();
+        for (vector<Element>::const_iterator e1 = expanded_sfdd1.elements.begin();
+        e1 != expanded_sfdd1.elements.end(); ++e1) {
+            for (vector<Element>::const_iterator e2 = expanded_sfdd2.elements.begin();
+            e2 != expanded_sfdd2.elements.end(); ++e2) {
+                Element new_e;
+                new_e.prime = e1->prime.Intersection(e2->prime).reduced();
+                if (!new_e.prime.zero()) {
+                    new_e.sub = e1->sub.Xor(e2->sub).reduced();
+                    new_sfdd.elements.push_back(new_e);
+                }
+            }
+        }
+    } 
+    return new_sfdd.reduced();
 }
 
 SFDD SFDD::And(const SFDD & sfdd) const {
@@ -172,9 +217,9 @@ SFDD Manager::get_SFDD(const Vtree* v, const int var) const {
     sfdd.vtree_index = v->index;
     // check if constant
     if (v->var) {
-        sfdd.lit = var;  // different with get_SFDD2, get_SFDD \
+        sfdd.lit = var;  /* different with get_SFDD2, get_SFDD \
                             solves 'f=x_i', so the var must be \
-                            the literal in the leaf.
+                            the literal in the leaf. */
         return sfdd;
     }
     Element e1, e2;
@@ -191,7 +236,7 @@ SFDD Manager::get_SFDD(const Vtree* v, const int var) const {
         e1.prime.constant = 1;
         // e1.sub.lit = var;
         e1.sub = get_SFDD(v->rt, var);  // normalization
-        e2.prime = get_SFDD2(v->rt, 0);
+        e2.prime = get_SFDD2(v->lt, 0);
         e2.sub.constant = -1;
     }
     sfdd.elements.push_back(e1);
@@ -237,7 +282,7 @@ SFDD Manager::get_SFDD2(const Vtree* v, const int rht) const {
             // e1.prime.lit = rht;
             e1.prime = get_SFDD(v->lt, rht);  // normalization
             e1.sub = get_SFDD2(v->rt, 0);
-            e2.prime = get_SFDD2(v->rt, rht);
+            e2.prime = get_SFDD2(v->lt, rht);
             e2.sub = get_SFDD2(v->rt);
         } else {
             // rule 2.(b)

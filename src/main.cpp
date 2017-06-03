@@ -29,10 +29,24 @@ int main(int argc, char** argv) {
     // @test the approach of compiling (note8)
     Manager mg;
     SFDD sfdd1 = mg.get_SFDD(v, 1);
+    cout << "f=x1 :" << endl;
     sfdd1.print();
     cout << endl;
     SFDD sfdd2 = mg.get_SFDD(v, 2);
+    cout << "f=x2 :" << endl;
     sfdd2.print();
+    cout << endl;
+
+    // @test Intersection
+    cout << "f=x1 \\cap f=x2 :" << endl;
+    SFDD inter_sfdd = sfdd1.Intersection(sfdd2);
+    inter_sfdd.print();
+    cout << endl;
+
+    // @test Xor
+    cout << "f=x1 \\oplus f=x2 :" << endl;
+    SFDD xor_sfdd = sfdd1.Xor(sfdd2);
+    xor_sfdd.print();
     cout << endl;
 
     return 0;

@@ -26,12 +26,13 @@ public:
     int constant = 0;  // true: 1, false: -1, non-constant: 0
     int lit = 0;  // constant:0, non-constant: x/-x
     vector<Element> elements;
-    int vtree_index;  // respect to vtree node
+    int vtree_index = 0;  // respect to vtree node
 public:
     SFDD() {}
-    int size() const { return elements.size(); }
-    bool terminal() const { return constant+lit; }
-    bool unsatisfiable() const { return constant==-1; }
+    inline int size() const { return elements.size(); }
+    inline bool terminal() const { return constant+lit; }
+    inline bool zero() const { return constant==-1; }
+    inline bool one() const { return constant==1; }
     bool equal(const SFDD & sfdd) const;
     SFDD& reduced();  // reducing
     SFDD expanded() const;
