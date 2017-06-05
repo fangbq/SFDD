@@ -33,7 +33,7 @@ public:
     inline bool terminal() const { return constant+lit; }
     inline bool zero() const { return constant==-1; }
     inline bool one() const { return constant==1; }
-    bool equal(const SFDD & sfdd) const;
+    bool equals(const SFDD & sfdd) const;
     SFDD& reduced();  // reducing
     SFDD expanded() const;
     SFDD Intersection(const SFDD & s) const;
@@ -51,6 +51,9 @@ public:
 public:
     Element() {}
     Element(const Element& e) { prime = e.prime; sub = e.sub; }
+    inline bool equals(const Element & e) const {
+        return prime.equals(e.prime) && sub.equals(e.sub);
+    };
 };
 
 

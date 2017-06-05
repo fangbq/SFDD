@@ -55,9 +55,24 @@ void Vtree::print(int indent) const {
     return;
 }
 
-bool SFDD::equal(const SFDD & sfdd) const {
+bool SFDD::equals(const SFDD & sfdd) const {
     if (terminal() && sfdd.terminal()) {
         return (constant ? constant==sfdd.constant : lit==sfdd.lit);
+    } else if (size() == sfdd.size()) {
+        set<int> equaled_elements;
+        for (vector<Element>::const_iterator e1 = elements.begin(); \
+        e1 != elements.end(); ++e1) {
+            bool found_equivalent = false;
+            for (int i = 0; i < sfdd.elements.size(); ++i) {
+                if (equaled_elements.find(i) != equaled_elements.end()
+                && e1->equals(sfdd.elements[i])) {
+                    equaled_elements.insert(i);
+                    found_equivalent = true;
+                    break;
+                }
+            }
+            if (!found_equivalent) return false;
+        }
     }
     return false;
 }
@@ -76,6 +91,22 @@ SFDD& SFDD::reduced() {
     // 1.2 return false if all elements' subs are false
     if (!valid) elements.clear();
     if (size()==0) constant = -1;
+    // 2 compressing
+    for (vector<Element>::iterator e1 = elements.begin(); \
+    e1 != elements.end(); ) {
+        bool is_delete = false;
+        for (vector<Element>::iterator e2 = elements.begin(); \
+        e2 != elements.end(); ++e2) {
+            if (e1 != e2 && e1->sub.equals(e2->sub)) {
+                is_delete = true;
+                e2->prime = e2->prime.Xor(e1->prime).reduced();
+                e1 = elements.erase(e1);
+                break;
+            }
+        }
+        if (!is_delete)
+            ++e1;
+    }
     return *this;
 }
 
@@ -98,7 +129,7 @@ SFDD SFDD::Intersection(const SFDD & sfdd) const {
     new_sfdd.vtree_index = vtree_index;
     if (terminal() && sfdd.terminal()) {
         // base case
-        if (equal(sfdd) || sfdd.lit < 0)
+        if (equals(sfdd) || sfdd.lit < 0)
             new_sfdd = *this;
         else if (lit < 0)
             new_sfdd = sfdd;
@@ -128,7 +159,7 @@ SFDD SFDD::Xor(const SFDD & sfdd) const {
     new_sfdd.vtree_index = vtree_index;
     if (terminal() && sfdd.terminal()) {
         // base case
-        if (equal(sfdd)) {
+        if (equals(sfdd)) {
             new_sfdd.constant = -1;
         } else if (zero() || sfdd.zero()) {
             new_sfdd.constant = max(constant, sfdd.constant);
