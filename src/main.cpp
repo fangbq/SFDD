@@ -27,26 +27,38 @@ int main(int argc, char** argv) {
     cout << endl << endl;
 
     // @test the approach of compiling (note8)
-    Manager mg;
-    SFDD sfdd1 = mg.get_SFDD(v, 1);
+    Manager mg(v);
+    SFDD sfdd1 = mg.sfddVar(v, 1);
     cout << "f=x1 :" << endl;
     sfdd1.print();
     cout << endl;
-    SFDD sfdd2 = mg.get_SFDD(v, 2);
-    cout << "f=x2 :" << endl;
-    sfdd2.print();
+    // SFDD sfdd2 = mg.sfddVar(v, 2);
+    // cout << "f=x2 :" << endl;
+    // sfdd2.print();
+    // cout << endl;
+    SFDD sfdd3 = mg.sfddOne();
+    cout << "f=1 :" << endl;
+    sfdd3.expanded(mg).print();
     cout << endl;
+    // SFDD sfdd4 = mg.sfddZero();
+    // cout << "f=0 :" << endl;
+    // sfdd4.print();
+    // cout << endl;
 
     // @test Intersection
-    cout << "f=x1 \\cap f=x2 :" << endl;
-    SFDD inter_sfdd = sfdd1.Intersection(sfdd2);
-    inter_sfdd.print();
-    cout << endl;
+    // cout << "f=x1 \\cap f=x2 :" << endl;
+    // SFDD inter_sfdd = sfdd1.Intersection(sfdd2);
+    // inter_sfdd.print();
+    // cout << endl;
 
     // @test Xor
-    cout << "f=x1 \\oplus f=x2 :" << endl;
-    SFDD xor_sfdd = sfdd1.Xor(sfdd2);
-    xor_sfdd.print();
+    // cout << "f=x1 \\oplus f=x2 :" << endl;
+    // SFDD xor_sfdd = sfdd1.Xor(sfdd2);
+    // xor_sfdd.print();
+    // cout << endl;
+    cout << "f=x1 \\oplus f=1 :" << endl;
+    SFDD xor_sfdd2 = sfdd1.Xor(sfdd3, mg);
+    xor_sfdd2.print();
     cout << endl;
 
     return 0;

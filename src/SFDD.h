@@ -6,6 +6,7 @@
 using namespace std;
 
 class Element;
+class Manager;
 
 class Vtree {
 public:
@@ -34,12 +35,12 @@ public:
     inline bool zero() const { return constant==-1; }
     inline bool one() const { return constant==1; }
     bool equals(const SFDD & sfdd) const;
-    SFDD& reduced();  // reducing
-    SFDD expanded() const;
-    SFDD Intersection(const SFDD & s) const;
-    SFDD Xor(const SFDD & s) const;
-    SFDD And(const SFDD & s) const;
-    SFDD Or(const SFDD & s) const;
+    SFDD& reduced(Manager & m);  // reducing
+    SFDD expanded(Manager & m) const;
+    SFDD Intersection(const SFDD & s, Manager & m) const;
+    SFDD Xor(const SFDD & s, Manager & m) const;
+    SFDD And(const SFDD & s, Manager & m) const;
+    SFDD Or(const SFDD & s, Manager & m) const;
     void print(int indent = 0) const;
 };
 
@@ -59,11 +60,13 @@ public:
 
 class Manager {
 public:
-    SFDD sfddVar(int i) const;
+    Vtree* vtree;
+public:
+    Manager(Vtree* v) { vtree = v; };
     SFDD sfddZero() const;
     SFDD sfddOne() const;
-    SFDD get_SFDD(const Vtree* v, const int var) const;
-    SFDD get_SFDD2(const Vtree* v, const int rht = -1) const;
+    SFDD sfddVar(const Vtree* v, const int var) const;
+    SFDD get_SFDD(const Vtree* v, const int rht = -1) const;
 };
 
 
