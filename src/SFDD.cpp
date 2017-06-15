@@ -135,6 +135,8 @@ SFDD SFDD::expanded(Manager & m) const {
 }
 
 SFDD SFDD::Intersection(const SFDD & sfdd, Manager & m) const {
+    // cout << "+++++++++++++++++++++++++++++++++" << endl;
+    // print(); sfdd.print();
     SFDD new_sfdd;
     new_sfdd.vtree_index = vtree_index;
     if (terminal() && sfdd.terminal()) {
@@ -161,26 +163,30 @@ SFDD SFDD::Intersection(const SFDD & sfdd, Manager & m) const {
             }
         }
     } else {
-        SFDD outer_sfdd, inner_sfdd;
-        if (vtree_index > sfdd.vtree_index) {
-            outer_sfdd = expanded(m);
-            inner_sfdd = sfdd.expanded(m);
-        } else {
-            outer_sfdd = sfdd.expanded(m);
-            inner_sfdd = expanded(m);
-        }
-        for (vector<Element>::const_iterator outer_e = outer_sfdd.elements.begin();
-        outer_e != outer_sfdd.elements.end(); ++outer_e) {
-            Element new_e;
-            new_e.prime = outer_e->prime.Intersection(inner_sfdd, m).reduced(m);
-            new_e.sub = outer_e->sub;
-            new_sfdd.elements.push_back(new_e);
-        }
+        cout << "Intersection Error!" << endl;
+        // SFDD outer_sfdd, inner_sfdd;
+        // if (vtree_index > sfdd.vtree_index) {
+        //     outer_sfdd = expanded(m);
+        //     inner_sfdd = sfdd.expanded(m);
+        // } else {
+        //     outer_sfdd = sfdd.expanded(m);
+        //     inner_sfdd = expanded(m);
+        // }
+        // for (vector<Element>::const_iterator outer_e = outer_sfdd.elements.begin();
+        // outer_e != outer_sfdd.elements.end(); ++outer_e) {
+        //     Element new_e;
+        //     new_e.prime = outer_e->prime.Intersection(inner_sfdd, m).reduced(m);
+        //     new_e.sub = outer_e->sub;
+        //     new_sfdd.elements.push_back(new_e);
+        // }
     }
+    // new_sfdd.reduced(m).print();
     return new_sfdd.reduced(m);
 }
 
 SFDD SFDD::Xor(const SFDD & sfdd, Manager & m) const {
+    if (empty()) return sfdd;
+    if (sfdd.empty()) return *this;
     SFDD new_sfdd;
     if (terminal() && sfdd.terminal()) {
         // base case
@@ -213,29 +219,65 @@ SFDD SFDD::Xor(const SFDD & sfdd, Manager & m) const {
             }
         }
     } else {
-        SFDD outer_sfdd, inner_sfdd;
-        if (vtree_index > sfdd.vtree_index) {
-            outer_sfdd = expanded(m);
-            inner_sfdd = sfdd.expanded(m);
-        } else {
-            outer_sfdd = sfdd.expanded(m);
-            inner_sfdd = expanded(m);
-        }
-        new_sfdd.vtree_index = outer_sfdd.vtree_index;
-        for (vector<Element>::const_iterator outer_e = outer_sfdd.elements.begin();
-        outer_e != outer_sfdd.elements.end(); ++outer_e) {
-            Element new_e;
-            new_e.prime = outer_e->prime.Xor(inner_sfdd, m).reduced(m);
-            new_e.sub = outer_e->sub;
-            new_sfdd.elements.push_back(new_e);
-        }
+        cout << "Xor Error!" << endl;
     }
     return new_sfdd.reduced(m);
 }
 
 SFDD SFDD::And(const SFDD & sfdd, Manager & m) const {
+    if (empty()) return sfdd;
+    if (sfdd.empty()) return *this;
     SFDD new_sfdd;
-    return new_sfdd;
+    if (terminal() && sfdd.terminal()) {
+        // base case
+        if (zero() || sfdd.zero()) {
+            new_sfdd.constant = -1;
+        } else if (one() || sfdd.one()) {
+            new_sfdd.constant = min(constant, sfdd.constant);
+            new_sfdd.lit = lit+sfdd.lit;
+        } else if (equals(sfdd)) {
+            new_sfdd = *this;
+        } else {
+            new_sfdd.constant = -1;
+        }
+    } else if (vtree_index == sfdd.vtree_index) {
+        new_sfdd.vtree_index = vtree_index;
+        SFDD expanded_sfdd1 = expanded(m);
+        SFDD expanded_sfdd2 = sfdd.expanded(m);
+        SFDD prime_products[expanded_sfdd1.size()][expanded_sfdd2.size()];
+        SFDD sub_products[expanded_sfdd1.size()][expanded_sfdd2.size()];
+        for (vector<Element>::const_iterator e1 = expanded_sfdd1.elements.begin();
+        e1 != expanded_sfdd1.elements.end(); ++e1) {
+            for (vector<Element>::const_iterator e2 = expanded_sfdd2.elements.begin();
+            e2 != expanded_sfdd2.elements.end(); ++e2) {
+                prime_products[e1-expanded_sfdd1.elements.begin()][e2-expanded_sfdd2.elements.begin()] \
+                    = e1->prime.And(e2->prime, m).reduced(m);
+                sub_products[e1-expanded_sfdd1.elements.begin()][e2-expanded_sfdd2.elements.begin()] \
+                    = e1->sub.And(e2->sub, m).reduced(m);
+            }
+        }
+        for (vector<Element>::const_iterator e1 = expanded_sfdd1.elements.begin();
+        e1 != expanded_sfdd1.elements.end(); ++e1) {
+            for (vector<Element>::const_iterator e2 = expanded_sfdd2.elements.begin();
+            e2 != expanded_sfdd2.elements.end(); ++e2) {
+                Element new_e;
+                new_e.prime = e1->prime.Intersection(e2->prime, m);
+                if (!new_e.prime.zero()) {
+                    for (int i = 0; i < expanded_sfdd1.size(); ++i) {
+                        for (int j = 0; j < expanded_sfdd2.size(); ++j) {
+                            if (!new_e.prime.Intersection(prime_products[i][j], m).zero()) {
+                                new_e.sub = new_e.sub.Xor(sub_products[i][j], m).reduced(m);
+                            }
+                        }
+                    }
+                    new_sfdd.elements.push_back(new_e);
+                }
+            }
+        }
+    } else {
+        cout << "And Error!" << endl;
+    }
+    return new_sfdd.reduced(m);
 }
 
 SFDD SFDD::Or(const SFDD & sfdd, Manager & m) const {

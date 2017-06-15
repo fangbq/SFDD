@@ -32,6 +32,7 @@ public:
     SFDD() {}
     inline int size() const { return elements.size(); }
     inline bool terminal() const { return constant+lit; }
+    inline bool empty() const { return !terminal()&&(size()==0);}
     inline bool zero() const { return constant==-1; }
     inline bool one() const { return constant==1; }
     bool equals(const SFDD & sfdd) const;

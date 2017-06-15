@@ -14,7 +14,7 @@ int main(int argc, char** argv) {
     for (int i = 1; i <= var_no; ++i) vars_order.push_back(i);
 
     // @test vtree-constuctor
-    Vtree* v = new Vtree(1, 4, vars_order);
+    Vtree* v = new Vtree(1, var_no, vars_order);
     v->print();
     cout << endl;
 
@@ -27,20 +27,20 @@ int main(int argc, char** argv) {
     cout << endl << endl;
 
     // @test the approach of compiling (note8)
-    Manager mg(v);
-    SFDD sfdd1 = mg.sfddVar(v, 1);
+    Manager m(v);
+    SFDD sfdd1 = m.sfddVar(v, 1);
     cout << "f=x1 :" << endl;
     sfdd1.print();
     cout << endl;
-    // SFDD sfdd2 = mg.sfddVar(v, 2);
-    // cout << "f=x2 :" << endl;
-    // sfdd2.print();
-    // cout << endl;
-    SFDD sfdd3 = mg.sfddOne();
-    cout << "f=1 :" << endl;
-    sfdd3.expanded(mg).print();
+    SFDD sfdd2 = m.sfddVar(v, 2);
+    cout << "f=x2 :" << endl;
+    sfdd2.print();
     cout << endl;
-    // SFDD sfdd4 = mg.sfddZero();
+    // SFDD sfdd3 = m.sfddOne();
+    // cout << "f=1 :" << endl;
+    // sfdd3.expanded(m).print();
+    // cout << endl;
+    // SFDD sfdd4 = m.sfddZero();
     // cout << "f=0 :" << endl;
     // sfdd4.print();
     // cout << endl;
@@ -56,9 +56,13 @@ int main(int argc, char** argv) {
     // SFDD xor_sfdd = sfdd1.Xor(sfdd2);
     // xor_sfdd.print();
     // cout << endl;
-    cout << "f=x1 \\oplus f=1 :" << endl;
-    SFDD xor_sfdd2 = sfdd1.Xor(sfdd3, mg);
-    xor_sfdd2.print();
+    // cout << "f=x1 \\oplus f=1 :" << endl;
+    // SFDD xor_sfdd2 = sfdd1.Xor(sfdd3, m);
+    // xor_sfdd2.print();
+    // cout << endl;
+    cout << "f=x1 \\and f=x2 :" << endl;
+    SFDD and_sfdd1 = sfdd1.And(sfdd2, m);
+    and_sfdd1.print();
     cout << endl;
 
     return 0;
