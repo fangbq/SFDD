@@ -64,7 +64,7 @@ bool SFDD::equals(const SFDD & sfdd) const {
         e1 != elements.end(); ++e1) {
             bool found_equivalent = false;
             for (int i = 0; i < sfdd.elements.size(); ++i) {
-                if (equaled_elements.find(i) != equaled_elements.end()
+                if (equaled_elements.find(i) == equaled_elements.end()
                 && e1->equals(sfdd.elements[i])) {
                     equaled_elements.insert(i);
                     found_equivalent = true;
@@ -73,6 +73,7 @@ bool SFDD::equals(const SFDD & sfdd) const {
             }
             if (!found_equivalent) return false;
         }
+        return true;
     }
     return false;
 }
@@ -112,24 +113,13 @@ SFDD& SFDD::reduced(Manager & m) {
 
 SFDD SFDD::expanded(Manager & m) const {
     if (value<2) {
-        // todo....
-
-        // // return {(1, 1), (x, 0)} if 1; return {(1, 0), (x, 0)} if 0
+        // return {(1, 1), (x, 0)} if 1; return {(1, 0), (x, 0)} if 0
         // SFDD expanded_sfdd;
         // expanded_sfdd.vtree_index = vtree_index;
         // Element e1, e2;
         // e1.prime.value = 1;
         // e1.sub.value = 1;
-        // int leftest_lit = 0;
-        // Vtree* tmp_v = m.vtree;
-        // while (tmp_v) {
-        //     leftest_lit = tmp_v->var;
-        //     tmp_v = tmp_v->lt;
-        // }
-        // e2.prime.lit = leftest_lit;
-        // e2.sub.constant = -1;
         // expanded_sfdd.elements.push_back(e1);
-        // expanded_sfdd.elements.push_back(e2);
         // return expanded_sfdd;
     }
     // return self if non-constant
@@ -141,6 +131,8 @@ SFDD SFDD::Intersection(const SFDD & sfdd, Manager & m) const {
     // print(); sfdd.print();
     SFDD new_sfdd;
     new_sfdd.vtree_index = vtree_index;
+    if (zero()) return *this;
+    if (sfdd.zero()) return sfdd;
     if (terminal() && sfdd.terminal()) {
         // base case
         if (equals(sfdd) || sfdd.negative())
@@ -190,6 +182,8 @@ SFDD SFDD::Xor(const SFDD & sfdd, Manager & m) const {
     if (empty()) return sfdd;
     if (sfdd.empty()) return *this;
     SFDD new_sfdd;
+    if (zero()) return sfdd;
+    if (sfdd.zero()) return *this;
     if (terminal() && sfdd.terminal()) {
         // base case
         if (equals(sfdd)) {
@@ -226,8 +220,11 @@ SFDD SFDD::Xor(const SFDD & sfdd, Manager & m) const {
 }
 
 SFDD SFDD::And(const SFDD & sfdd, Manager & m) const {
-    if (empty()) return sfdd;
-    if (sfdd.empty()) return *this;
+    if (zero()) return *this;
+    if (sfdd.zero()) return sfdd;
+    if (one()) return sfdd;
+    if (sfdd.one()) return *this;
+
     SFDD new_sfdd;
     if (terminal() && sfdd.terminal()) {
         // base case

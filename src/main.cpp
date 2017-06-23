@@ -29,24 +29,21 @@ int main(int argc, char** argv) {
     // @test the approach of compiling (note8)
     Manager m(v);
     SFDD sfdd1 = m.sfddVar(v, 1);
-    cout << "f=x1 :" << endl;
-    sfdd1.print();
+    // cout << "f=x1 :" << endl;
 
     fstream f;
     // @test print_dot(...)
     f.open("../dotG/f=x1.dot", fstream::out | fstream::trunc);
     sfdd1.print_dot(f, true);
-
-    cout << endl;
-
-
+    f.close();
+    
     SFDD sfdd2 = m.sfddVar(v, 2);
-    cout << "f=x2 :" << endl;
-    sfdd2.print();
-    cout << endl;
+    f.open("../dotG/f=x2.dot", fstream::out | fstream::trunc);
+    sfdd2.print_dot(f, true);
+    f.close();
+    
     // SFDD sfdd3 = m.sfddOne();
     // cout << "f=1 :" << endl;
-    // sfdd3.expanded(m).print();
     // cout << endl;
     // SFDD sfdd4 = m.sfddZero();
     // cout << "f=0 :" << endl;
@@ -60,20 +57,20 @@ int main(int argc, char** argv) {
     // cout << endl;
 
     // @test Xor
-    cout << "f=x1 \\oplus f=x2 :" << endl;
     SFDD xor_sfdd = sfdd1.Xor(sfdd2, m);
-    xor_sfdd.print();
-    cout << endl;
+    f.open("../dotG/f=x1⊕x2.dot", fstream::out | fstream::trunc);
+    xor_sfdd.print_dot(f, true);
+    f.close();
+    
     // cout << "f=x1 \\oplus f=1 :" << endl;
     // SFDD xor_sfdd2 = sfdd1.Xor(sfdd3, m);
     // xor_sfdd2.print();
     // cout << endl;
-    // cout << "f=x1 \\and f=x2 :" << endl;
-    // SFDD and_sfdd1 = sfdd1.And(sfdd2, m);
-    // and_sfdd1.print();
-    // cout << endl;
-
-    f.close();
+    // cout << "f=x1·x2 :" << endl;
+    // SFDD and_sfdd = sfdd1.And(sfdd2, m);
+    // f.open("../dotG/f=x1·x2.dot", fstream::out | fstream::trunc);
+    // and_sfdd.print_dot(f, true);
+    // f.close();
 
     return 0;
 }
