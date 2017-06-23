@@ -28,4 +28,9 @@ cat $test_cases_file | while read oneline
 do
     timeout 1800 "$program $oneline"
 done
+
+for filename in ../dotG/*.dot; do
+    dot -Tpng ../dotG/"$filename" -o ../dotG/"$filename".png
+done
+
 exit 0

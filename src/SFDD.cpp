@@ -57,7 +57,7 @@ void Vtree::print(int indent) const {
 
 bool SFDD::equals(const SFDD & sfdd) const {
     if (terminal() && sfdd.terminal()) {
-        return (constant ? constant==sfdd.constant : lit==sfdd.lit);
+        return value == sfdd.value;
     } else if (size() == sfdd.size()) {
         set<int> equaled_elements;
         for (vector<Element>::const_iterator e1 = elements.begin(); \
@@ -90,7 +90,7 @@ SFDD& SFDD::reduced(Manager & m) {
     }
     // 1.2 return false if all elements' subs are false
     if (!valid) elements.clear();
-    if (size()==0) constant = -1;
+    if (size()==0) value = 0;
     // 2 compressing
     for (vector<Element>::iterator e1 = elements.begin(); \
     e1 != elements.end(); ) {
@@ -111,24 +111,26 @@ SFDD& SFDD::reduced(Manager & m) {
 }
 
 SFDD SFDD::expanded(Manager & m) const {
-    if (constant) {
-        // return {(1, 1), (x, 0)} if 1; return {(1, 0), (x, 0)} if 0
-        SFDD expanded_sfdd;
-        expanded_sfdd.vtree_index = vtree_index;
-        Element e1, e2;
-        e1.prime.constant = 1;
-        e1.sub.constant = constant;
-        int leftest_lit = 0;
-        Vtree* tmp_v = m.vtree;
-        while (tmp_v) {
-            leftest_lit = tmp_v->var;
-            tmp_v = tmp_v->lt;
-        }
-        e2.prime.lit = leftest_lit;
-        e2.sub.constant = -1;
-        expanded_sfdd.elements.push_back(e1);
-        expanded_sfdd.elements.push_back(e2);
-        return expanded_sfdd;
+    if (value<2) {
+        // todo....
+
+        // // return {(1, 1), (x, 0)} if 1; return {(1, 0), (x, 0)} if 0
+        // SFDD expanded_sfdd;
+        // expanded_sfdd.vtree_index = vtree_index;
+        // Element e1, e2;
+        // e1.prime.value = 1;
+        // e1.sub.value = 1;
+        // int leftest_lit = 0;
+        // Vtree* tmp_v = m.vtree;
+        // while (tmp_v) {
+        //     leftest_lit = tmp_v->var;
+        //     tmp_v = tmp_v->lt;
+        // }
+        // e2.prime.lit = leftest_lit;
+        // e2.sub.constant = -1;
+        // expanded_sfdd.elements.push_back(e1);
+        // expanded_sfdd.elements.push_back(e2);
+        // return expanded_sfdd;
     }
     // return self if non-constant
     return *this;
@@ -141,12 +143,12 @@ SFDD SFDD::Intersection(const SFDD & sfdd, Manager & m) const {
     new_sfdd.vtree_index = vtree_index;
     if (terminal() && sfdd.terminal()) {
         // base case
-        if (equals(sfdd) || sfdd.lit < 0)
+        if (equals(sfdd) || sfdd.negative())
             new_sfdd = *this;
-        else if (lit < 0)
+        else if (negative())
             new_sfdd = sfdd;
         else
-            new_sfdd.constant = -1;
+            new_sfdd.value = 0;
     } else if (vtree_index == sfdd.vtree_index) {
         SFDD expanded_sfdd1 = expanded(m);
         SFDD expanded_sfdd2 = sfdd.expanded(m);
@@ -191,16 +193,15 @@ SFDD SFDD::Xor(const SFDD & sfdd, Manager & m) const {
     if (terminal() && sfdd.terminal()) {
         // base case
         if (equals(sfdd)) {
-            new_sfdd.constant = -1;
+            new_sfdd.value = 0;
         } else if (zero() || sfdd.zero()) {
-            new_sfdd.constant = max(constant, sfdd.constant);
-            new_sfdd.lit = lit+sfdd.lit;
-        } else if (one() || sfdd.one()) {
-            new_sfdd.constant = min(constant, sfdd.constant);
-            new_sfdd.lit = -(lit+sfdd.lit);
+            new_sfdd.value = value+sfdd.value;
+        } else if (one()) {
+            new_sfdd.value = sfdd.value/2*2+1-sfdd.value%2;
+        } else if (sfdd.one()) {
+            new_sfdd.value = value/2*2+1-value%2;
         } else {
-            new_sfdd.constant = 1;
-            new_sfdd.lit = 0;
+            new_sfdd.value = 1;
         }
     } else if (vtree_index == sfdd.vtree_index) {
         new_sfdd.vtree_index = vtree_index;
@@ -231,14 +232,13 @@ SFDD SFDD::And(const SFDD & sfdd, Manager & m) const {
     if (terminal() && sfdd.terminal()) {
         // base case
         if (zero() || sfdd.zero()) {
-            new_sfdd.constant = -1;
+            new_sfdd.value = 0;
         } else if (one() || sfdd.one()) {
-            new_sfdd.constant = min(constant, sfdd.constant);
-            new_sfdd.lit = lit+sfdd.lit;
+            new_sfdd.value = value*sfdd.value;
         } else if (equals(sfdd)) {
             new_sfdd = *this;
         } else {
-            new_sfdd.constant = -1;
+            new_sfdd.value = 0;
         }
     } else if (vtree_index == sfdd.vtree_index) {
         new_sfdd.vtree_index = vtree_index;
@@ -288,11 +288,11 @@ SFDD SFDD::Or(const SFDD & sfdd, Manager & m) const {
 void SFDD::print(int indent) const {
     if (elements.empty()) {
         for (int i = 0; i < indent; ++i) cout << " ";
-        if (constant) {
-            cout << (constant>0 ? 1 : 0) << endl;
+        if (value < 2) {
+            cout << value << endl;
         } else {
-            if (lit < 0) cout << "-";
-            cout << "x" << abs(lit) << endl;
+            if (negative()) cout << "-";
+            cout << "x" << value/2 << endl;
         }
         return;
     }
@@ -301,58 +301,127 @@ void SFDD::print(int indent) const {
     int counter = 1;
     for (vector<Element>::const_iterator e = elements.begin();
     e != elements.end(); ++e) {
-        for (int i = 0; i < indent+1; ++i) cout << " ";
-        cout << "E" << counter << "p:" << endl;
-        for (int i = 0; i < indent+1; ++i) cout << " ";
-        e->prime.print(indent+1);
-        for (int i = 0; i < indent+1; ++i) cout << " ";
-        cout << "E" << counter++ << "s:" << endl;
-        for (int i = 0; i < indent+1; ++i) cout << " ";
-        e->sub.print(indent+1);
+        e->print(indent, counter++);
     }
     return;
+}
+
+void SFDD::print_dot(fstream & out_dot, bool root, int depth, int counter) const {
+    if (root) out_dot << "digraph G {" << endl;
+    if (elements.empty()) {
+        if (value < 2) {
+            out_dot << value;
+        } else {
+            if (negative()) out_dot << "-";
+            out_dot << "x" << value/2;
+        }
+        return;
+    }
+    string dec_name = "Dec_" + to_string(depth++) + "_" + to_string(counter);
+    out_dot << "\t" << dec_name << " [shape=circle, label=\"" << vtree_index << "\"]" << endl;
+    int ele_no = 1;
+    for (vector<Element>::const_iterator e = elements.begin();
+    e != elements.end(); ++e, ++ele_no) {
+        string e_name = dec_name + "Ele_" + to_string(depth) + "_" + to_string(ele_no);
+        out_dot << "\t" << dec_name << " -> " << e_name << endl;
+        e->print_dot(out_dot, depth, ele_no, dec_name);
+    }
+    if (root) out_dot << "}" << endl;
+}
+
+void Element::print(int indent, int counter) const {
+    for (int i = 0; i < indent+1; ++i) cout << " ";
+    cout << "E" << counter << "p:" << endl;
+    for (int i = 0; i < indent+1; ++i) cout << " ";
+    prime.print(indent+1);
+    for (int i = 0; i < indent+1; ++i) cout << " ";
+    cout << "E" << counter << "s:" << endl;
+    for (int i = 0; i < indent+1; ++i) cout << " ";
+    sub.print(indent+1);
+}
+
+void Element::print_dot(fstream & out_dot, int depth, int ele_no, string dec_name) const {
+    string e_name = dec_name + "Ele_" + to_string(depth) + "_" + to_string(ele_no);
+    out_dot << "\t" << e_name << " [shape=record,label=\"<f0> ";
+    bool prime_out_edge = false;
+    bool sub_out_edge = false;
+    if (prime.terminal()) prime.print_dot(out_dot);
+    else { out_dot << "●"; prime_out_edge = true; }
+    out_dot << "|<f1> ";
+    if (sub.terminal()) sub.print_dot(out_dot);
+    else { out_dot << "●"; sub_out_edge = true; }
+    out_dot << "\"]" << endl;
+    ++depth;
+    if (prime_out_edge) {
+        string dec_name = "Dec_" + to_string(depth) + "_" + to_string(ele_no*2);
+        out_dot << "\t" << e_name << ":f0 -> " << dec_name << endl;
+        prime.print_dot(out_dot, false, depth, ele_no*2);
+    }
+    if (sub_out_edge) {
+        string dec_name = "Dec_" + to_string(depth) + "_" + to_string(ele_no*2-1);
+        out_dot << "\t" << e_name << ":f1 -> " << dec_name << endl;
+        sub.print_dot(out_dot, false, depth, ele_no*2-1);
+    }
 }
 
 SFDD Manager::sfddZero() const {
     SFDD sfdd;
     sfdd.vtree_index = 1;
-    sfdd.constant = -1;
+    sfdd.value = 0;
     return sfdd;
 }
 
 SFDD Manager::sfddOne() const {
     SFDD sfdd;
     sfdd.vtree_index = 1;
-    sfdd.constant = 1;
+    sfdd.value = 1;
     return sfdd;
 }
 
-SFDD Manager::sfddVar(const Vtree* v, const int var) const {
+SFDD Manager::sfddVar(const Vtree* v, const int tmp_var) {
+    assert(tmp_var != 0);
+    if (tmp_var < 0) return get_SFDD1(v, (0-tmp_var)*2+1).reduced(*this);
+    else if (tmp_var > 0) return get_SFDD1(v, tmp_var*2).reduced(*this);
+    else return get_SFDD1(v, tmp_var).reduced(*this);
+}
+
+extern SFDD get_SFDD1(const Vtree* v, const int var) {
     SFDD sfdd;
     sfdd.vtree_index = v->index;
     // check if constant
     if (v->var) {
-        sfdd.lit = var;  /* different with get_SFDD, sfddVar \
-                            solves 'f=x_i', so the var must be \
-                            the literal in the leaf. */
+        sfdd.value = var;  /* different with get_SFDD, sfddVar \
+                            solves 'f=x_i', so the var only be \
+                            the terminal. */
         return sfdd;
     }
     Element e1, e2;
     set<int> lt_vars = v->lt->get_variables();
-    if (lt_vars.find(var) != lt_vars.end()) {
+    set<int> rt_vars = v->rt->get_variables();
+    if (var == 0) {
+        // rule 1.(d)
+        e1.prime = get_SFDD2(v->lt, 0);
+        e1.sub = get_SFDD1(v->rt, 0);
+        sfdd.elements.push_back(e1);
+        return sfdd;
+    } else if (var == 1) {
+        // rule 1.(c)
+        e1.prime = get_SFDD1(v->lt, 1);
+        e1.sub = get_SFDD1(v->rt, 1);  // normalization
+        e2.prime = get_SFDD2(v->lt, 1);
+        e2.sub = get_SFDD1(v->rt, 0);
+    } else if (lt_vars.find(var/2) != lt_vars.end()) {
         // rule 1.(a)
-        // e1.prime.lit = var;
-        e1.prime = sfddVar(v->lt, var);  // normalization
-        e1.sub.constant = 1;
-        e2.prime = get_SFDD(v->lt, var);
-        e2.sub.constant = -1;
+        e1.prime = get_SFDD1(v->lt, var);  // normalization
+        e1.sub = get_SFDD1(v->rt, 1);
+        e2.prime = get_SFDD2(v->lt, var);
+        e2.sub = get_SFDD1(v->rt, 0);
     } else {
         // rule 1.(b)
-        e1.prime.constant = 1;
-        // e1.sub.lit = var;
-        e1.sub = sfddVar(v->rt, var);  // normalization
-        e2.prime = get_SFDD(v->lt, 0);
-        e2.sub.constant = -1;
+        e1.prime = get_SFDD1(v->lt, 1);
+        e1.sub = get_SFDD1(v->rt, var);  // normalization
+        e2.prime = get_SFDD2(v->lt, 1);
+        e2.sub = get_SFDD1(v->rt, 0);
     }
     sfdd.elements.push_back(e1);
     sfdd.elements.push_back(e2);
@@ -364,50 +433,45 @@ SFDD Manager::sfddVar(const Vtree* v, const int var) const {
  *        are formulas like $f \oplus g$, rht means 'g' in
  *        this kind format.
  */
-SFDD Manager::get_SFDD(const Vtree* v, const int rht) const {
+extern SFDD get_SFDD2(const Vtree* v, const int rht) {
     SFDD sfdd;
     sfdd.vtree_index = v->index;
     // check if constant
     if (v->var) {
-        sfdd.constant = (rht>0);
-        sfdd.lit = (rht==0)*v->var-(rht==-1)*v->var;
+        if (rht == 1) sfdd.value = v->var*2;
+        else if (rht == 0) sfdd.value = v->var*2+1;
+        else sfdd.value = 1;
         return sfdd;
     }
-    if (rht == -1) {
-        // rule 4
-        Element e;
-        e.prime = get_SFDD(v->lt);
-        e.sub = get_SFDD(v->rt);
-        sfdd.elements.push_back(e);
-    } else if (rht == 0) {
-        // rule 3
-        Element e1, e2;
-        e1.prime.constant = 1;
-        e1.sub = get_SFDD(v->rt, 0);
-        e2.prime = e1.sub;
-        e2.sub = get_SFDD(v->rt);
+    Element e1, e2;
+    set<int> lt_vars = v->lt->get_variables();
+    set<int> rt_vars = v->rt->get_variables();
+    if (rht == 0) {
+        // rule 2.(d)
+        e1.prime = get_SFDD2(v->lt);
+        e1.sub = get_SFDD2(v->rt);
         sfdd.elements.push_back(e1);
-        sfdd.elements.push_back(e2);
+        return sfdd;
+    } else if (rht == 1) {
+        // rule 2.(c)
+        e1.prime = get_SFDD1(v->lt, 1);
+        e1.sub = get_SFDD2(v->rt, 1);  // normalization
+        e2.prime = get_SFDD2(v->lt, 1);
+        e2.sub = get_SFDD1(v->rt, 0);
+    } else if (lt_vars.find(rht/2) != lt_vars.end()) {
+        // rule 2.(a)
+        e1.prime = get_SFDD1(v->lt, rht);  // normalization
+        e1.sub = get_SFDD2(v->rt, 1);
+        e2.prime = get_SFDD2(v->lt, rht);
+        e2.sub = get_SFDD2(v->rt);
     } else {
-        // rule 2
-        Element e1, e2;
-        set<int> lt_vars = v->lt->get_variables();
-        if (lt_vars.find(rht) != lt_vars.end()) {
-            // rule 2.(a)
-            // e1.prime.lit = rht;
-            e1.prime = sfddVar(v->lt, rht);  // normalization
-            e1.sub = get_SFDD(v->rt, 0);
-            e2.prime = get_SFDD(v->lt, rht);
-            e2.sub = get_SFDD(v->rt);
-        } else {
-            // rule 2.(b)
-            e1.prime.constant = 1;
-            e1.sub = get_SFDD(v->rt, rht);
-            e2.prime = get_SFDD(v->lt, 0);
-            e2.sub = get_SFDD(v->rt);
-        }
-        sfdd.elements.push_back(e1);
-        sfdd.elements.push_back(e2);
+        // rule 2.(b)
+        e1.prime = get_SFDD1(v->lt, 1);
+        e1.sub = get_SFDD2(v->rt, rht);  // normalization
+        e2.prime = get_SFDD2(v->lt, 1);
+        e2.sub = get_SFDD2(v->rt);
     }
+    sfdd.elements.push_back(e1);
+    sfdd.elements.push_back(e2);
     return sfdd;
 }
