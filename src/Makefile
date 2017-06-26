@@ -21,3 +21,9 @@ reader.o:  reader.cpp reader.h
 
 clean:
 	rm -f *.o sfdd
+
+clrdot:
+	rm -f ../dotG/*.dot
+
+clrdotg:
+	rm -f ../dotG/*.png

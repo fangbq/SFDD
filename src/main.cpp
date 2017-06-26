@@ -29,6 +29,7 @@ int main(int argc, char** argv) {
     // @test the approach of compiling (note8)
     Manager m(v);
     SFDD sfdd1 = m.sfddVar(v, 1);
+    SFDD sfdd11 = m.sfddVar(v, -1);
     // cout << "f=x1 :" << endl;
 
     fstream f;
@@ -36,11 +37,15 @@ int main(int argc, char** argv) {
     f.open("../dotG/f=x1.dot", fstream::out | fstream::trunc);
     sfdd1.print_dot(f, true);
     f.close();
-    
-    SFDD sfdd2 = m.sfddVar(v, 2);
-    f.open("../dotG/f=x2.dot", fstream::out | fstream::trunc);
-    sfdd2.print_dot(f, true);
+
+    f.open("../dotG/f=-x1.dot", fstream::out | fstream::trunc);
+    sfdd11.print_dot(f, true);
     f.close();
+    
+    // SFDD sfdd2 = m.sfddVar(v, 2);
+    // f.open("../dotG/f=x2.dot", fstream::out | fstream::trunc);
+    // sfdd2.print_dot(f, true);
+    // f.close();
     
     // SFDD sfdd3 = m.sfddOne();
     // cout << "f=1 :" << endl;
@@ -57,9 +62,13 @@ int main(int argc, char** argv) {
     // cout << endl;
 
     // @test Xor
-    SFDD xor_sfdd = sfdd1.Xor(sfdd2, m);
-    f.open("../dotG/f=x1⊕x2.dot", fstream::out | fstream::trunc);
-    xor_sfdd.print_dot(f, true);
+    // SFDD xor_sfdd = sfdd1.Xor(sfdd2, m);
+    // f.open("../dotG/f=x1⊕x2.dot", fstream::out | fstream::trunc);
+    // xor_sfdd.print_dot(f, true);
+    // f.close();
+    SFDD xor_sfdd2 = sfdd1.Xor(sfdd11, m);
+    f.open("../dotG/f=x1⊕-x1.dot", fstream::out | fstream::trunc);
+    xor_sfdd2.print_dot(f, true);
     f.close();
     
     // cout << "f=x1 \\oplus f=1 :" << endl;

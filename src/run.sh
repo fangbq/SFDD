@@ -29,7 +29,7 @@ do
     timeout 1800 "$program $oneline"
 done
 
-killall Preview
+# killall Preview
 for filename in ../dotG/*.dot; do
     dot -Tpng ../dotG/"$filename" -o ../dotG/"$filename".png
     open ../dotG/"$filename".png

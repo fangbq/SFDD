@@ -82,12 +82,16 @@ SFDD& SFDD::reduced(Manager & m) {
     if (terminal()) return *this;
     bool valid = false;
     for (vector<Element>::iterator e = elements.begin(); \
-    e != elements.end(); ++e) {
+    e != elements.end(); ) {
         // 1.1 removes those elements that primes are false
-        if (e->prime.reduced(m).zero())
-            elements.erase(e);
-        else if (!e->sub.reduced(m).zero())
+        if (e->prime.reduced(m).zero()) {
+            e = elements.erase(e);
+        } else if (!e->sub.reduced(m).zero()) {
             valid = true;
+            ++e;
+        } else {
+            ++e;
+        }
     }
     // 1.2 return false if all elements' subs are false
     if (!valid) elements.clear();
@@ -437,7 +441,8 @@ extern SFDD get_SFDD2(const Vtree* v, const int rht) {
     if (v->var) {
         if (rht == 1) sfdd.value = v->var*2;
         else if (rht == 0) sfdd.value = v->var*2+1;
-        else sfdd.value = 1;
+        else if (rht%2 == 0) sfdd.value = 1;
+        else sfdd.value = 0;
         return sfdd;
     }
     Element e1, e2;
