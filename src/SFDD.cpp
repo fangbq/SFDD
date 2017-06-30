@@ -302,12 +302,32 @@ void SFDD::print(int indent) const {
     int counter = 1;
     for (vector<Element>::const_iterator e = elements.begin();
     e != elements.end(); ++e) {
-        e->print(indent, counter++);
+        e->print(indent+1, counter++);
     }
     return;
 }
 
-void SFDD::print_dot(fstream & out_dot, bool root, int depth, int counter) const {
+static set<string> node_names;
+
+string check_dec_name(string node_name) {
+    // cout << "haha " << node_name << endl;
+    // cout << "----------" << endl;
+    // for (set<string>::iterator nn = node_names.begin(); nn != node_names.end(); ++nn)
+    //     cout << *nn << endl;
+    // cout << "===================" << endl;
+    if (node_names.find(node_name) != node_names.end()) {
+        string new_node_name = \
+            node_name.substr(0, node_name.find_last_of('_')+1) + \
+            to_string(stoi(node_name.substr(node_name.find_last_of('_')+1, node_name.length()-node_name.find_last_of('_')-1))+1);
+        new_node_name = check_dec_name(new_node_name);
+        return new_node_name;
+    } else {
+        node_names.insert(node_name);
+        return node_name;
+    }
+}
+
+void SFDD::print_dot(fstream & out_dot, bool root, int depth, string dec_name) const {
     if (root) out_dot << "digraph G {" << endl;
     if (elements.empty()) {
         if (value < 2) {
@@ -318,31 +338,28 @@ void SFDD::print_dot(fstream & out_dot, bool root, int depth, int counter) const
         }
         return;
     }
-    string dec_name = "Dec_" + to_string(depth++) + "_" + to_string(counter);
+    ++depth;
     out_dot << "\t" << dec_name << " [shape=circle, label=\"" << vtree_index << "\"]" << endl;
-    int ele_no = 1;
+    string e_name = "Ele_" + to_string(depth) + "_1";
     for (vector<Element>::const_iterator e = elements.begin();
-    e != elements.end(); ++e, ++ele_no) {
-        string e_name = dec_name + "Ele_" + to_string(depth) + "_" + to_string(ele_no);
+    e != elements.end(); ++e) {
+        e_name = check_dec_name(e_name);
         out_dot << "\t" << dec_name << " -> " << e_name << endl;
-        e->print_dot(out_dot, depth, ele_no, dec_name);
+        e->print_dot(out_dot, depth, e_name);
     }
     if (root) out_dot << "}" << endl;
 }
 
 void Element::print(int indent, int counter) const {
-    for (int i = 0; i < indent+1; ++i) cout << " ";
+    for (int i = 0; i < indent; ++i) cout << " ";
     cout << "E" << counter << "p:" << endl;
-    for (int i = 0; i < indent+1; ++i) cout << " ";
     prime.print(indent+1);
-    for (int i = 0; i < indent+1; ++i) cout << " ";
+    for (int i = 0; i < indent; ++i) cout << " ";
     cout << "E" << counter << "s:" << endl;
-    for (int i = 0; i < indent+1; ++i) cout << " ";
     sub.print(indent+1);
 }
 
-void Element::print_dot(fstream & out_dot, int depth, int ele_no, string dec_name) const {
-    string e_name = dec_name + "Ele_" + to_string(depth) + "_" + to_string(ele_no);
+void Element::print_dot(fstream & out_dot, int depth, string e_name) const {
     out_dot << "\t" << e_name << " [shape=record,label=\"<f0> ";
     bool prime_out_edge = false;
     bool sub_out_edge = false;
@@ -354,14 +371,16 @@ void Element::print_dot(fstream & out_dot, int depth, int ele_no, string dec_nam
     out_dot << "\"]" << endl;
     ++depth;
     if (prime_out_edge) {
-        string dec_name = "Dec_" + to_string(depth) + "_" + to_string(ele_no*2);
+        string dec_name = "Dec_" + to_string(depth) + "_1";
+        dec_name = check_dec_name(dec_name);
         out_dot << "\t" << e_name << ":f0 -> " << dec_name << endl;
-        prime.print_dot(out_dot, false, depth, ele_no*2);
+        prime.print_dot(out_dot, false, depth, dec_name);
     }
     if (sub_out_edge) {
-        string dec_name = "Dec_" + to_string(depth) + "_" + to_string(ele_no*2-1);
+        string dec_name = "Dec_" + to_string(depth) + "_1";
+        dec_name = check_dec_name(dec_name);
         out_dot << "\t" << e_name << ":f1 -> " << dec_name << endl;
-        sub.print_dot(out_dot, false, depth, ele_no*2-1);
+        sub.print_dot(out_dot, false, depth, dec_name);
     }
 }
 

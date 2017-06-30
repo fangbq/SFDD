@@ -49,7 +49,7 @@ public:
     SFDD And(const SFDD & s, Manager & m) const;
     SFDD Or(const SFDD & s, Manager & m) const;
     void print(int indent = 0) const;
-    void print_dot(fstream & out_dot, bool root = false, int depth = 0, int counter = 1) const;
+    void print_dot(fstream & out_dot, bool root = false, int depth = 0, string dec_name = "Dec_0_1") const;
 };
 
 
@@ -64,7 +64,7 @@ public:
         return prime.equals(e.prime) && sub.equals(e.sub);
     };
     void print(int indent, int counter) const;
-    void print_dot(fstream & out_dot, int depth, int ele_no, string dec_name) const;
+    void print_dot(fstream & out_dot, int depth, string e_name) const;
 };
 
 

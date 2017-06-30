@@ -10,12 +10,12 @@ int main(int argc, char** argv) {
 
     // @test create vars order
     vector<int> vars_order;
-    int var_no = 4;
+    int var_no = 20;
     for (int i = 1; i <= var_no; ++i) vars_order.push_back(i);
 
     // @test vtree-constuctor
     Vtree* v = new Vtree(1, var_no, vars_order);
-    v->print();
+    // v->print();
     cout << endl;
 
     // @test vtree-get_variables
@@ -36,6 +36,7 @@ int main(int argc, char** argv) {
     // @test print_dot(...)
     f.open("../dotG/f=x1.dot", fstream::out | fstream::trunc);
     sfdd1.print_dot(f, true);
+    // sfdd1.print();
     f.close();
 
     f.open("../dotG/f=-x1.dot", fstream::out | fstream::trunc);
