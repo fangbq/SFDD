@@ -242,38 +242,39 @@ SFDD SFDD::And(const SFDD & sfdd, Manager & m) const {
             new_sfdd.value = 0;
         }
     } else if (vtree_index == sfdd.vtree_index) {
-        new_sfdd.vtree_index = vtree_index;
         SFDD expanded_sfdd1 = expanded(m);
         SFDD expanded_sfdd2 = sfdd.expanded(m);
-        SFDD prime_products[expanded_sfdd1.size()][expanded_sfdd2.size()];
-        SFDD sub_products[expanded_sfdd1.size()][expanded_sfdd2.size()];
         for (vector<Element>::const_iterator e1 = expanded_sfdd1.elements.begin();
         e1 != expanded_sfdd1.elements.end(); ++e1) {
             for (vector<Element>::const_iterator e2 = expanded_sfdd2.elements.begin();
             e2 != expanded_sfdd2.elements.end(); ++e2) {
-                prime_products[e1-expanded_sfdd1.elements.begin()][e2-expanded_sfdd2.elements.begin()] \
-                    = e1->prime.And(e2->prime, m).reduced(m);
-                sub_products[e1-expanded_sfdd1.elements.begin()][e2-expanded_sfdd2.elements.begin()] \
-                    = e1->sub.And(e2->sub, m).reduced(m);
-            }
-        }
-        for (vector<Element>::const_iterator e1 = expanded_sfdd1.elements.begin();
-        e1 != expanded_sfdd1.elements.end(); ++e1) {
-            for (vector<Element>::const_iterator e2 = expanded_sfdd2.elements.begin();
-            e2 != expanded_sfdd2.elements.end(); ++e2) {
-                Element new_e;
-                new_e.prime = e1->prime.Intersection(e2->prime, m);
-                if (!new_e.prime.zero()) {
-                    for (int i = 0; i < expanded_sfdd1.size(); ++i) {
-                        for (int j = 0; j < expanded_sfdd2.size(); ++j) {
-                            if (!new_e.prime.Intersection(prime_products[i][j], m).zero()) {
-                                new_e.sub = new_e.sub.Xor(sub_products[i][j], m).reduced(m);
-                            }
-                        }
+                SFDD prime_product = e1->prime.And(e2->prime, m).reduced(m);
+                SFDD sub_product = e1->sub.And(e2->sub, m).reduced(m);
+                SFDD tmp_new_sfdd;
+                for (vector<Element>::const_iterator new_e = new_sfdd.elements.begin();
+                new_e != new_sfdd.elements.end(); ++new_e) {
+                    Element inter_e, origin_e;
+                    inter_e.prime = new_e->prime.Intersection(prime_product, m);
+                    if (!inter_e.prime.zero()) {
+                        inter_e.sub = new_e->sub.Xor(sub_product, m);
+                        tmp_new_sfdd.elements.push_back(inter_e);  // add 1
+                        origin_e.prime = new_e->prime.Xor(inter_e.prime, m);
+                        origin_e.sub = new_e->sub;
+                        tmp_new_sfdd.elements.push_back(origin_e);  // add 2
+                        prime_product = prime_product.Xor(inter_e.prime, m);
+                    } else {
+                        tmp_new_sfdd.elements.push_back(*new_e);
                     }
-                    new_sfdd.elements.push_back(new_e);
                 }
+                if (!prime_product.zero()) {
+                    Element last_e;  // last element that has removed all common parts with others
+                    last_e.prime = prime_product;
+                    last_e.sub = sub_product;
+                    tmp_new_sfdd.elements.push_back(last_e);  // add last element
+                }
+                new_sfdd = tmp_new_sfdd;
             }
+        new_sfdd.vtree_index = vtree_index;
         }
     } else {
         cout << "And Error!" << endl;
@@ -384,25 +385,19 @@ void Element::print_dot(fstream & out_dot, int depth, string e_name) const {
     }
 }
 
-SFDD Manager::sfddZero() const {
-    SFDD sfdd;
-    sfdd.vtree_index = 1;
-    sfdd.value = 0;
-    return sfdd;
+SFDD Manager::sfddZero() {
+    return get_SFDD1(vtree, 0);
 }
 
-SFDD Manager::sfddOne() const {
-    SFDD sfdd;
-    sfdd.vtree_index = 1;
-    sfdd.value = 1;
-    return sfdd;
+SFDD Manager::sfddOne() {
+    return get_SFDD1(vtree, 1).reduced(*this);
 }
 
-SFDD Manager::sfddVar(const Vtree* v, const int tmp_var) {
+SFDD Manager::sfddVar(const int tmp_var) {
     assert(tmp_var != 0);
-    if (tmp_var < 0) return get_SFDD1(v, (0-tmp_var)*2+1).reduced(*this);
-    else if (tmp_var > 0) return get_SFDD1(v, tmp_var*2).reduced(*this);
-    else return get_SFDD1(v, tmp_var).reduced(*this);
+    if (tmp_var < 0) return get_SFDD1(vtree, (0-tmp_var)*2+1).reduced(*this);
+    else if (tmp_var > 0) return get_SFDD1(vtree, tmp_var*2).reduced(*this);
+    else return get_SFDD1(vtree, tmp_var).reduced(*this);
 }
 
 extern SFDD get_SFDD1(const Vtree* v, const int var) {

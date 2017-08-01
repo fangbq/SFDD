@@ -73,9 +73,9 @@ public:
     Vtree* vtree;
 public:
     Manager(Vtree* v) { vtree = v; };
-    SFDD sfddZero() const;
-    SFDD sfddOne() const;
-    SFDD sfddVar(const Vtree* v, const int var);
+    SFDD sfddZero();
+    SFDD sfddOne();
+    SFDD sfddVar(const int var);
 };
 
 SFDD get_SFDD1(const Vtree* v, const int var);

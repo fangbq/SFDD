@@ -10,7 +10,7 @@ int main(int argc, char** argv) {
 
     // @test create vars order
     vector<int> vars_order;
-    int var_no = 20;
+    int var_no = 4;
     for (int i = 1; i <= var_no; ++i) vars_order.push_back(i);
 
     // @test vtree-constuctor
@@ -28,8 +28,8 @@ int main(int argc, char** argv) {
 
     // @test the approach of compiling (note8)
     Manager m(v);
-    SFDD sfdd1 = m.sfddVar(v, 1);
-    SFDD sfdd11 = m.sfddVar(v, -1);
+    SFDD sfdd1 = m.sfddVar(1);
+    SFDD sfdd11 = m.sfddVar(-1);
     // cout << "f=x1 :" << endl;
 
     fstream f;
@@ -39,22 +39,27 @@ int main(int argc, char** argv) {
     // sfdd1.print();
     f.close();
 
-    f.open("../dotG/f=-x1.dot", fstream::out | fstream::trunc);
-    sfdd11.print_dot(f, true);
-    f.close();
-    
-    // SFDD sfdd2 = m.sfddVar(v, 2);
-    // f.open("../dotG/f=x2.dot", fstream::out | fstream::trunc);
-    // sfdd2.print_dot(f, true);
+    // f.open("../dotG/f=-x1.dot", fstream::out | fstream::trunc);
+    // sfdd11.print_dot(f, true);
     // f.close();
     
-    // SFDD sfdd3 = m.sfddOne();
-    // cout << "f=1 :" << endl;
-    // cout << endl;
-    // SFDD sfdd4 = m.sfddZero();
-    // cout << "f=0 :" << endl;
-    // sfdd4.print();
-    // cout << endl;
+    SFDD sfdd2 = m.sfddVar(2);
+    f.open("../dotG/f=x2.dot", fstream::out | fstream::trunc);
+    sfdd2.print_dot(f, true);
+    f.close();
+    
+    /* @test f=1 */
+    SFDD sfdd3 = m.sfddOne();
+    f.open("../dotG/f=1.dot", fstream::out | fstream::trunc);
+    sfdd3.print_dot(f, true);
+    f.close();
+
+    /* @test f=0 */
+    SFDD sfdd4 = m.sfddZero();
+    f.open("../dotG/f=0.dot", fstream::out | fstream::trunc);
+    sfdd4.print();
+    sfdd4.print_dot(f, true);
+    f.close();
 
     // @test Intersection
     // cout << "f=x1 \\cap f=x2 :" << endl;
@@ -67,20 +72,20 @@ int main(int argc, char** argv) {
     // f.open("../dotG/f=x1⊕x2.dot", fstream::out | fstream::trunc);
     // xor_sfdd.print_dot(f, true);
     // f.close();
-    SFDD xor_sfdd2 = sfdd1.Xor(sfdd11, m);
-    f.open("../dotG/f=x1⊕-x1.dot", fstream::out | fstream::trunc);
-    xor_sfdd2.print_dot(f, true);
-    f.close();
+    // SFDD xor_sfdd2 = sfdd1.Xor(sfdd11, m);
+    // f.open("../dotG/f=x1⊕-x1.dot", fstream::out | fstream::trunc);
+    // xor_sfdd2.print_dot(f, true);
+    // f.close();
     
     // cout << "f=x1 \\oplus f=1 :" << endl;
     // SFDD xor_sfdd2 = sfdd1.Xor(sfdd3, m);
     // xor_sfdd2.print();
     // cout << endl;
     // cout << "f=x1·x2 :" << endl;
-    // SFDD and_sfdd = sfdd1.And(sfdd2, m);
-    // f.open("../dotG/f=x1·x2.dot", fstream::out | fstream::trunc);
-    // and_sfdd.print_dot(f, true);
-    // f.close();
+    SFDD and_sfdd = sfdd1.And(sfdd2, m);
+    f.open("../dotG/f=x1·x2.dot", fstream::out | fstream::trunc);
+    and_sfdd.print_dot(f, true);
+    f.close();
 
     return 0;
 }
