@@ -5,21 +5,17 @@ digraph G {
 	Ele_1_5:f0 -> Dec_2_7
 	Dec_2_7 [shape=circle, label="1"]
 	Dec_2_7 -> Ele_3_13
-	Ele_3_13 [shape=record,label="<f0> 1|<f1> 1"]
-	Dec_2_7 -> Ele_3_14
-	Ele_3_14 [shape=record,label="<f0> x1|<f1> 0"]
+	Ele_3_13 [shape=record,label="<f0> -x1|<f1> 1"]
 	Ele_1_5:f1 -> Dec_2_8
 	Dec_2_8 [shape=circle, label="3"]
+	Dec_2_8 -> Ele_3_14
+	Ele_3_14 [shape=record,label="<f0> 1|<f1> 1"]
 	Dec_2_8 -> Ele_3_15
-	Ele_3_15 [shape=record,label="<f0> 1|<f1> 1"]
-	Dec_2_8 -> Ele_3_16
-	Ele_3_16 [shape=record,label="<f0> x3|<f1> 0"]
+	Ele_3_15 [shape=record,label="<f0> x3|<f1> 0"]
 	Dec_0_1 -> Ele_1_6
 	Ele_1_6 [shape=record,label="<f0> ●|<f1> 0"]
 	Ele_1_6:f0 -> Dec_2_9
 	Dec_2_9 [shape=circle, label="1"]
-	Dec_2_9 -> Ele_3_17
-	Ele_3_17 [shape=record,label="<f0> 1|<f1> x2"]
-	Dec_2_9 -> Ele_3_18
-	Ele_3_18 [shape=record,label="<f0> x1|<f1> 0"]
+	Dec_2_9 -> Ele_3_16
+	Ele_3_16 [shape=record,label="<f0> -x1|<f1> x2"]
 }

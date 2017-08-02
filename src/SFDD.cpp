@@ -329,7 +329,14 @@ string check_dec_name(string node_name) {
 }
 
 void SFDD::print_dot(fstream & out_dot, bool root, int depth, string dec_name) const {
-    if (root) out_dot << "digraph G {" << endl;
+    if (root) {
+        out_dot << "digraph G {" << endl;
+        if (zero() | one()) {
+            out_dot << "\t" << value << " [shape=record, label=\"" \
+            << value << "\"]" << endl << "}";
+            return;
+        }
+    }
     if (elements.empty()) {
         if (value < 2) {
             out_dot << value;
@@ -386,7 +393,7 @@ void Element::print_dot(fstream & out_dot, int depth, string e_name) const {
 }
 
 SFDD Manager::sfddZero() {
-    return get_SFDD1(vtree, 0);
+    return get_SFDD1(vtree, 0).reduced(*this);
 }
 
 SFDD Manager::sfddOne() {
