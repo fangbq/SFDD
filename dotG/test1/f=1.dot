@@ -21,5 +21,5 @@ digraph G {
 	Dec_2_3 -> Ele_3_5
 	Ele_3_5 [shape=record,label="<f0> 1|<f1> x2"]
 	Dec_2_3 -> Ele_3_6
-	Ele_3_6 [shape=record,label="<f0> x1|<f1> 0"]
+	Ele_3_6 [shape=record,label="<f0> x1|<f1> -x2"]
 }

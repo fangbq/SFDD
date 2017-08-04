@@ -1,17 +1,25 @@
 digraph G {
 	Dec_0_1 [shape=circle, label="2"]
-	Dec_0_1 -> Ele_1_11
-	Ele_1_11 [shape=record,label="<f0> ●|<f1> ●"]
-	Ele_1_11:f0 -> Dec_2_16
-	Dec_2_16 [shape=circle, label="1"]
-	Dec_2_16 -> Ele_3_29
-	Ele_3_29 [shape=record,label="<f0> 1|<f1> -x2"]
-	Dec_2_16 -> Ele_3_30
-	Ele_3_30 [shape=record,label="<f0> x1|<f1> 0"]
-	Ele_1_11:f1 -> Dec_2_17
-	Dec_2_17 [shape=circle, label="3"]
-	Dec_2_17 -> Ele_3_31
-	Ele_3_31 [shape=record,label="<f0> 1|<f1> 1"]
-	Dec_2_17 -> Ele_3_32
-	Ele_3_32 [shape=record,label="<f0> x3|<f1> 0"]
+	Dec_0_1 -> Ele_1_13
+	Ele_1_13 [shape=record,label="<f0> ●|<f1> ●"]
+	Ele_1_13:f0 -> Dec_2_19
+	Dec_2_19 [shape=circle, label="1"]
+	Dec_2_19 -> Ele_3_33
+	Ele_3_33 [shape=record,label="<f0> 1|<f1> -x2"]
+	Dec_2_19 -> Ele_3_34
+	Ele_3_34 [shape=record,label="<f0> x1|<f1> 0"]
+	Ele_1_13:f1 -> Dec_2_20
+	Dec_2_20 [shape=circle, label="3"]
+	Dec_2_20 -> Ele_3_35
+	Ele_3_35 [shape=record,label="<f0> 1|<f1> 1"]
+	Dec_2_20 -> Ele_3_36
+	Ele_3_36 [shape=record,label="<f0> x3|<f1> 0"]
+	Dec_0_1 -> Ele_1_14
+	Ele_1_14 [shape=record,label="<f0> ●|<f1> 0"]
+	Ele_1_14:f0 -> Dec_2_21
+	Dec_2_21 [shape=circle, label="1"]
+	Dec_2_21 -> Ele_3_37
+	Ele_3_37 [shape=record,label="<f0> 1|<f1> 0"]
+	Dec_2_21 -> Ele_3_38
+	Ele_3_38 [shape=record,label="<f0> x1|<f1> -x2"]
 }

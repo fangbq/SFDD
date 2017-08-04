@@ -63,7 +63,7 @@ bool SFDD::equals(const SFDD & sfdd) const {
         for (vector<Element>::const_iterator e1 = elements.begin(); \
         e1 != elements.end(); ++e1) {
             bool found_equivalent = false;
-            for (int i = 0; i < sfdd.elements.size(); ++i) {
+            for (int i = 0; i < sfdd.size(); ++i) {
                 if (equaled_elements.find(i) == equaled_elements.end()
                 && e1->equals(sfdd.elements[i])) {
                     equaled_elements.insert(i);
@@ -480,7 +480,7 @@ extern SFDD get_SFDD2(const Vtree* v, const int rht) {
         e1.prime = get_SFDD1(v->lt, 1);
         e1.sub = get_SFDD2(v->rt, 1);  // normalization
         e2.prime = get_SFDD2(v->lt, 1);
-        e2.sub = get_SFDD1(v->rt, 0);
+        e2.sub = get_SFDD2(v->rt);
     } else if (lt_vars.find(rht/2) != lt_vars.end()) {
         // rule 2.(a)
         e1.prime = get_SFDD1(v->lt, rht);  // normalization

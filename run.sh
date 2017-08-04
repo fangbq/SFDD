@@ -25,7 +25,7 @@ timeout() {
 }
 
 test_cases_file="test/test_cases"
-program="./sfdd"
+# program="./test1"
 
 $program
 # cat $test_cases_file | while read oneline
