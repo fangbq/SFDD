@@ -2,11 +2,9 @@
  * File: test1.cpp
  * Author: Biqing Fang
  * this test file used to test following basic cases:
- * 1. f=0
- * 2. f=1
- * 3. f=x1
- * 4. f=-x1
- * 5. f=x2
+ * 1. f=¬0
+ * 2. f=¬1
+ * 3. f=¬x1
  */
 
 #include <iostream>
@@ -28,38 +26,23 @@ int main(int argc, char** argv) {
 
     fstream f;
 
-    /* @test f=0 */
+    /* @test f=¬0 */
     SFDD sfdd1 = m.sfddZero();
-    f.open("dotG/test1/f=0.dot", fstream::out | fstream::trunc);
-    sfdd1.print_dot(f, true);
+    f.open("dotG/test1/f=¬0.dot", fstream::out | fstream::trunc);
+    sfdd1.Not(m).print_dot(f, true);
     f.close();
     // sfdd1.print();
 
-    /* @test f=1 */
+    /* @test f=¬1 */
     SFDD sfdd2 = m.sfddOne();
-    f.open("dotG/test1/f=1.dot", fstream::out | fstream::trunc);
-    sfdd2.print_dot(f, true);
+    f.open("dotG/test1/f=¬1.dot", fstream::out | fstream::trunc);
+    sfdd2.Not(m).print_dot(f, true);
     f.close();
     
-    /* @test f=x1 */
+    /* @test f=¬x1 */
     SFDD sfdd3 = m.sfddVar(1);
-    f.open("dotG/test1/f=x1.dot", fstream::out | fstream::trunc);
-    sfdd3.print_dot(f, true);
-    f.close();
-
-    /* @test f=-x1 */
-    SFDD sfdd4 = m.sfddVar(-1);
-    f.open("dotG/test1/f=-x1.dot", fstream::out | fstream::trunc);
-    // sfdd4.print();
-    sfdd4.print_dot(f, true);
-    f.close();
-
-    /* @test f=x2 */
-    SFDD sfdd5 = m.sfddVar(2);
-    f.open("dotG/test1/f=x2.dot", fstream::out | fstream::trunc);
-    // sfdd4.print();
-    sfdd5.print_dot(f, true);
-
+    f.open("dotG/test1/f=¬x1.dot", fstream::out | fstream::trunc);
+    sfdd3.Not(m).print_dot(f, true);
     f.close();
 
     return 0;

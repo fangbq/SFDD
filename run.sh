@@ -25,9 +25,17 @@ timeout() {
 }
 
 test_cases_file="test/test_cases"
-# program="./test1"
+test0="./test0"
+test1="./test1"
+test2="./test3"
+test3="./test3"
+test4="./test4"
 
-$program
+$test0
+$test1
+$test2
+$test3
+$test4
 # cat $test_cases_file | while read oneline
 # do
 #     timeout 1800 "$program $oneline"
@@ -38,7 +46,7 @@ $program
 for foldername in dotG/test*; do
     for filename in $foldername/*.dot; do
         dot -Tpng "$filename" -o "$filename".png
-        open "$filename".png
+        # open "$filename".png
     done
 done
 

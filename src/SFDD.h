@@ -5,6 +5,7 @@
 
 using namespace std;
 
+class SFDD;
 class Element;
 class Manager;
 
@@ -19,6 +20,17 @@ public:
     Vtree(int start_var_index, int end_var_index, vector<int> full_order, VTREE_TYPE t = TRIVIAL_TREE);
     set<int>  get_variables() const;
     void print(int indent = 0) const;
+};
+
+
+class Manager {
+public:
+    Vtree* vtree;
+public:
+    Manager(Vtree* v) { vtree = v; };
+    SFDD sfddZero();
+    SFDD sfddOne();
+    SFDD sfddVar(const int var);
 };
 
 
@@ -47,7 +59,8 @@ public:
     SFDD Intersection(const SFDD & s, Manager & m) const;
     SFDD Xor(const SFDD & s, Manager & m) const;
     SFDD And(const SFDD & s, Manager & m) const;
-    SFDD Or(const SFDD & s, Manager & m) const;
+    inline SFDD Or(const SFDD & s, Manager & m) const { return Xor(s, m).Xor(And(s, m), m); }
+    inline SFDD Not(Manager & m) const { return Xor(m.sfddOne(), m); }
     void print(int indent = 0) const;
     void print_dot(fstream & out_dot, bool root = false, int depth = 0, string dec_name = "Dec_0_1") const;
 };
@@ -68,15 +81,6 @@ public:
 };
 
 
-class Manager {
-public:
-    Vtree* vtree;
-public:
-    Manager(Vtree* v) { vtree = v; };
-    SFDD sfddZero();
-    SFDD sfddOne();
-    SFDD sfddVar(const int var);
-};
 
 SFDD get_SFDD1(const Vtree* v, const int var);
 SFDD get_SFDD2(const Vtree* v, const int rht = 0);

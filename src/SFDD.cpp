@@ -282,11 +282,6 @@ SFDD SFDD::And(const SFDD & sfdd, Manager & m) const {
     return new_sfdd.reduced(m);
 }
 
-SFDD SFDD::Or(const SFDD & sfdd, Manager & m) const {
-    SFDD new_sfdd;
-    return new_sfdd;
-}
-
 void SFDD::print(int indent) const {
     if (elements.empty()) {
         for (int i = 0; i < indent; ++i) cout << " ";

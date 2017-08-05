@@ -1,0 +1,25 @@
+digraph G {
+	Dec_0_1 [shape=circle, label="2"]
+	Dec_0_1 -> Ele_1_17
+	Ele_1_17 [shape=record,label="<f0> ●|<f1> ●"]
+	Ele_1_17:f0 -> Dec_2_25
+	Dec_2_25 [shape=circle, label="1"]
+	Dec_2_25 -> Ele_3_47
+	Ele_3_47 [shape=record,label="<f0> x1|<f1> 1"]
+	Dec_2_25 -> Ele_3_48
+	Ele_3_48 [shape=record,label="<f0> 1|<f1> 0"]
+	Ele_1_17:f1 -> Dec_2_26
+	Dec_2_26 [shape=circle, label="3"]
+	Dec_2_26 -> Ele_3_49
+	Ele_3_49 [shape=record,label="<f0> 1|<f1> 1"]
+	Dec_2_26 -> Ele_3_50
+	Ele_3_50 [shape=record,label="<f0> x3|<f1> 0"]
+	Dec_0_1 -> Ele_1_18
+	Ele_1_18 [shape=record,label="<f0> ●|<f1> 0"]
+	Ele_1_18:f0 -> Dec_2_27
+	Dec_2_27 [shape=circle, label="1"]
+	Dec_2_27 -> Ele_3_51
+	Ele_3_51 [shape=record,label="<f0> x1|<f1> x2"]
+	Dec_2_27 -> Ele_3_52
+	Ele_3_52 [shape=record,label="<f0> 1|<f1> -x2"]
+}
