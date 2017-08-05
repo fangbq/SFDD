@@ -30,16 +30,12 @@ test1="./test1"
 test2="./test3"
 test3="./test3"
 test4="./test4"
+prog="./sfdd"
 
-$test0
-$test1
-$test2
-$test3
-$test4
-# cat $test_cases_file | while read oneline
-# do
-#     timeout 1800 "$program $oneline"
-# done
+cat $test_cases_file | while read oneline
+do
+    timeout 1800 "$prog $oneline"
+done
 
 # The following loops open all pictures in dot
 # killall Preview

@@ -1,7 +1,7 @@
 /* 
  * File: test0.cpp
  * Author: Biqing Fang
- * this test file used to test following basic cases:
+ * this test file is used to test following basic cases:
  * 1. f=0
  * 2. f=1
  * 3. f=x1

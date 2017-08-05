@@ -46,7 +46,7 @@ public:
     int vtree_index = 0;  // respect to vtree node
 public:
     SFDD() {}
-    inline int size() const { return elements.size(); }
+    int size() const;
     inline bool terminal() const { return value>-1; }
     inline bool positive() const { return value>1 && value%2==0; }
     inline bool negative() const { return value>1 && value%2==1; }
@@ -59,7 +59,8 @@ public:
     SFDD Intersection(const SFDD & s, Manager & m) const;
     SFDD Xor(const SFDD & s, Manager & m) const;
     SFDD And(const SFDD & s, Manager & m) const;
-    inline SFDD Or(const SFDD & s, Manager & m) const { return Xor(s, m).Xor(And(s, m), m); }
+    // SFDD& operator^(const SFDD & s) { return Xor(s); }
+    SFDD Or(const SFDD & s, Manager & m) const;
     inline SFDD Not(Manager & m) const { return Xor(m.sfddOne(), m); }
     void print(int indent = 0) const;
     void print_dot(fstream & out_dot, bool root = false, int depth = 0, string dec_name = "Dec_0_1") const;

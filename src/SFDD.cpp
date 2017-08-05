@@ -55,6 +55,10 @@ void Vtree::print(int indent) const {
     return;
 }
 
+int SFDD::size() const {
+    return 1;
+}
+
 bool SFDD::equals(const SFDD & sfdd) const {
     if (terminal() && sfdd.terminal()) {
         return value == sfdd.value;
@@ -185,6 +189,7 @@ SFDD SFDD::Intersection(const SFDD & sfdd, Manager & m) const {
 SFDD SFDD::Xor(const SFDD & sfdd, Manager & m) const {
     if (empty()) return sfdd;
     if (sfdd.empty()) return *this;
+
     SFDD new_sfdd;
     if (zero()) return sfdd;
     if (sfdd.zero()) return *this;
@@ -224,6 +229,9 @@ SFDD SFDD::Xor(const SFDD & sfdd, Manager & m) const {
 }
 
 SFDD SFDD::And(const SFDD & sfdd, Manager & m) const {
+    if (empty()) return sfdd;
+    if (sfdd.empty()) return *this;
+
     if (zero()) return *this;
     if (sfdd.zero()) return sfdd;
     if (one()) return sfdd;
@@ -280,6 +288,18 @@ SFDD SFDD::And(const SFDD & sfdd, Manager & m) const {
         cout << "And Error!" << endl;
     }
     return new_sfdd.reduced(m);
+}
+
+SFDD SFDD::Or(const SFDD & sfdd, Manager & m) const {
+    if (empty()) return sfdd;
+    if (sfdd.empty()) return *this;
+
+    if (zero()) return sfdd;
+    if (sfdd.zero()) return *this;
+    if (one()) return *this;
+    if (sfdd.one()) return sfdd;
+
+    return Xor(sfdd, m).Xor(And(sfdd, m), m);
 }
 
 void SFDD::print(int indent) const {

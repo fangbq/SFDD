@@ -1,7 +1,7 @@
 /* 
  * File: test2.cpp
  * Author: Biqing Fang
- * this test file used to test ⊕ operator:
+ * this test file is used to test ⊕ operator:
  * 1. f=0⊕0
  * 2. f=0⊕1     6. f=1⊕1
  * 3. f=0⊕x1    7. f=1⊕x1   10. f=x1⊕x1
