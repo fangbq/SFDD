@@ -32,6 +32,7 @@ test3="./test3"
 test4="./test4"
 prog="./sfdd"
 
+$prog
 cat $test_cases_file | while read oneline
 do
     timeout 1800 "$prog $oneline"

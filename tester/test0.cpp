@@ -19,7 +19,7 @@ using namespace std;
 int main(int argc, char** argv) {
 
     vector<int> vars_order;
-    int var_no = 4;
+    int var_no = 18;
     for (int i = 1; i <= var_no; ++i) vars_order.push_back(i);
 
     Vtree* v = new Vtree(1, var_no, vars_order);
@@ -50,16 +50,22 @@ int main(int argc, char** argv) {
     /* @test f=-x1 */
     SFDD sfdd4 = m.sfddVar(-1);
     f.open("dotG/test0/f=-x1.dot", fstream::out | fstream::trunc);
-    // sfdd4.print();
     sfdd4.print_dot(f, true);
     f.close();
 
     /* @test f=x2 */
     SFDD sfdd5 = m.sfddVar(2);
     f.open("dotG/test0/f=x2.dot", fstream::out | fstream::trunc);
-    // sfdd4.print();
     sfdd5.print_dot(f, true);
+    f.close();
 
+    /* @test f=x17 */
+cout << "haha 1" << endl;
+    SFDD sfdd6 = m.sfddVar(17);
+    f.open("dotG/test0/f=x17.dot", fstream::out | fstream::trunc);
+    sfdd6.print_dot(f, true);
+
+cout << "haha 2" << endl;
     f.close();
 
     return 0;

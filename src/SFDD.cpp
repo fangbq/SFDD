@@ -56,7 +56,16 @@ void Vtree::print(int indent) const {
 }
 
 int SFDD::size() const {
-    return 1;
+    if (empty()) return 0;
+    if (terminal()) return 1;
+
+    int size = 0;
+    for (vector<Element>::const_iterator e = elements.begin(); \
+    e != elements.end(); ++e) {
+        size += e->prime.size();
+        size += e->sub.size();
+    }
+    return size;
 }
 
 bool SFDD::equals(const SFDD & sfdd) const {
@@ -83,6 +92,8 @@ bool SFDD::equals(const SFDD & sfdd) const {
 }
 
 SFDD& SFDD::reduced(Manager & m) {
+    return *this;
+
     if (terminal()) return *this;
     bool valid = false;
     for (vector<Element>::iterator e = elements.begin(); \
@@ -137,6 +148,7 @@ SFDD SFDD::expanded(Manager & m) const {
 SFDD SFDD::Intersection(const SFDD & sfdd, Manager & m) const {
     // cout << "+++++++++++++++++++++++++++++++++" << endl;
     // print(); sfdd.print();
+    // cout << "Intersection..." << endl;
     SFDD new_sfdd;
     new_sfdd.vtree_index = vtree_index;
     if (zero()) return *this;
@@ -187,6 +199,7 @@ SFDD SFDD::Intersection(const SFDD & sfdd, Manager & m) const {
 }
 
 SFDD SFDD::Xor(const SFDD & sfdd, Manager & m) const {
+    // cout << "Xor..." << endl;
     if (empty()) return sfdd;
     if (sfdd.empty()) return *this;
 
@@ -229,6 +242,7 @@ SFDD SFDD::Xor(const SFDD & sfdd, Manager & m) const {
 }
 
 SFDD SFDD::And(const SFDD & sfdd, Manager & m) const {
+    // cout << "And..." << endl;
     if (empty()) return sfdd;
     if (sfdd.empty()) return *this;
 
@@ -291,6 +305,7 @@ SFDD SFDD::And(const SFDD & sfdd, Manager & m) const {
 }
 
 SFDD SFDD::Or(const SFDD & sfdd, Manager & m) const {
+    // cout << "Or..." << endl;
     if (empty()) return sfdd;
     if (sfdd.empty()) return *this;
 

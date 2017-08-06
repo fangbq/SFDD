@@ -22,12 +22,14 @@ int main(int argc, char** argv) {
 
     // read *.cnf
     ifstream infile(argv[1], ios::in);
+    cout << static_cast<string>(argv[1]) << endl;
     if(!infile)
     {
-        cerr<<"open infile error!"<<endl; exit(1);
+        cerr << "open infile error!" << endl;
+        exit(1);
     }
     string line;
-    int var_no, col_no;     //Number of variables  and number of clauses
+    int var_no = 0, col_no = 0;  // Number of variables and number of clauses
     while (!infile.eof()) {
         getline(infile,line);
 
@@ -36,10 +38,10 @@ int main(int argc, char** argv) {
         else {
             var_no = stoi(line.substr(6, line.find_last_of(' ')-6));
             col_no = stoi(line.substr(line.find_last_of(' ')+1, line.length()-line.find_last_of(' ')));
-            cout << var_no << "\t" << col_no << "\t";
             break;
         }
     }
+    cout << "statistics: " << var_no << "\t" << col_no << "\t";
 
     vector<int> vars_order;  // order
     for (int i = 1; i <= var_no; ++i) vars_order.push_back(i);
@@ -56,15 +58,17 @@ int main(int argc, char** argv) {
             infile >> var;
             if (var == 0) break;
             clause = clause.Or(m.sfddVar(var), m);
+            cout << " one var done" << endl;
         }
         fml = fml.And(clause, m);
+        cout << " one clause done" << endl;
     }
     clock_t finish = clock();
     double ptime = (double)(finish - start) / CLOCKS_PER_SEC;  //BDD time
     cout << ptime << "\t" << fml.size() << endl;
 
     // fstream f;
-    // f.open("dotG/iscas89/f=ssss.dot", fstream::out | fstream::trunc);
+    // f.open("dotG/iscas89/f=s1.dot", fstream::out | fstream::trunc);
     // fml.print_dot(f, true);
     // f.close();
 

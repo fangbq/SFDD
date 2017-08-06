@@ -45,12 +45,12 @@ public:
     vector<Element> elements;
     int vtree_index = 0;  // respect to vtree node
 public:
-    SFDD() {}
+    SFDD() { elements.clear(); }
     int size() const;
     inline bool terminal() const { return value>-1; }
     inline bool positive() const { return value>1 && value%2==0; }
     inline bool negative() const { return value>1 && value%2==1; }
-    inline bool empty() const { return !terminal()&&(size()==0);}
+    inline bool empty() const { return !terminal() && (elements.size()==0);}
     inline bool zero() const { return value==0; }
     inline bool one() const { return value==1; }
     bool equals(const SFDD & sfdd) const;

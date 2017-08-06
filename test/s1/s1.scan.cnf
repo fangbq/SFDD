@@ -1,0 +1,12 @@
+c  s27
+c  7 inputs
+c  4 outputs
+c  2 inverters
+c  8 gates ( 1 AND + 1 NAND + 2 ORs + 4 NORs + 1 BUFF )
+cc labels (1 G2) (2 G7) (3 G1) (4 G6) (5 G0) (6 G3) (7 G5) (8 G13) (9 G11_EXTRA) (10 G10) (11 G12) (12 G15) (13 G14) (14 G8) (15 G16) (16 G9) (17 G11) (18 G17)
+cc inputs 1 2 3 4 5 6 7 
+cc outputs 18 10 9 8 
+p cnf 18 1
+18 17 0
+%
+0
