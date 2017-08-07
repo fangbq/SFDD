@@ -32,19 +32,23 @@ test3="./test3"
 test4="./test4"
 prog="./sfdd"
 
-$prog
 cat $test_cases_file | while read oneline
 do
-    timeout 1800 "$prog $oneline"
+    $prog test/$oneline
+    $prog test/$oneline
+    $prog test/$oneline
+    $prog test/$oneline
+    $prog test/$oneline
+    # timeout 1800 "$prog test/$oneline"
 done
 
 # The following loops open all pictures in dot
 # killall Preview
-for foldername in dotG/test*; do
-    for filename in $foldername/*.dot; do
-        dot -Tpng "$filename" -o "$filename".png
-        # open "$filename".png
-    done
-done
+# for foldername in dotG/test*; do
+#     for filename in $foldername/*.dot; do
+#         dot -Tpng "$filename" -o "$filename".png
+#         # open "$filename".png
+#     done
+# done
 
 exit 0

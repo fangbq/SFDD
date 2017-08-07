@@ -20,6 +20,7 @@ public:
     Vtree(int start_var_index, int end_var_index, vector<int> full_order, VTREE_TYPE t = TRIVIAL_TREE);
     set<int>  get_variables() const;
     void print(int indent = 0) const;
+    void print_dot(fstream & out_dot, bool root = false, int depth = 0, string dec_name = "Dec_0_1") const;
 };
 
 

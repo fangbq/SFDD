@@ -22,7 +22,8 @@ int main(int argc, char** argv) {
 
     // read *.cnf
     ifstream infile(argv[1], ios::in);
-    cout << static_cast<string>(argv[1]) << endl;
+    string file_name = static_cast<string>(argv[1]);
+    cout << file_name.substr(file_name.find_last_of("/")+1, file_name.length()-file_name.find_last_of("/")) << "\t";
     if(!infile)
     {
         cerr << "open infile error!" << endl;
@@ -41,7 +42,7 @@ int main(int argc, char** argv) {
             break;
         }
     }
-    cout << "statistics: " << var_no << "\t" << col_no << "\t";
+    cout << var_no << "  " << col_no << "    ";
 
     vector<int> vars_order;  // order
     for (int i = 1; i <= var_no; ++i) vars_order.push_back(i);
@@ -58,14 +59,17 @@ int main(int argc, char** argv) {
             infile >> var;
             if (var == 0) break;
             clause = clause.Or(m.sfddVar(var), m);
-            cout << " one var done" << endl;
+            // cout << " one var done" << endl;
         }
         fml = fml.And(clause, m);
-        cout << " one clause done" << endl;
+        // cout << " one clause done" << endl;
     }
     clock_t finish = clock();
     double ptime = (double)(finish - start) / CLOCKS_PER_SEC;  //BDD time
-    cout << ptime << "\t" << fml.size() << endl;
+    cout.setf(ios::showpoint);
+    cout.precision(4);
+    cout.setf(ios::fixed);
+    cout << ptime << "  " << fml.size() << endl;
 
     // fstream f;
     // f.open("dotG/iscas89/f=s1.dot", fstream::out | fstream::trunc);

@@ -60,12 +60,20 @@ int main(int argc, char** argv) {
     f.close();
 
     /* @test f=x17 */
-cout << "haha 1" << endl;
     SFDD sfdd6 = m.sfddVar(17);
     f.open("dotG/test0/f=x17.dot", fstream::out | fstream::trunc);
     sfdd6.print_dot(f, true);
+    f.close();
 
-cout << "haha 2" << endl;
+    /* @test f=x17 */
+    SFDD sfdd7 = m.sfddVar(18);
+    f.open("dotG/test0/f=x18.dot", fstream::out | fstream::trunc);
+    sfdd7.print_dot(f, true);
+    f.close();
+
+    /* @test f=x17*x18 */
+    f.open("dotG/test0/f=x17*x18.dot", fstream::out | fstream::trunc);
+    sfdd6.And(sfdd7, m).print_dot(f, true);
     f.close();
 
     return 0;

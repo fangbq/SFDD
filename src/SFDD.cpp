@@ -55,6 +55,24 @@ void Vtree::print(int indent) const {
     return;
 }
 
+void Vtree::print_dot(fstream & out_dot, bool root, int depth, string dec_name) const {
+    // if (root) {
+    //     out_dot << "digraph G {" << endl;
+    //     if (zero() | one()) {
+    //         out_dot << "\t" << value << " [shape=record, label=\"" \
+    //         << value << "\"]" << endl << "}";
+    //         return;
+    //     }
+    // }
+    // for (int i = 0; i < indent; ++i) cout << " ";
+    // if (!var) out_dot << index << endl;
+    // else out_dot << "x" << var << endl;
+    // if (lt) lt->print(indent+1);
+    // if (rt) rt->print(indent+1);
+    // if (root) out_dot << "}" << endl;
+    return;
+}
+
 int SFDD::size() const {
     if (empty()) return 0;
     if (terminal()) return 1;
@@ -92,8 +110,6 @@ bool SFDD::equals(const SFDD & sfdd) const {
 }
 
 SFDD& SFDD::reduced(Manager & m) {
-    return *this;
-
     if (terminal()) return *this;
     bool valid = false;
     for (vector<Element>::iterator e = elements.begin(); \
@@ -146,8 +162,6 @@ SFDD SFDD::expanded(Manager & m) const {
 }
 
 SFDD SFDD::Intersection(const SFDD & sfdd, Manager & m) const {
-    // cout << "+++++++++++++++++++++++++++++++++" << endl;
-    // print(); sfdd.print();
     // cout << "Intersection..." << endl;
     SFDD new_sfdd;
     new_sfdd.vtree_index = vtree_index;
@@ -203,9 +217,9 @@ SFDD SFDD::Xor(const SFDD & sfdd, Manager & m) const {
     if (empty()) return sfdd;
     if (sfdd.empty()) return *this;
 
-    SFDD new_sfdd;
     if (zero()) return sfdd;
     if (sfdd.zero()) return *this;
+    SFDD new_sfdd;
     if (terminal() && sfdd.terminal()) {
         // base case
         if (equals(sfdd)) {
