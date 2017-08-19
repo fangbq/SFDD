@@ -6,10 +6,12 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <map>
 #include <set>
 #include <cassert>
 
 using namespace std;
+
 
 enum OPERATOR_TYPE {
     XOR,

@@ -14,19 +14,21 @@ CFLAGS	= -Isrc -g -Wall -std=c++0x
 VPATH = src:tester:objs
 
 
-all: test0 test1 test2 test3 test4  sfdd
+all: test0 sfdd
 
-test4:	test4.o SFDD.o
-		$(CC) $(CFLAGS) $(T4_OBJS) -o test4
+# all: test0 test1 test2 test3 test4  sfdd
 
-test3:	test3.o SFDD.o
-		$(CC) $(CFLAGS) $(T3_OBJS) -o test3
+# test4:	test4.o SFDD.o
+# 		$(CC) $(CFLAGS) $(T4_OBJS) -o test4
 
-test2:	test2.o SFDD.o
-		$(CC) $(CFLAGS) $(T2_OBJS) -o test2
+# test3:	test3.o SFDD.o
+# 		$(CC) $(CFLAGS) $(T3_OBJS) -o test3
 
-test1:	test1.o SFDD.o
-		$(CC) $(CFLAGS) $(T1_OBJS) -o test1
+# test2:	test2.o SFDD.o
+# 		$(CC) $(CFLAGS) $(T2_OBJS) -o test2
+
+# test1:	test1.o SFDD.o
+# 		$(CC) $(CFLAGS) $(T1_OBJS) -o test1
 
 test0:	test0.o SFDD.o
 		$(CC) $(CFLAGS) $(T0_OBJS) -o test0

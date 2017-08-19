@@ -11,70 +11,52 @@
 
 #include <iostream>
 #include <string>
-#include "reader.h"
+// #include "reader.h"
 #include "SFDD.h"
-
-using namespace std;
 
 int main(int argc, char** argv) {
 
     vector<int> vars_order;
-    int var_no = 18;
+    int var_no = 4;
     for (int i = 1; i <= var_no; ++i) vars_order.push_back(i);
 
-    Vtree* v = new Vtree(1, var_no, vars_order);
+    Vtree* v = new Vtree(1, var_no*2-1, vars_order);
+    v->print();
+    v->save_file_as_dot("vtree");
 
     Manager m(v);
 
-    fstream f;
-
     /* @test f=0 */
     SFDD sfdd1 = m.sfddZero();
-    f.open("dotG/test0/f=0.dot", fstream::out | fstream::trunc);
-    sfdd1.print_dot(f, true);
-    f.close();
-    // sfdd1.print();
+    sfdd1.save_file_as_dot("f=0");
 
     /* @test f=1 */
     SFDD sfdd2 = m.sfddOne();
-    f.open("dotG/test0/f=1.dot", fstream::out | fstream::trunc);
-    sfdd2.print_dot(f, true);
-    f.close();
+    sfdd2.save_file_as_dot("f=1");
     
     /* @test f=x1 */
-    SFDD sfdd3 = m.sfddVar(1);
-    f.open("dotG/test0/f=x1.dot", fstream::out | fstream::trunc);
-    sfdd3.print_dot(f, true);
-    f.close();
+    SFDD sfdd3 = m.sfddVar(4);
+    sfdd3.save_file_as_dot("f=x4");
 
     /* @test f=-x1 */
     SFDD sfdd4 = m.sfddVar(-1);
-    f.open("dotG/test0/f=-x1.dot", fstream::out | fstream::trunc);
-    sfdd4.print_dot(f, true);
-    f.close();
+    sfdd4.save_file_as_dot("f=-x1.dot");
+
+    /* @test f=x4^-x1 */
+    SFDD sfdd7 = sfdd4.Xor(sfdd3, m);
+    sfdd7.save_file_as_dot("f=x4^-x1");
 
     /* @test f=x2 */
     SFDD sfdd5 = m.sfddVar(2);
-    f.open("dotG/test0/f=x2.dot", fstream::out | fstream::trunc);
-    sfdd5.print_dot(f, true);
-    f.close();
-
-    /* @test f=x17 */
-    SFDD sfdd6 = m.sfddVar(17);
-    f.open("dotG/test0/f=x17.dot", fstream::out | fstream::trunc);
-    sfdd6.print_dot(f, true);
-    f.close();
-
-    /* @test f=x17 */
-    SFDD sfdd7 = m.sfddVar(18);
-    f.open("dotG/test0/f=x18.dot", fstream::out | fstream::trunc);
-    sfdd7.print_dot(f, true);
-    f.close();
-
-    /* @test f=x17*x18 */
-    f.open("dotG/test0/f=x17*x18.dot", fstream::out | fstream::trunc);
-    sfdd6.And(sfdd7, m).print_dot(f, true);
-    f.close();
+    sfdd5.save_file_as_dot("f=x2");
+    cout << sfdd5.vtree_index << endl;
+cout << "ha 1" << endl;
+    sfdd5.normalized(4, m).save_file_as_dot("f=nml(x2)");
+cout << "ha 2" << endl;
+    sfdd7.normalized(4, m).save_file_as_dot("f=nml(x4^-x1)");
+cout << "ha 3" << endl;
+    sfdd5.Xor(sfdd7, m).save_file_as_dot("f=x2^(x4^-x1)");
+cout << "ha 4" << endl;
 
     return 0;
 }

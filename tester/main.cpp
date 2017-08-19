@@ -59,10 +59,11 @@ int main(int argc, char** argv) {
             infile >> var;
             if (var == 0) break;
             clause = clause.Or(m.sfddVar(var), m);
-            // cout << " one var done" << endl;
+            cout << "var: " << var << " done" << endl;
         }
+
         fml = fml.And(clause, m);
-        // cout << " one clause done" << endl;
+        cout << " one clause done" << endl;
     }
     clock_t finish = clock();
     double ptime = (double)(finish - start) / CLOCKS_PER_SEC;  //BDD time

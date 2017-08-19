@@ -1,0 +1,3 @@
+digraph G {
+	x4 [shape=record, label="x4"]
+}

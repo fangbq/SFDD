@@ -1,0 +1,15 @@
+graph {
+	i4 [shape=none, label="4"]
+	i4 -- i2
+	i2 [shape=none, label="2"]
+	i2 -- i1x1
+	i1x1 [shape=none, label="1_x1"]
+	i2 -- i3x2
+	i3x2 [shape=none, label="3_x2"]
+	i4 -- i6
+	i6 [shape=none, label="6"]
+	i6 -- i5x3
+	i5x3 [shape=none, label="5_x3"]
+	i6 -- i7x4
+	i7x4 [shape=none, label="7_x4"]
+}

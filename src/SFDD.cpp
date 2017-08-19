@@ -1,20 +1,25 @@
 #include "SFDD.h"
 
 
+map<int, int> get_index_by_var;
+
 Vtree::Vtree(int start_var_index, int end_var_index, vector<int> full_order, VTREE_TYPE t) {
     if (start_var_index == end_var_index) {
         size = 1;
-        var = full_order[start_var_index-1];
+        index = start_var_index;
+        var = full_order[(start_var_index-1)/2];
+        get_index_by_var[var] = start_var_index;
         return;
     }
     switch (t) {
         case TRIVIAL_TREE:
         {
-            int mid = start_var_index+(end_var_index-start_var_index)/2;
+            int mid = (end_var_index+start_var_index)/2;
+            mid = mid%2 ? mid-1 : mid;
             index = mid;
-            lt = new Vtree(start_var_index, mid, full_order, t);
+            lt = new Vtree(start_var_index, mid-1, full_order, t);
             rt = new Vtree(mid+1, end_var_index, full_order, t);
-            size = lt->size + rt->size;
+            size = lt->size + rt->size + 1;
             break;
         }
         case RANDOM_TREE:
@@ -27,6 +32,31 @@ Vtree::Vtree(int start_var_index, int end_var_index, vector<int> full_order, VTR
     return;
 }
 
+Vtree::Vtree(const Vtree & v)
+    : index(v.index), var(v.var), size(v.size) {
+    if (v.lt) lt = new Vtree(*v.lt);
+    if (v.rt) rt = new Vtree(*v.rt);
+}
+
+Vtree* Vtree::subvtree(int i) {
+/*    Vtree* tmp_v = this;
+    while (tmp_v->index != i) {
+        if (tmp_v->index > i) tmp_v = tmp_v->lt;
+        else tmp_v = tmp_v->rt;
+    }
+    return tmp_v;*/
+    assert(i > 0);
+    if (i == index) return this;
+    else if (i < index) return lt->subvtree(i);
+    else return rt->subvtree(i);
+}
+
+bool Vtree::leaf(int index) {
+    if (index == 0) return true;  // value is true or false when vtree_index equals zero
+    return subvtree(index)->lt == NULL;
+}
+
+/*
 set<int> Vtree::get_variables() const {
     set<int> vars;
     if (var) {
@@ -43,47 +73,64 @@ set<int> Vtree::get_variables() const {
     }
     return vars;
 }
-
+*/
 void Vtree::print(int indent) const {
     if (indent == 0)
         cout << "Vtree Size: " << size << endl;
     for (int i = 0; i < indent; ++i) cout << " ";
-    if (!var) cout << index << endl;
-    else cout << "x" << var << endl;
+    cout << index << "  x"+to_string(var) << endl;
     if (lt) lt->print(indent+1);
     if (rt) rt->print(indent+1);
     return;
 }
 
-void Vtree::print_dot(fstream & out_dot, bool root, int depth, string dec_name) const {
-    // if (root) {
-    //     out_dot << "digraph G {" << endl;
-    //     if (zero() | one()) {
-    //         out_dot << "\t" << value << " [shape=record, label=\"" \
-    //         << value << "\"]" << endl << "}";
-    //         return;
-    //     }
-    // }
-    // for (int i = 0; i < indent; ++i) cout << " ";
-    // if (!var) out_dot << index << endl;
-    // else out_dot << "x" << var << endl;
-    // if (lt) lt->print(indent+1);
-    // if (rt) rt->print(indent+1);
-    // if (root) out_dot << "}" << endl;
+void Vtree::print_dot(fstream & out_dot, bool root) const {
+    if (root) out_dot << "graph {" << endl;
+    out_dot << "\ti" << index;
+    if (var) out_dot << "x"+to_string(var);
+    out_dot << " [shape=none, label=\"" << index;
+    if (var) out_dot << "_x"<< var;
+    out_dot << "\"]" << endl;
+    if (lt) {
+        out_dot << "\ti" << index << " -- i";
+        out_dot << lt->index;
+        if (lt->var) out_dot << "x"+to_string(lt->var);
+        out_dot << endl;
+        lt->print_dot(out_dot, false);
+    }
+    if (rt) {
+        out_dot << "\ti" << index << " -- i";
+        out_dot <<  rt->index;
+        if (rt->var) out_dot << "x"+to_string(rt->var);
+        out_dot << endl;
+        rt->print_dot(out_dot, false);
+    }
+    if (root) out_dot << "}" << endl;
     return;
+}
+
+void Vtree::save_file_as_dot(const string f_name) const {
+    fstream f;
+    f.open("dotG/test0/"+f_name+".dot", fstream::out | fstream::trunc);
+    print_dot(f, true);
+    f.close();
 }
 
 int SFDD::size() const {
     if (empty()) return 0;
     if (terminal()) return 1;
 
-    int size = 0;
+    int size = elements.size();
     for (vector<Element>::const_iterator e = elements.begin(); \
     e != elements.end(); ++e) {
         size += e->prime.size();
         size += e->sub.size();
     }
     return size;
+}
+
+bool SFDD::computable_with(const SFDD & sfdd, const Manager & m) const {
+    m.vtree->leaf(normalized_sfdd1.vtree_index) || !m.vtree->leaf(normalized_sfdd2.vtree_index);
 }
 
 bool SFDD::equals(const SFDD & sfdd) const {
@@ -109,7 +156,7 @@ bool SFDD::equals(const SFDD & sfdd) const {
     return false;
 }
 
-SFDD& SFDD::reduced(Manager & m) {
+SFDD& SFDD::reduced(const Manager & m) {
     if (terminal()) return *this;
     bool valid = false;
     for (vector<Element>::iterator e = elements.begin(); \
@@ -143,119 +190,178 @@ SFDD& SFDD::reduced(Manager & m) {
         if (!is_delete)
             ++e1;
     }
-    return *this;
-}
-
-SFDD SFDD::expanded(Manager & m) const {
-    if (value<2) {
-        // return {(1, 1), (x, 0)} if 1; return {(1, 0), (x, 0)} if 0
-        // SFDD expanded_sfdd;
-        // expanded_sfdd.vtree_index = vtree_index;
-        // Element e1, e2;
-        // e1.prime.value = 1;
-        // e1.sub.value = 1;
-        // expanded_sfdd.elements.push_back(e1);
-        // return expanded_sfdd;
+    //3 trimming
+    if (elements.size() == 1) {
+        // {(-a, T)} -> -a
+        if (elements[0].prime.terminal() && elements[0].sub.one()) {
+            value = elements[0].prime.value;
+            elements.clear();
+        }
     }
-    // return self if non-constant
+    if (elements.size() == 2) {
+        // {(a, 1), (other-pi-terms/a, 0)} -> a
+        // {(1, a), (other-pi-terms/1, 0)} -> a
+        if (elements[0].sub.zero()) {
+            if (elements[1].sub.one() && elements[1].prime.terminal()) {
+                value = elements[1].prime.value;
+                elements.clear();
+            } else if (elements[1].prime.one() && elements[1].sub.terminal()) {
+                value = elements[1].sub.value;
+                elements.clear();
+            }
+        } else if (elements[1].sub.zero()) {
+            if (elements[0].sub.one() && elements[0].prime.terminal()) {
+                value = elements[0].prime.value;
+                elements.clear();
+            } else if (elements[0].prime.one() && elements[0].sub.terminal()) {
+                value = elements[0].sub.value;
+                elements.clear();
+            }
+        }
+    }
     return *this;
 }
 
-SFDD SFDD::Intersection(const SFDD & sfdd, Manager & m) const {
+extern int get_lca(int a, int b, Vtree * v) {
+    if (!v) return 0;
+    if (v->index == a || v->index == b) return v->index;
+    int L = get_lca(a, b, v->lt);
+    int R = get_lca(a, b, v->rt);
+    if (L && R) return v->index;  // if p and q are on both sides
+    return L ? L : R;  // either one of p,q is on one side OR p,q is not in L&R subtrees
+}
+
+// int level = 1;
+SFDD& SFDD::normalized(int lca, const Manager & m) {
+    if (!terminal()) value = -1;
+    // normalize \alpha from vtree_index to bottom
+    // int c = 1;
+    for (vector<Element>::iterator e = elements.begin(); \
+    e != elements.end(); ++e) {
+        // if (level < 4) e->prime.save_file_as_dot(to_string(level)+"before_prime"+to_string(c));
+        e->prime.normalized(m.vtree->subvtree(vtree_index)->lt->index, m);
+        // if (level < 4) e->prime.save_file_as_dot(to_string(level)+"prime"+to_string(c));
+        // if (level < 4) e->sub.save_file_as_dot(to_string(level)+"before_sub"+to_string(c));
+        e->sub.normalized(m.vtree->subvtree(vtree_index)->rt->index, m);
+        // if (level < 4) e->sub.save_file_as_dot(to_string(level++)+"sub"+to_string(c++));
+    }
+// m.vtree->subvtree(lca)->save_file_as_dot("z_vtree");
+// this->save_file_as_dot("z_sfdd");
+//     cout << "hh 2" << endl;
+    // top-down from lca to vtree_index
+    *this = normalization_1(m.vtree->subvtree(lca), *this, m);
+    return *this;
+}
+
+SFDD SFDD::Intersection(const SFDD & sfdd, const Manager & m) const {
     // cout << "Intersection..." << endl;
-    SFDD new_sfdd;
-    new_sfdd.vtree_index = vtree_index;
     if (zero()) return *this;
     if (sfdd.zero()) return sfdd;
-    if (terminal() && sfdd.terminal()) {
+            // cout << "==================================" << endl;
+            // cout << "index: " << vtree_index << endl;
+            // print();
+            // cout << "inter with -------------" << endl;
+            // cout << "index: " << sfdd.vtree_index << endl;
+            // sfdd.print();
+    // normalizing for both sides
+    SFDD normalized_sfdd1 = *this, normalized_sfdd2 = sfdd;
+    if ((!m.vtree->leaf(normalized_sfdd1.vtree_index) || !m.vtree->leaf(normalized_sfdd2.vtree_index)) \
+        && normalized_sfdd1.vtree_index != normalized_sfdd2.vtree_index) {
+        int lca = get_lca(normalized_sfdd1.vtree_index, normalized_sfdd2.vtree_index, m.vtree);
+        normalized_sfdd1.normalized(lca, m);
+        normalized_sfdd2.normalized(lca, m);
+    }
+
+    SFDD new_sfdd;
+    new_sfdd.vtree_index = normalized_sfdd1.vtree_index;
+
+    if (normalized_sfdd1.terminal() && normalized_sfdd2.terminal()) {
         // base case
-        if (equals(sfdd) || sfdd.negative())
-            new_sfdd = *this;
-        else if (negative())
-            new_sfdd = sfdd;
+        if (normalized_sfdd1.equals(normalized_sfdd2) || normalized_sfdd2.negative())
+            new_sfdd = normalized_sfdd1;
+        else if (normalized_sfdd1.negative())
+            new_sfdd = normalized_sfdd2;
         else
             new_sfdd.value = 0;
-    } else if (vtree_index == sfdd.vtree_index) {
-        SFDD expanded_sfdd1 = expanded(m);
-        SFDD expanded_sfdd2 = sfdd.expanded(m);
-        for (vector<Element>::const_iterator e1 = expanded_sfdd1.elements.begin();
-        e1 != expanded_sfdd1.elements.end(); ++e1) {
-            for (vector<Element>::const_iterator e2 = expanded_sfdd2.elements.begin();
-            e2 != expanded_sfdd2.elements.end(); ++e2) {
+    } else {
+        for (vector<Element>::const_iterator e1 = normalized_sfdd1.elements.begin();
+        e1 != normalized_sfdd1.elements.end(); ++e1) {
+            for (vector<Element>::const_iterator e2 = normalized_sfdd2.elements.begin();
+            e2 != normalized_sfdd2.elements.end(); ++e2) {
                 Element new_e;
-                new_e.prime = e1->prime.Intersection(e2->prime, m).reduced(m);
+                new_e.prime = e1->prime.Intersection(e2->prime, m);
                 if (!new_e.prime.zero()) {
-                    new_e.sub = e1->sub.Intersection(e2->sub, m).reduced(m);
+                    new_e.sub = e1->sub.Intersection(e2->sub, m);
                     new_sfdd.elements.push_back(new_e);
                 }
             }
         }
-    } else {
-        cout << "Intersection Error!" << endl;
-        // SFDD outer_sfdd, inner_sfdd;
-        // if (vtree_index > sfdd.vtree_index) {
-        //     outer_sfdd = expanded(m);
-        //     inner_sfdd = sfdd.expanded(m);
-        // } else {
-        //     outer_sfdd = sfdd.expanded(m);
-        //     inner_sfdd = expanded(m);
-        // }
-        // for (vector<Element>::const_iterator outer_e = outer_sfdd.elements.begin();
-        // outer_e != outer_sfdd.elements.end(); ++outer_e) {
-        //     Element new_e;
-        //     new_e.prime = outer_e->prime.Intersection(inner_sfdd, m).reduced(m);
-        //     new_e.sub = outer_e->sub;
-        //     new_sfdd.elements.push_back(new_e);
-        // }
     }
-    // new_sfdd.reduced(m).print();
+
+            // cout << "get ------------------" << endl;
+            // new_sfdd.print();
     return new_sfdd.reduced(m);
 }
 
-SFDD SFDD::Xor(const SFDD & sfdd, Manager & m) const {
-    // cout << "Xor..." << endl;
+//int c = 1;
+SFDD SFDD::Xor(const SFDD & sfdd, const Manager & m) const {
+    cout << "Xor..." << endl;
     if (empty()) return sfdd;
     if (sfdd.empty()) return *this;
 
     if (zero()) return sfdd;
     if (sfdd.zero()) return *this;
+
+    SFDD normalized_sfdd1 = *this, normalized_sfdd2 = sfdd;
+    if ((!m.vtree->leaf(normalized_sfdd1.vtree_index) || !m.vtree->leaf(normalized_sfdd2.vtree_index)) \
+        && normalized_sfdd1.vtree_index != normalized_sfdd2.vtree_index) {
+        int lca = get_lca(normalized_sfdd1.vtree_index, normalized_sfdd2.vtree_index, m.vtree);
+        normalized_sfdd1.normalized(lca, m);
+        // normalized_sfdd1.save_file_as_dot("sfdd1 "+to_string(c));
+        normalized_sfdd2.normalized(lca, m);
+        // normalized_sfdd2.save_file_as_dot("sfdd2 "+to_string(c++));
+    }
     SFDD new_sfdd;
-    if (terminal() && sfdd.terminal()) {
+    new_sfdd.vtree_index = normalized_sfdd1.vtree_index;
+
+    if (normalized_sfdd1.terminal() && normalized_sfdd2.terminal()) {
         // base case
-        if (equals(sfdd)) {
+        if (normalized_sfdd1.equals(normalized_sfdd2)) {
             new_sfdd.value = 0;
-        } else if (zero() || sfdd.zero()) {
-            new_sfdd.value = value+sfdd.value;
-        } else if (one()) {
-            new_sfdd.value = sfdd.value/2*2+1-sfdd.value%2;
-        } else if (sfdd.one()) {
-            new_sfdd.value = value/2*2+1-value%2;
+        } else if (normalized_sfdd1.zero() || normalized_sfdd2.zero()) {
+            new_sfdd.value = normalized_sfdd1.value+normalized_sfdd2.value;
+        } else if (normalized_sfdd1.one()) {
+            new_sfdd.value = normalized_sfdd2.value/2*2+1-normalized_sfdd2.value%2;
+        } else if (normalized_sfdd2.one()) {
+            new_sfdd.value = normalized_sfdd1.value/2*2+1-normalized_sfdd1.value%2;
         } else {
             new_sfdd.value = 1;
         }
-    } else if (vtree_index == sfdd.vtree_index) {
-        new_sfdd.vtree_index = vtree_index;
-        SFDD expanded_sfdd1 = expanded(m);
-        SFDD expanded_sfdd2 = sfdd.expanded(m);
-        for (vector<Element>::const_iterator e1 = expanded_sfdd1.elements.begin();
-        e1 != expanded_sfdd1.elements.end(); ++e1) {
-            for (vector<Element>::const_iterator e2 = expanded_sfdd2.elements.begin();
-            e2 != expanded_sfdd2.elements.end(); ++e2) {
+    } else {
+        for (vector<Element>::const_iterator e1 = normalized_sfdd1.elements.begin();
+        e1 != normalized_sfdd1.elements.end(); ++e1) {
+            for (vector<Element>::const_iterator e2 = normalized_sfdd2.elements.begin();
+            e2 != normalized_sfdd2.elements.end(); ++e2) {
                 Element new_e;
-                new_e.prime = e1->prime.Intersection(e2->prime, m).reduced(m);
+            cout << "==================================" << endl;
+            e1->prime.print();
+            cout << "inter with -------------" << endl;
+            e2->prime.print();
+                new_e.prime = e1->prime.Intersection(e2->prime, m);
+            cout << "get --------------------" << endl;
+            new_e.prime.print();
+            cout << "==================================" << endl;
                 if (!new_e.prime.zero()) {
-                    new_e.sub = e1->sub.Xor(e2->sub, m).reduced(m);
+                    new_e.sub = e1->sub.Xor(e2->sub, m);
                     new_sfdd.elements.push_back(new_e);
                 }
             }
         }
-    } else {
-        cout << "Xor Error!" << endl;
     }
     return new_sfdd.reduced(m);
 }
 
-SFDD SFDD::And(const SFDD & sfdd, Manager & m) const {
+SFDD SFDD::And(const SFDD & sfdd, const Manager & m) const {
     // cout << "And..." << endl;
     if (empty()) return sfdd;
     if (sfdd.empty()) return *this;
@@ -266,24 +372,32 @@ SFDD SFDD::And(const SFDD & sfdd, Manager & m) const {
     if (sfdd.one()) return *this;
 
     SFDD new_sfdd;
-    if (terminal() && sfdd.terminal()) {
+    new_sfdd.vtree_index = vtree_index;
+
+    SFDD normalized_sfdd1 = *this, normalized_sfdd2 = sfdd;
+    if ((!m.vtree->leaf(normalized_sfdd1.vtree_index) || !m.vtree->leaf(normalized_sfdd2.vtree_index)) \
+        && normalized_sfdd1.vtree_index != normalized_sfdd2.vtree_index) {
+        int lca = get_lca(normalized_sfdd1.vtree_index, normalized_sfdd2.vtree_index, m.vtree);
+        normalized_sfdd1.normalized(lca, m);
+        normalized_sfdd2.normalized(lca, m);
+    }
+
+    if (normalized_sfdd1.terminal() && normalized_sfdd2.terminal()) {
         // base case
-        if (zero() || sfdd.zero()) {
+        if (normalized_sfdd1.zero() || normalized_sfdd2.zero()) {
             new_sfdd.value = 0;
-        } else if (one() || sfdd.one()) {
-            new_sfdd.value = value*sfdd.value;
-        } else if (equals(sfdd)) {
-            new_sfdd = *this;
+        } else if (normalized_sfdd1.one() || normalized_sfdd2.one()) {
+            new_sfdd.value = normalized_sfdd1.value*normalized_sfdd2.value;
+        } else if (normalized_sfdd1.equals(normalized_sfdd2)) {
+            new_sfdd = normalized_sfdd1;
         } else {
             new_sfdd.value = 0;
         }
-    } else if (vtree_index == sfdd.vtree_index) {
-        SFDD expanded_sfdd1 = expanded(m);
-        SFDD expanded_sfdd2 = sfdd.expanded(m);
-        for (vector<Element>::const_iterator e1 = expanded_sfdd1.elements.begin();
-        e1 != expanded_sfdd1.elements.end(); ++e1) {
-            for (vector<Element>::const_iterator e2 = expanded_sfdd2.elements.begin();
-            e2 != expanded_sfdd2.elements.end(); ++e2) {
+    } else {
+        for (vector<Element>::const_iterator e1 = normalized_sfdd1.elements.begin();
+        e1 != normalized_sfdd1.elements.end(); ++e1) {
+            for (vector<Element>::const_iterator e2 = normalized_sfdd2.elements.begin();
+            e2 != normalized_sfdd2.elements.end(); ++e2) {
                 SFDD prime_product = e1->prime.And(e2->prime, m).reduced(m);
                 SFDD sub_product = e1->sub.And(e2->sub, m).reduced(m);
                 SFDD tmp_new_sfdd;
@@ -310,15 +424,12 @@ SFDD SFDD::And(const SFDD & sfdd, Manager & m) const {
                 }
                 new_sfdd = tmp_new_sfdd;
             }
-        new_sfdd.vtree_index = vtree_index;
         }
-    } else {
-        cout << "And Error!" << endl;
     }
     return new_sfdd.reduced(m);
 }
 
-SFDD SFDD::Or(const SFDD & sfdd, Manager & m) const {
+SFDD SFDD::Or(const SFDD & sfdd, const Manager & m) const {
     // cout << "Or..." << endl;
     if (empty()) return sfdd;
     if (sfdd.empty()) return *this;
@@ -375,9 +486,17 @@ string check_dec_name(string node_name) {
 void SFDD::print_dot(fstream & out_dot, bool root, int depth, string dec_name) const {
     if (root) {
         out_dot << "digraph G {" << endl;
-        if (zero() | one()) {
-            out_dot << "\t" << value << " [shape=record, label=\"" \
-            << value << "\"]" << endl << "}";
+        if (terminal()) {
+            if (zero() || one()) {
+                out_dot << "\t" << value << " [shape=record, label=\"" \
+                << value << "\"]" << endl << "}";
+            } else {
+                out_dot << "\t";
+                if (negative()) out_dot << "neg";
+                out_dot << "x" << value/2 << " [shape=record, label=\"";
+                if (negative()) out_dot << "-";
+                out_dot << "x" << value/2 << "\"]" << endl << "}";
+            }
             return;
         }
     }
@@ -400,6 +519,13 @@ void SFDD::print_dot(fstream & out_dot, bool root, int depth, string dec_name) c
         e->print_dot(out_dot, depth, e_name);
     }
     if (root) out_dot << "}" << endl;
+}
+
+void SFDD::save_file_as_dot(const string f_name) const {
+    fstream f;
+    f.open("dotG/test0/"+f_name+".dot", fstream::out | fstream::trunc);
+    print_dot(f, true);
+    f.close();
 }
 
 void Element::print(int indent, int counter) const {
@@ -436,58 +562,52 @@ void Element::print_dot(fstream & out_dot, int depth, string e_name) const {
     }
 }
 
-SFDD Manager::sfddZero() {
-    return get_SFDD1(vtree, 0).reduced(*this);
+SFDD Manager::sfddZero() const {
+    return *(new SFDD(0));
 }
 
-SFDD Manager::sfddOne() {
-    return get_SFDD1(vtree, 1).reduced(*this);
+SFDD Manager::sfddOne() const {
+    return *(new SFDD(1));
 }
 
 SFDD Manager::sfddVar(const int tmp_var) {
     assert(tmp_var != 0);
-    if (tmp_var < 0) return get_SFDD1(vtree, (0-tmp_var)*2+1).reduced(*this);
-    else if (tmp_var > 0) return get_SFDD1(vtree, tmp_var*2).reduced(*this);
-    else return get_SFDD1(vtree, tmp_var).reduced(*this);
+    return *(new SFDD(tmp_var < 0 ? (0-tmp_var)*2+1 : tmp_var*2, get_index_by_var[abs(tmp_var)]));
 }
 
-extern SFDD get_SFDD1(const Vtree* v, const int var) {
+extern SFDD normalization_1(const Vtree* v, const SFDD & rsfdd, const Manager & m) {
     SFDD sfdd;
     sfdd.vtree_index = v->index;
-    // check if constant
-    if (v->var) {
-        sfdd.value = var;  /* different with get_SFDD, sfddVar \
-                            solves 'f=x_i', so the var only be \
-                            the terminal. */
-        return sfdd;
+    // base case
+    if (v->var || (!rsfdd.terminal() && v->index == rsfdd.vtree_index)) {
+        return rsfdd;
     }
+
     Element e1, e2;
-    set<int> lt_vars = v->lt->get_variables();
-    set<int> rt_vars = v->rt->get_variables();
-    if (var == 0) {
+    if (rsfdd.zero()) {
         // rule 1.(d)
-        e1.prime = get_SFDD2(v->lt, 0);
-        e1.sub = get_SFDD1(v->rt, 0);
+        e1.prime = normalization_2(v->lt, m.sfddZero(), m);
+        e1.sub = normalization_1(v->rt, m.sfddZero(), m);
         sfdd.elements.push_back(e1);
         return sfdd;
-    } else if (var == 1) {
+    } else if (rsfdd.one()) {
         // rule 1.(c)
-        e1.prime = get_SFDD1(v->lt, 1);
-        e1.sub = get_SFDD1(v->rt, 1);  // normalization
-        e2.prime = get_SFDD2(v->lt, 1);
-        e2.sub = get_SFDD1(v->rt, 0);
-    } else if (lt_vars.find(var/2) != lt_vars.end()) {
+        e1.prime = normalization_1(v->lt, m.sfddOne(), m);
+        e1.sub = normalization_1(v->rt, m.sfddOne(), m);  // normalization
+        e2.prime = normalization_2(v->lt, m.sfddOne(), m);
+        e2.sub = normalization_1(v->rt, m.sfddZero(), m);
+    } else if (rsfdd.vtree_index < v->index) {
         // rule 1.(a)
-        e1.prime = get_SFDD1(v->lt, var);  // normalization
-        e1.sub = get_SFDD1(v->rt, 1);
-        e2.prime = get_SFDD2(v->lt, var);
-        e2.sub = get_SFDD1(v->rt, 0);
+        e1.prime = normalization_1(v->lt, rsfdd, m);  // normalization
+        e1.sub = normalization_1(v->rt, m.sfddOne(), m);
+        e2.prime = normalization_2(v->lt, rsfdd, m);
+        e2.sub = normalization_1(v->rt, m.sfddZero(), m);
     } else {
         // rule 1.(b)
-        e1.prime = get_SFDD1(v->lt, 1);
-        e1.sub = get_SFDD1(v->rt, var);  // normalization
-        e2.prime = get_SFDD2(v->lt, 1);
-        e2.sub = get_SFDD1(v->rt, 0);
+        e1.prime = normalization_1(v->lt, m.sfddOne(), m);
+        e1.sub = normalization_1(v->rt, rsfdd, m);  // normalization
+        e2.prime = normalization_2(v->lt, m.sfddOne(), m);
+        e2.sub = normalization_1(v->rt, m.sfddZero(), m);
     }
     sfdd.elements.push_back(e1);
     sfdd.elements.push_back(e2);
@@ -495,48 +615,49 @@ extern SFDD get_SFDD1(const Vtree* v, const int var) {
 }
 
 /*
- * @para: v - vtree, rht - in compiling rules 2 and 3, there
- *        are formulas like $f \oplus g$, rht means 'g' in
+ * @para: v - vtree, rsfdd - in compiling rules 2 and 3, there
+ *        are formulas like $f \oplus g$, rsfdd means 'g' in
  *        this kind format.
  */
-extern SFDD get_SFDD2(const Vtree* v, const int rht) {
+extern SFDD normalization_2(const Vtree* v, const SFDD & rsfdd, const Manager & m) {
     SFDD sfdd;
     sfdd.vtree_index = v->index;
     // check if constant
     if (v->var) {
-        if (rht == 1) sfdd.value = v->var*2;
-        else if (rht == 0) sfdd.value = v->var*2+1;
-        else if (rht%2 == 0) sfdd.value = 1;
+        if (rsfdd.one()) sfdd.value = v->var*2;
+        else if (rsfdd.zero()) sfdd.value = v->var*2+1;
+        else if (rsfdd.value%2 == 0) sfdd.value = 1;
         else sfdd.value = 0;
         return sfdd;
     }
+    if (v->index == rsfdd.vtree_index)
+        return normalization_2(v, m.sfddZero(), m).Xor(rsfdd, m);
+
     Element e1, e2;
-    set<int> lt_vars = v->lt->get_variables();
-    set<int> rt_vars = v->rt->get_variables();
-    if (rht == 0) {
+    if (rsfdd.zero()) {
         // rule 2.(d)
-        e1.prime = get_SFDD2(v->lt);
-        e1.sub = get_SFDD2(v->rt);
+        e1.prime = normalization_2(v->lt, m.sfddZero(), m);
+        e1.sub = normalization_2(v->rt, m.sfddZero(), m);
         sfdd.elements.push_back(e1);
         return sfdd;
-    } else if (rht == 1) {
+    } else if (rsfdd.one()) {
         // rule 2.(c)
-        e1.prime = get_SFDD1(v->lt, 1);
-        e1.sub = get_SFDD2(v->rt, 1);  // normalization
-        e2.prime = get_SFDD2(v->lt, 1);
-        e2.sub = get_SFDD2(v->rt);
-    } else if (lt_vars.find(rht/2) != lt_vars.end()) {
+        e1.prime = normalization_1(v->lt, m.sfddOne(), m);
+        e1.sub = normalization_2(v->rt, m.sfddOne(), m);  // normalization
+        e2.prime = normalization_2(v->lt, m.sfddOne(), m);
+        e2.sub = normalization_2(v->rt, m.sfddZero(), m);
+    } else if (rsfdd.vtree_index < v->index) {
         // rule 2.(a)
-        e1.prime = get_SFDD1(v->lt, rht);  // normalization
-        e1.sub = get_SFDD2(v->rt, 1);
-        e2.prime = get_SFDD2(v->lt, rht);
-        e2.sub = get_SFDD2(v->rt);
+        e1.prime = normalization_1(v->lt, rsfdd, m);  // normalization
+        e1.sub = normalization_2(v->rt, m.sfddOne(), m);
+        e2.prime = normalization_2(v->lt, rsfdd, m);
+        e2.sub = normalization_2(v->rt, m.sfddZero(), m);
     } else {
         // rule 2.(b)
-        e1.prime = get_SFDD1(v->lt, 1);
-        e1.sub = get_SFDD2(v->rt, rht);  // normalization
-        e2.prime = get_SFDD2(v->lt, 1);
-        e2.sub = get_SFDD2(v->rt);
+        e1.prime = normalization_1(v->lt, m.sfddOne(), m);
+        e1.sub = normalization_2(v->rt, rsfdd, m);  // normalization
+        e2.prime = normalization_2(v->lt, m.sfddOne(), m);
+        e2.sub = normalization_2(v->rt, m.sfddZero(), m);
     }
     sfdd.elements.push_back(e1);
     sfdd.elements.push_back(e2);
