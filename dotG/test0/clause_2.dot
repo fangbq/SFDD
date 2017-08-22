@@ -1,0 +1,7 @@
+digraph G {
+	Dec_0_1 [shape=circle, label="34"]
+	Dec_0_1 -> Ele_1_3
+	Ele_1_3 [shape=record,label="<f0> 1|<f1> 1"]
+	Dec_0_1 -> Ele_1_4
+	Ele_1_4 [shape=record,label="<f0> x17|<f1> x18"]
+}

@@ -1,0 +1,173 @@
+digraph G {
+	Dec_0_1 [shape=circle, label="18"]
+	Dec_0_1 -> Ele_1_5
+	Ele_1_5 [shape=record,label="<f0> 1|<f1> ●"]
+	Ele_1_5:f1 -> Dec_2_1
+	Dec_2_1 [shape=circle, label="26"]
+	Dec_2_1 -> Ele_3_1
+	Ele_3_1 [shape=record,label="<f0> 1|<f1> ●"]
+	Ele_3_1:f1 -> Dec_4_1
+	Dec_4_1 [shape=circle, label="30"]
+	Dec_4_1 -> Ele_5_1
+	Ele_5_1 [shape=record,label="<f0> 1|<f1> ●"]
+	Ele_5_1:f1 -> Dec_6_1
+	Dec_6_1 [shape=circle, label="32"]
+	Dec_6_1 -> Ele_7_1
+	Ele_7_1 [shape=record,label="<f0> 1|<f1> x17"]
+	Dec_6_1 -> Ele_7_2
+	Ele_7_2 [shape=record,label="<f0> x16|<f1> -x17"]
+	Dec_4_1 -> Ele_5_2
+	Ele_5_2 [shape=record,label="<f0> ●|<f1> 0"]
+	Ele_5_2:f0 -> Dec_6_2
+	Dec_6_2 [shape=circle, label="28"]
+	Dec_6_2 -> Ele_7_3
+	Ele_7_3 [shape=record,label="<f0> 1|<f1> x15"]
+	Dec_6_2 -> Ele_7_4
+	Ele_7_4 [shape=record,label="<f0> x14|<f1> -x15"]
+	Dec_2_1 -> Ele_3_2
+	Ele_3_2 [shape=record,label="<f0> ●|<f1> 0"]
+	Ele_3_2:f0 -> Dec_4_2
+	Dec_4_2 [shape=circle, label="22"]
+	Dec_4_2 -> Ele_5_3
+	Ele_5_3 [shape=record,label="<f0> 1|<f1> ●"]
+	Ele_5_3:f1 -> Dec_6_3
+	Dec_6_3 [shape=circle, label="24"]
+	Dec_6_3 -> Ele_7_5
+	Ele_7_5 [shape=record,label="<f0> 1|<f1> x13"]
+	Dec_6_3 -> Ele_7_6
+	Ele_7_6 [shape=record,label="<f0> x12|<f1> -x13"]
+	Dec_4_2 -> Ele_5_4
+	Ele_5_4 [shape=record,label="<f0> ●|<f1> ●"]
+	Ele_5_4:f0 -> Dec_6_4
+	Dec_6_4 [shape=circle, label="20"]
+	Dec_6_4 -> Ele_7_7
+	Ele_7_7 [shape=record,label="<f0> 1|<f1> x11"]
+	Dec_6_4 -> Ele_7_8
+	Ele_7_8 [shape=record,label="<f0> x10|<f1> -x11"]
+	Ele_5_4:f1 -> Dec_6_5
+	Dec_6_5 [shape=circle, label="24"]
+	Dec_6_5 -> Ele_7_9
+	Ele_7_9 [shape=record,label="<f0> -x12|<f1> -x13"]
+	Dec_0_1 -> Ele_1_6
+	Ele_1_6 [shape=record,label="<f0> x7|<f1> ●"]
+	Ele_1_6:f1 -> Dec_2_2
+	Dec_2_2 [shape=circle, label="26"]
+	Dec_2_2 -> Ele_3_3
+	Ele_3_3 [shape=record,label="<f0> 1|<f1> ●"]
+	Ele_3_3:f1 -> Dec_4_3
+	Dec_4_3 [shape=circle, label="30"]
+	Dec_4_3 -> Ele_5_5
+	Ele_5_5 [shape=record,label="<f0> 1|<f1> ●"]
+	Ele_5_5:f1 -> Dec_6_6
+	Dec_6_6 [shape=circle, label="32"]
+	Dec_6_6 -> Ele_7_10
+	Ele_7_10 [shape=record,label="<f0> -x16|<f1> -x17"]
+	Dec_4_3 -> Ele_5_6
+	Ele_5_6 [shape=record,label="<f0> ●|<f1> 0"]
+	Ele_5_6:f0 -> Dec_6_7
+	Dec_6_7 [shape=circle, label="28"]
+	Dec_6_7 -> Ele_7_11
+	Ele_7_11 [shape=record,label="<f0> 1|<f1> x15"]
+	Dec_6_7 -> Ele_7_12
+	Ele_7_12 [shape=record,label="<f0> x14|<f1> -x15"]
+	Dec_2_2 -> Ele_3_4
+	Ele_3_4 [shape=record,label="<f0> ●|<f1> 0"]
+	Ele_3_4:f0 -> Dec_4_4
+	Dec_4_4 [shape=circle, label="22"]
+	Dec_4_4 -> Ele_5_7
+	Ele_5_7 [shape=record,label="<f0> 1|<f1> ●"]
+	Ele_5_7:f1 -> Dec_6_8
+	Dec_6_8 [shape=circle, label="24"]
+	Dec_6_8 -> Ele_7_13
+	Ele_7_13 [shape=record,label="<f0> 1|<f1> x13"]
+	Dec_6_8 -> Ele_7_14
+	Ele_7_14 [shape=record,label="<f0> x12|<f1> -x13"]
+	Dec_4_4 -> Ele_5_8
+	Ele_5_8 [shape=record,label="<f0> ●|<f1> ●"]
+	Ele_5_8:f0 -> Dec_6_9
+	Dec_6_9 [shape=circle, label="20"]
+	Dec_6_9 -> Ele_7_15
+	Ele_7_15 [shape=record,label="<f0> 1|<f1> x11"]
+	Dec_6_9 -> Ele_7_16
+	Ele_7_16 [shape=record,label="<f0> x10|<f1> -x11"]
+	Ele_5_8:f1 -> Dec_6_10
+	Dec_6_10 [shape=circle, label="24"]
+	Dec_6_10 -> Ele_7_17
+	Ele_7_17 [shape=record,label="<f0> -x12|<f1> -x13"]
+	Dec_0_1 -> Ele_1_7
+	Ele_1_7 [shape=record,label="<f0> ●|<f1> 0"]
+	Ele_1_7:f0 -> Dec_2_3
+	Dec_2_3 [shape=circle, label="8"]
+	Dec_2_3 -> Ele_3_5
+	Ele_3_5 [shape=record,label="<f0> 1|<f1> ●"]
+	Ele_3_5:f1 -> Dec_4_5
+	Dec_4_5 [shape=circle, label="12"]
+	Dec_4_5 -> Ele_5_9
+	Ele_5_9 [shape=record,label="<f0> 1|<f1> ●"]
+	Ele_5_9:f1 -> Dec_6_11
+	Dec_6_11 [shape=circle, label="14"]
+	Dec_6_11 -> Ele_7_18
+	Ele_7_18 [shape=record,label="<f0> -x7|<f1> ●"]
+	Ele_7_18:f1 -> Dec_8_1
+	Dec_8_1 [shape=circle, label="16"]
+	Dec_8_1 -> Ele_9_1
+	Ele_9_1 [shape=record,label="<f0> 1|<f1> x9"]
+	Dec_8_1 -> Ele_9_2
+	Ele_9_2 [shape=record,label="<f0> x8|<f1> -x9"]
+	Dec_4_5 -> Ele_5_10
+	Ele_5_10 [shape=record,label="<f0> ●|<f1> ●"]
+	Ele_5_10:f0 -> Dec_6_12
+	Dec_6_12 [shape=circle, label="10"]
+	Dec_6_12 -> Ele_7_19
+	Ele_7_19 [shape=record,label="<f0> 1|<f1> x6"]
+	Dec_6_12 -> Ele_7_20
+	Ele_7_20 [shape=record,label="<f0> x5|<f1> -x6"]
+	Ele_5_10:f1 -> Dec_6_13
+	Dec_6_13 [shape=circle, label="14"]
+	Dec_6_13 -> Ele_7_21
+	Ele_7_21 [shape=record,label="<f0> -x7|<f1> ●"]
+	Ele_7_21:f1 -> Dec_8_2
+	Dec_8_2 [shape=circle, label="16"]
+	Dec_8_2 -> Ele_9_3
+	Ele_9_3 [shape=record,label="<f0> -x8|<f1> -x9"]
+	Dec_2_3 -> Ele_3_6
+	Ele_3_6 [shape=record,label="<f0> ●|<f1> ●"]
+	Ele_3_6:f0 -> Dec_4_6
+	Dec_4_6 [shape=circle, label="4"]
+	Dec_4_6 -> Ele_5_11
+	Ele_5_11 [shape=record,label="<f0> 1|<f1> ●"]
+	Ele_5_11:f1 -> Dec_6_14
+	Dec_6_14 [shape=circle, label="6"]
+	Dec_6_14 -> Ele_7_22
+	Ele_7_22 [shape=record,label="<f0> 1|<f1> x4"]
+	Dec_6_14 -> Ele_7_23
+	Ele_7_23 [shape=record,label="<f0> x3|<f1> -x4"]
+	Dec_4_6 -> Ele_5_12
+	Ele_5_12 [shape=record,label="<f0> ●|<f1> ●"]
+	Ele_5_12:f0 -> Dec_6_15
+	Dec_6_15 [shape=circle, label="2"]
+	Dec_6_15 -> Ele_7_24
+	Ele_7_24 [shape=record,label="<f0> 1|<f1> x2"]
+	Dec_6_15 -> Ele_7_25
+	Ele_7_25 [shape=record,label="<f0> x1|<f1> -x2"]
+	Ele_5_12:f1 -> Dec_6_16
+	Dec_6_16 [shape=circle, label="6"]
+	Dec_6_16 -> Ele_7_26
+	Ele_7_26 [shape=record,label="<f0> -x3|<f1> -x4"]
+	Ele_3_6:f1 -> Dec_4_7
+	Dec_4_7 [shape=circle, label="12"]
+	Dec_4_7 -> Ele_5_13
+	Ele_5_13 [shape=record,label="<f0> ●|<f1> ●"]
+	Ele_5_13:f0 -> Dec_6_17
+	Dec_6_17 [shape=circle, label="10"]
+	Dec_6_17 -> Ele_7_27
+	Ele_7_27 [shape=record,label="<f0> -x5|<f1> -x6"]
+	Ele_5_13:f1 -> Dec_6_18
+	Dec_6_18 [shape=circle, label="14"]
+	Dec_6_18 -> Ele_7_28
+	Ele_7_28 [shape=record,label="<f0> -x7|<f1> ●"]
+	Ele_7_28:f1 -> Dec_8_3
+	Dec_8_3 [shape=circle, label="16"]
+	Dec_8_3 -> Ele_9_4
+	Ele_9_4 [shape=record,label="<f0> -x8|<f1> -x9"]
+}

@@ -27,7 +27,8 @@ public:
     Vtree(const Vtree & v);
     Vtree* subvtree(int index);  // return subvtree whose root is index
     // set<int>  get_variables() const;
-    bool leaf(int index);  // return if node index is leaf
+    int father_of(int i);
+    bool is_leaf(int i);  // return if node index is leaf
     void print(int indent = 0) const;
     void print_dot(fstream & out_dot, bool root = false) const;
     void save_file_as_dot(const string f_name) const;
@@ -59,21 +60,27 @@ public:
     SFDD() {}
     SFDD(int v, int i = 0) { value = v; vtree_index = i; }
     int size() const;
-    inline bool terminal() const { return value>-1; }
-    inline bool positive() const { return value>1 && value%2==0; }
-    inline bool negative() const { return value>1 && value%2==1; }
-    inline bool empty() const { return !terminal() && (elements.size()==0);}
-    inline bool zero() const { return value==0; }
-    inline bool one() const { return value==1; }
+    inline bool is_terminal() const { return value>-1; }
+    inline bool is_leaf(const Manager & m) const { return m.vtree->is_leaf(vtree_index); }  // differ with
+    inline bool is_positive() const { return value>1 && value%2==0; }
+    inline bool is_negative() const { return value>1 && value%2==1; }
+    inline bool is_empty() const { return !is_terminal() && (elements.size()==0);}
+    inline bool is_zero() const { return value==0; }
+    inline bool is_one() const { return value==1; }
+    inline bool is_constant() const { return is_zero() || is_one(); }
     bool computable_with(const SFDD & sfdd, const Manager & m) const;
     bool equals(const SFDD & sfdd) const;
     SFDD& reduced(const Manager & m);  // reducing
     SFDD& normalized(int lca, const Manager & m);  // lca must be ancestor of this SFDD!!!
     SFDD Intersection(const SFDD & s, const Manager & m) const;
-    SFDD Xor(const SFDD & s, const Manager & m) const;
-    SFDD And(const SFDD & s, const Manager & m) const;
+    /*
+     * must nml for the first time, example, x1 xor x2, if not
+     * they will be calculated directly, it's not what we want
+     */
+    SFDD Xor(const SFDD & s, const Manager & m, bool do_nml = false) const;
+    SFDD And(const SFDD & s, const Manager & m, bool do_nml = false) const;
     // SFDD& operator^(const SFDD & s) { return Xor(s); }
-    SFDD Or(const SFDD & s, const Manager & m) const;
+    SFDD Or(const SFDD & s, const Manager & m, bool do_nml = false) const;
     inline SFDD Not(const Manager & m) const { return Xor(m.sfddOne(), m); }
     void print(int indent = 0) const;
     void print_dot(fstream & out_dot, bool root = false, int depth = 0, string dec_name = "Dec_0_1") const;

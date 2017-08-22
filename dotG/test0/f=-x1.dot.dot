@@ -1,3 +1,0 @@
-digraph G {
-	negx1 [shape=record, label="-x1"]
-}

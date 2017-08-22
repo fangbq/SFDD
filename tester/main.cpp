@@ -19,7 +19,6 @@
 using namespace std;
 
 int main(int argc, char** argv) {
-
     // read *.cnf
     ifstream infile(argv[1], ios::in);
     string file_name = static_cast<string>(argv[1]);
@@ -46,10 +45,11 @@ int main(int argc, char** argv) {
 
     vector<int> vars_order;  // order
     for (int i = 1; i <= var_no; ++i) vars_order.push_back(i);
-    Vtree* v = new Vtree(1, var_no, vars_order);  // vtree
+    Vtree* v = new Vtree(1, var_no*2-1, vars_order);  // vtree
     Manager m(v);  // manager
 
     SFDD fml;
+    int  clause_counter = 1;
     clock_t start = clock();
     for(int line = 0; line < col_no; ++line)  //read every line number, and save as a clause
     {
@@ -58,12 +58,13 @@ int main(int argc, char** argv) {
             int var;
             infile >> var;
             if (var == 0) break;
-            clause = clause.Or(m.sfddVar(var), m);
+            clause = clause.Or(m.sfddVar(var), m, true);
             cout << "var: " << var << " done" << endl;
         }
-
-        fml = fml.And(clause, m);
-        cout << " one clause done" << endl;
+        clause.save_file_as_dot("clause_"+to_string(clause_counter));
+        // fml = fml.And(clause, m, true);
+        // fml.save_file_as_dot("fml_"+to_string(clause_counter++));
+        cout << "clause : " << clause_counter++ << " done" << endl;
     }
     clock_t finish = clock();
     double ptime = (double)(finish - start) / CLOCKS_PER_SEC;  //BDD time
@@ -71,7 +72,7 @@ int main(int argc, char** argv) {
     cout.precision(4);
     cout.setf(ios::fixed);
     cout << ptime << "  " << fml.size() << endl;
-
+    fml.save_file_as_dot("s1");
     // fstream f;
     // f.open("dotG/iscas89/f=s1.dot", fstream::out | fstream::trunc);
     // fml.print_dot(f, true);
