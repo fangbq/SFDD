@@ -8,6 +8,8 @@
  * 4. f=0+-x1   8. f=1+-x1  11. f=x1+-x1  13. f=-x1+-x1
  * 5. f=0+x4    9. f=1+x4   12. f=x1+x4   14. f=-x1+x4   15. f=x4+x4
  */
+#include <sys/time.h>
+#include <sys/resource.h>
 
 #include <iostream>
 #include <string>
@@ -45,12 +47,15 @@ int main(int argc, char** argv) {
 
     vector<int> vars_order;  // order
     for (int i = 1; i <= var_no; ++i) vars_order.push_back(i);
-    Vtree* v = new Vtree(1, var_no*2-1, vars_order);  // vtree
+    Vtree v(1, var_no*2-1, vars_order);  // vtree
+    v.save_file_as_dot("vtree");
     Manager m(v);  // manager
 
     SFDD fml;
+    // struct rusage r_usage;
     int  clause_counter = 1;
     clock_t start = clock();
+    vector<SFDD> sfdds;  // not because out memory
     for(int line = 0; line < col_no; ++line)  //read every line number, and save as a clause
     {
         SFDD clause;
@@ -58,12 +63,17 @@ int main(int argc, char** argv) {
             int var;
             infile >> var;
             if (var == 0) break;
-            clause = clause.Or(m.sfddVar(var), m, true);
-            cout << "var: " << var << " done" << endl;
+            SFDD tmp_var = m.sfddVar(var);
+            // cout << "var: " << var << " done" << endl;
+            clause = clause.Or(tmp_var, m);
+            // getrusage(RUSAGE_SELF, &r_usage);
+            // cout << "Memory usage = " << r_usage.ru_maxrss << endl;
+            // clause.save_file_as_dot(to_string(clause_counter)+"after"+to_string(var));
+            // cout << endl;
         }
-        clause.save_file_as_dot("clause_"+to_string(clause_counter));
-        // fml = fml.And(clause, m, true);
-        // fml.save_file_as_dot("fml_"+to_string(clause_counter++));
+        // clause.save_file_as_dot("clause_"+to_string(clause_counter++));
+        fml = fml.And(clause, m, true, clause_counter);
+        // fml.save_file_as_dot("fml_"+to_string(clause_counter-1));
         cout << "clause : " << clause_counter++ << " done" << endl;
     }
     clock_t finish = clock();

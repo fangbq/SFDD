@@ -1,7 +1,0 @@
-digraph G {
-	Dec_0_1 [shape=circle, label="34"]
-	Dec_0_1 -> Ele_1_1
-	Ele_1_1 [shape=record,label="<f0> x17|<f1> -x18"]
-	Dec_0_1 -> Ele_1_2
-	Ele_1_2 [shape=record,label="<f0> 1|<f1> x18"]
-}

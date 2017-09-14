@@ -31,21 +31,22 @@ all: test0 sfdd
 # 		$(CC) $(CFLAGS) $(T1_OBJS) -o test1
 
 test0:	test0.o SFDD.o
-		$(CC) $(CFLAGS) $(T0_OBJS) -o test0
+		$(CC) $(CFLAGS) $(T0_OBJS) -o test0 -O0
 
 sfdd:	main.o SFDD.o
-		$(CC) $(CFLAGS) $(M_OBJS) -o sfdd
+		$(CC) $(CFLAGS) $(M_OBJS) -o sfdd -O0
 
 %.o:%.cpp
-		$(CC) -c $(CFLAGS) $< -o ./objs/$@
+		$(CC) -c $(CFLAGS) $< -o ./objs/$@ -O0
 
 .PHONY : clean
 
 clean:
 	rm -f src/*.o objs/*.o sfdd test*
 
-clrdot:
-	rm -f dotG/test*/*.dot
+# clrdot:
+# 	rm -f dotG/test*/*.dot
 
 clrdotg:
+	rm -f dotG/test*/*.dot
 	rm -f dotG/test*/*.png
