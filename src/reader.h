@@ -1,8 +1,7 @@
 #ifndef READER_H
 #define READER_H
 
-#include "define.h"
-#include "SFDD.h"
+#include "sfdd.h"
 
 
 class Reader {

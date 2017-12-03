@@ -13,12 +13,14 @@
 
 #include <iostream>
 #include <string>
-#include "reader.h"
-#include "SFDD.h"
+#include "sfdd.h"
 #include <time.h>
 // #include <stdlib.h>
 
+
 using namespace std;
+using namespace sfdd;
+
 
 int main(int argc, char** argv) {
     // read *.cnf
@@ -49,21 +51,21 @@ int main(int argc, char** argv) {
     for (int i = 1; i <= var_no; ++i) vars_order.push_back(i);
     Vtree v(1, var_no*2-1, vars_order);  // vtree
     v.save_file_as_dot("vtree");
-    Manager m(v);  // manager
+    SfddManager m(v);  // manager
 
-    SFDD fml;
+    Sfdd fml;
     // struct rusage r_usage;
     int  clause_counter = 1;
     clock_t start = clock();
-    vector<SFDD> sfdds;  // not because out memory
+    vector<Sfdd> sfdds;  // not because out memory
     for(int line = 0; line < col_no; ++line)  //read every line number, and save as a clause
     {
-        SFDD clause;
+        Sfdd clause;
         while (true) {
             int var;
             infile >> var;
             if (var == 0) break;
-            SFDD tmp_var = m.sfddVar(var);
+            Sfdd tmp_var = m.sfddVar(var);
             // cout << "var: " << var << " done" << endl;
             clause = clause.Or(tmp_var, m);
             // getrusage(RUSAGE_SELF, &r_usage);
@@ -72,7 +74,7 @@ int main(int argc, char** argv) {
             // cout << endl;
         }
         // clause.save_file_as_dot("clause_"+to_string(clause_counter++));
-        fml = fml.And(clause, m, true, clause_counter);
+        fml = fml.And(clause, m, true);
         // fml.save_file_as_dot("fml_"+to_string(clause_counter-1));
         cout << "clause : " << clause_counter++ << " done" << endl;
     }
