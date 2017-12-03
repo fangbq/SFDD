@@ -1,0 +1,7 @@
+graph {
+	i2 [shape=none, label="2"]
+	i2 -- i1x2
+	i1x2 [shape=none, label="1_x2"]
+	i2 -- i3x1
+	i3x1 [shape=none, label="3_x1"]
+}

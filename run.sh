@@ -26,7 +26,7 @@ timeout() {
 
 test_cases_file="test/test_cases"
 test0="./test0"
-test1="./test1"
+test_vtree_reader="./test_vtree_reader"
 test2="./test3"
 test3="./test3"
 test4="./test4"

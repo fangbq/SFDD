@@ -13,14 +13,12 @@
 
 #include <iostream>
 #include <string>
-#include "sfdd.h"
+#include "reader.h"
+#include "SFDD.h"
 #include <time.h>
 // #include <stdlib.h>
 
-
 using namespace std;
-using namespace sfdd;
-
 
 int main(int argc, char** argv) {
     // read *.cnf
@@ -35,7 +33,7 @@ int main(int argc, char** argv) {
     string line;
     int var_no = 0, col_no = 0;  // Number of variables and number of clauses
     while (!infile.eof()) {
-        getline(infile,line);
+        getline(infile, line);
 
         if (line.length() == 0 || line[0] == 'c')
             ; //cout << "IGNORE LINE\n";
@@ -47,36 +45,40 @@ int main(int argc, char** argv) {
     }
     cout << var_no << "  " << col_no << "    ";
 
-    vector<int> vars_order;  // order
-    for (int i = 1; i <= var_no; ++i) vars_order.push_back(i);
-    Vtree v(1, var_no*2-1, vars_order);  // vtree
+    // vector<int> vars_order;  // order
+    // for (int i = 1; i <= var_no; ++i) vars_order.push_back(i);
+    // Vtree v(1, var_no*2-1, vars_order);  // vtree
+    Vtree v(argv[2]);
     v.save_file_as_dot("vtree");
-    SfddManager m(v);  // manager
+    v.print();
+    Manager m(v);  // manager
 
-    Sfdd fml;
+    SFDD fml;
     // struct rusage r_usage;
     int  clause_counter = 1;
     clock_t start = clock();
-    vector<Sfdd> sfdds;  // not because out memory
+    vector<SFDD> sfdds;  // not because out memory
     for(int line = 0; line < col_no; ++line)  //read every line number, and save as a clause
     {
-        Sfdd clause;
+        SFDD clause;
         while (true) {
             int var;
             infile >> var;
             if (var == 0) break;
-            Sfdd tmp_var = m.sfddVar(var);
+            SFDD tmp_var = m.sfddVar(var);
             // cout << "var: " << var << " done" << endl;
             clause = clause.Or(tmp_var, m);
+            clause.print();
             // getrusage(RUSAGE_SELF, &r_usage);
             // cout << "Memory usage = " << r_usage.ru_maxrss << endl;
             // clause.save_file_as_dot(to_string(clause_counter)+"after"+to_string(var));
             // cout << endl;
         }
         // clause.save_file_as_dot("clause_"+to_string(clause_counter++));
-        fml = fml.And(clause, m, true);
+        fml = fml.And(clause, m, true, clause_counter);
+        // fml.print();
         // fml.save_file_as_dot("fml_"+to_string(clause_counter-1));
-        cout << "clause : " << clause_counter++ << " done" << endl;
+        cout << "clause : " << clause_counter++ << " done; size : " << fml.size() << endl;
     }
     clock_t finish = clock();
     double ptime = (double)(finish - start) / CLOCKS_PER_SEC;  //BDD time

@@ -1,39 +1,39 @@
 # Makefile
 
-OBJS	=  test0.o test1.o test2.o test3.o test4.o main.0 sfdd.o
+OBJS	=  test0.o test_vtree_reader.o test2.o test3.o test4.o main.0 reader.o SFDD.o
 T_OBJS = $(patsubst %.o, objs/%.o, $(OBJS))
-T0_OBJS = $(patsubst %.o, objs/%.o, test0.o sfdd.o)
-T1_OBJS = $(patsubst %.o, objs/%.o, test1.o sfdd.o)
-T2_OBJS = $(patsubst %.o, objs/%.o, test2.o sfdd.o)
-T3_OBJS = $(patsubst %.o, objs/%.o, test3.o sfdd.o)
-T4_OBJS = $(patsubst %.o, objs/%.o, test4.o sfdd.o)
-M_OBJS = $(patsubst %.o, objs/%.o, main.o sfdd.o)
+T0_OBJS = $(patsubst %.o, objs/%.o, test0.o SFDD.o)
+T1_OBJS = $(patsubst %.o, objs/%.o, test_vtree_reader.o SFDD.o)
+T2_OBJS = $(patsubst %.o, objs/%.o, test2.o SFDD.o)
+T3_OBJS = $(patsubst %.o, objs/%.o, test3.o SFDD.o)
+T4_OBJS = $(patsubst %.o, objs/%.o, test4.o SFDD.o)
+M_OBJS = $(patsubst %.o, objs/%.o, main.o SFDD.o)
 
 CC	= g++
 CFLAGS	= -Isrc -g -Wall -std=c++0x
 VPATH = src:tester:objs
 
 
-all: sfdd
+all: test0 test_vtree_reader sfdd
 
-# all: test0 test1 test2 test3 test4  sfdd
+# all: test0 test_vtree_reader test2 test3 test4  sfdd
 
-# test4:	test4.o sfdd.o
+# test4:	test4.o SFDD.o
 # 		$(CC) $(CFLAGS) $(T4_OBJS) -o test4
 
-# test3:	test3.o sfdd.o
+# test3:	test3.o SFDD.o
 # 		$(CC) $(CFLAGS) $(T3_OBJS) -o test3
 
-# test2:	test2.o sfdd.o
+# test2:	test2.o SFDD.o
 # 		$(CC) $(CFLAGS) $(T2_OBJS) -o test2
 
-# test1:	test1.o sfdd.o
-# 		$(CC) $(CFLAGS) $(T1_OBJS) -o test1
+test_vtree_reader:	test_vtree_reader.o SFDD.o
+		$(CC) $(CFLAGS) $(T1_OBJS) -o test_vtree_reader
 
-# test0:	test0.o sfdd.o
-# 		$(CC) $(CFLAGS) $(T0_OBJS) -o test0 -O0
+test0:	test0.o SFDD.o
+		$(CC) $(CFLAGS) $(T0_OBJS) -o test0 -O0
 
-sfdd:	main.o sfdd.o
+sfdd:	main.o SFDD.o
 		$(CC) $(CFLAGS) $(M_OBJS) -o sfdd -O0
 
 %.o:%.cpp

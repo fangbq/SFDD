@@ -1,0 +1,1707 @@
+cht.cnf	203  650    Vtree Size: 3
+1  x0
+ 0  x2
+ 15  x0
+  3  x0
+   2  x1
+   13  x0
+    5  x0
+     4  x37
+     9  x0
+      7  x0
+       6  x33
+       8  x34
+      11  x0
+       10  x36
+       12  x38
+    14  x35
+  27  x0
+   17  x0
+    16  x3
+    21  x0
+     19  x0
+      18  x8
+      20  x4
+     23  x0
+      22  x7
+      25  x0
+       24  x5
+       26  x6
+   39  x0
+    33  x0
+     29  x0
+      28  x32
+      31  x0
+       30  x27
+       32  x28
+     35  x0
+      34  x30
+      37  x0
+       36  x31
+       38  x29
+    63  x0
+     51  x0
+      41  x0
+       40  x9
+       45  x0
+        43  x0
+         42  x10
+         44  x14
+        49  x0
+         47  x0
+          46  x11
+          48  x12
+         50  x13
+      53  x0
+       52  x19
+       59  x0
+        55  x0
+         54  x18
+         57  x0
+          56  x17
+          58  x20
+        61  x0
+         60  x15
+         62  x16
+     75  x0
+      65  x0
+       64  x21
+       69  x0
+        67  x0
+         66  x26
+         68  x22
+        71  x0
+         70  x23
+         73  x0
+          72  x24
+          74  x25
+      77  x0
+       76  x39
+       137  x0
+        127  x0
+         109  x0
+          99  x0
+           79  x0
+            78  x46
+            91  x0
+             81  x0
+              80  x40
+              85  x0
+               83  x0
+                82  x41
+                84  x45
+               87  x0
+                86  x43
+                89  x0
+                 88  x42
+                 90  x44
+             97  x0
+              93  x0
+               92  x49
+               95  x0
+                94  x47
+                96  x48
+              98  x50
+           103  x0
+            101  x0
+             100  x55
+             102  x53
+            107  x0
+             105  x0
+              104  x54
+              106  x52
+             108  x51
+          117  x0
+           113  x0
+            111  x0
+             110  x59
+             112  x60
+            115  x0
+             114  x57
+             116  x56
+           121  x0
+            119  x0
+             118  x58
+             120  x64
+            123  x0
+             122  x65
+             125  x0
+              124  x61
+              126  x62
+         131  x0
+          129  x0
+           128  x63
+           130  x69
+          133  x0
+           132  x70
+           135  x0
+            134  x67
+            136  x66
+        147  x0
+         141  x0
+          139  x0
+           138  x68
+           140  x75
+          143  x0
+           142  x72
+           145  x0
+            144  x74
+            146  x73
+         149  x0
+          148  x71
+          159  x0
+           153  x0
+            151  x0
+             150  x79
+             152  x78
+            155  x0
+             154  x80
+             157  x0
+              156  x77
+              158  x76
+           169  x0
+            163  x0
+             161  x0
+              160  x83
+              162  x85
+             167  x0
+              165  x0
+               164  x84
+               166  x82
+              168  x81
+            199  x0
+             179  x0
+              173  x0
+               171  x0
+                170  x88
+                172  x90
+               177  x0
+                175  x0
+                 174  x89
+                 176  x87
+                178  x86
+              189  x0
+               181  x0
+                180  x91
+                183  x0
+                 182  x95
+                 187  x0
+                  185  x0
+                   184  x93
+                   186  x94
+                  188  x92
+               193  x0
+                191  x0
+                 190  x96
+                 192  x100
+                195  x0
+                 194  x98
+                 197  x0
+                  196  x99
+                  198  x97
+             203  x0
+              201  x0
+               200  x103
+               202  x105
+              207  x0
+               205  x0
+                204  x102
+                206  x104
+               209  x0
+                208  x101
+                213  x0
+                 211  x0
+                  210  x109
+                  212  x110
+                 217  x0
+                  215  x0
+                   214  x108
+                   216  x107
+                  219  x0
+                   218  x106
+                   283  x0
+                    221  x0
+                     220  x111
+                     253  x0
+                      231  x0
+                       223  x0
+                        222  x116
+                        225  x0
+                         224  x117
+                         227  x0
+                          226  x115
+                          229  x0
+                           228  x113
+                           230  x114
+                       241  x0
+                        233  x0
+                         232  x112
+                         237  x0
+                          235  x0
+                           234  x120
+                           236  x122
+                          239  x0
+                           238  x121
+                           240  x119
+                        243  x0
+                         242  x118
+                         247  x0
+                          245  x0
+                           244  x127
+                           246  x126
+                          249  x0
+                           248  x125
+                           251  x0
+                            250  x124
+                            252  x123
+                      271  x0
+                       259  x0
+                        255  x0
+                         254  x130
+                         257  x0
+                          256  x131
+                          258  x132
+                        263  x0
+                         261  x0
+                          260  x129
+                          262  x128
+                         267  x0
+                          265  x0
+                           264  x136
+                           266  x137
+                          269  x0
+                           268  x135
+                           270  x134
+                       273  x0
+                        272  x133
+                        277  x0
+                         275  x0
+                          274  x141
+                          276  x142
+                         279  x0
+                          278  x140
+                          281  x0
+                           280  x139
+                           282  x138
+                    291  x0
+                     287  x0
+                      285  x0
+                       284  x146
+                       286  x147
+                      289  x0
+                       288  x145
+                       290  x144
+                     295  x0
+                      293  x0
+                       292  x150
+                       294  x143
+                      301  x0
+                       297  x0
+                        296  x154
+                        299  x0
+                         298  x155
+                         300  x156
+                       309  x0
+                        305  x0
+                         303  x0
+                          302  x152
+                          304  x151
+                         307  x0
+                          306  x153
+                          308  x149
+                        313  x0
+                         311  x0
+                          310  x148
+                          312  x158
+                         321  x0
+                          317  x0
+                           315  x0
+                            314  x159
+                            316  x160
+                           319  x0
+                            318  x162
+                            320  x161
+                          325  x0
+                           323  x0
+                            322  x157
+                            324  x164
+                           333  x0
+                            329  x0
+                             327  x0
+                              326  x168
+                              328  x165
+                             331  x0
+                              330  x167
+                              332  x166
+                            335  x0
+                             334  x163
+                             347  x0
+                              339  x0
+                               337  x0
+                                336  x172
+                                338  x171
+                               341  x0
+                                340  x173
+                                343  x0
+                                 342  x169
+                                 345  x0
+                                  344  x170
+                                  346  x174
+                              359  x0
+                               351  x0
+                                349  x0
+                                 348  x177
+                                 350  x178
+                                353  x0
+                                 352  x179
+                                 355  x0
+                                  354  x175
+                                  357  x0
+                                   356  x176
+                                   358  x180
+                               367  x0
+                                363  x0
+                                 361  x0
+                                  360  x185
+                                  362  x186
+                                 365  x0
+                                  364  x183
+                                  366  x184
+                                371  x0
+                                 369  x0
+                                  368  x182
+                                  370  x181
+                                 377  x0
+                                  373  x0
+                                   372  x200
+                                   375  x0
+                                    374  x201
+                                    376  x202
+                                  381  x0
+                                   379  x0
+                                    378  x203
+                                    380  x199
+                                   389  x0
+                                    385  x0
+                                     383  x0
+                                      382  x197
+                                      384  x198
+                                     387  x0
+                                      386  x195
+                                      388  x193
+                                    393  x0
+                                     391  x0
+                                      390  x196
+                                      392  x194
+                                     395  x0
+                                      394  x187
+                                      399  x0
+                                       397  x0
+                                        396  x192
+                                        398  x191
+                                       401  x0
+                                        400  x190
+                                        403  x0
+                                         402  x188
+                                         404  x189
+1 ~ 0
+clause : 1 done; size : 1
+1 ~ 0
+clause : 2 done; size : 1
+1 ~ 0
+clause : 3 done; size : 1
+1 ~ 0
+clause : 4 done; size : 1
+1 ~ 0
+clause : 5 done; size : 1
+1 ~ 0
+clause : 6 done; size : 1
+1 ~ 0
+clause : 7 done; size : 1
+1 ~ 0
+clause : 8 done; size : 1
+1 ~ 0
+clause : 9 done; size : 1
+1 ~ 0
+clause : 10 done; size : 1
+1 ~ 0
+clause : 11 done; size : 1
+1 ~ 0
+clause : 12 done; size : 1
+1 ~ 0
+clause : 13 done; size : 1
+1 ~ 0
+clause : 14 done; size : 1
+1 ~ 0
+clause : 15 done; size : 1
+1 ~ 0
+clause : 16 done; size : 1
+1 ~ 0
+clause : 17 done; size : 1
+1 ~ 0
+clause : 18 done; size : 1
+1 ~ 0
+clause : 19 done; size : 1
+1 ~ 0
+clause : 20 done; size : 1
+1 ~ 0
+clause : 21 done; size : 1
+1 ~ 0
+clause : 22 done; size : 1
+1 ~ 0
+clause : 23 done; size : 1
+1 ~ 0
+clause : 24 done; size : 1
+1 ~ 0
+clause : 25 done; size : 1
+1 ~ 0
+clause : 26 done; size : 1
+1 ~ 0
+clause : 27 done; size : 1
+1 ~ 0
+clause : 28 done; size : 1
+1 ~ 0
+clause : 29 done; size : 1
+1 ~ 0
+clause : 30 done; size : 1
+1 ~ 0
+clause : 31 done; size : 1
+1 ~ 0
+clause : 32 done; size : 1
+1 ~ 0
+clause : 33 done; size : 1
+1 ~ 0
+clause : 34 done; size : 1
+1 ~ 0
+clause : 35 done; size : 1
+1 ~ 0
+clause : 36 done; size : 1
+1 ~ 0
+clause : 37 done; size : 1
+1 ~ 0
+clause : 38 done; size : 1
+1 ~ 0
+clause : 39 done; size : 1
+1 ~ 0
+clause : 40 done; size : 1
+1 ~ 0
+clause : 41 done; size : 1
+1 ~ 0
+clause : 42 done; size : 1
+1 ~ 0
+clause : 43 done; size : 1
+1 ~ 0
+clause : 44 done; size : 1
+1 ~ 0
+clause : 45 done; size : 1
+1 ~ 0
+clause : 46 done; size : 1
+1 ~ 0
+clause : 47 done; size : 1
+1 ~ 0
+clause : 48 done; size : 1
+1 ~ 0
+clause : 49 done; size : 1
+1 ~ 0
+clause : 50 done; size : 1
+1 ~ 0
+clause : 51 done; size : 1
+1 ~ 0
+clause : 52 done; size : 1
+1 ~ 0
+clause : 53 done; size : 1
+1 ~ 0
+clause : 54 done; size : 1
+1 ~ 0
+clause : 55 done; size : 1
+1 ~ 0
+clause : 56 done; size : 1
+1 ~ 0
+clause : 57 done; size : 1
+1 ~ 0
+clause : 58 done; size : 1
+1 ~ 0
+clause : 59 done; size : 1
+1 ~ 0
+clause : 60 done; size : 1
+1 ~ 0
+clause : 61 done; size : 1
+1 ~ 0
+clause : 62 done; size : 1
+1 ~ 0
+clause : 63 done; size : 1
+1 ~ 0
+clause : 64 done; size : 1
+1 ~ 0
+clause : 65 done; size : 1
+1 ~ 0
+clause : 66 done; size : 1
+1 ~ 0
+clause : 67 done; size : 1
+1 ~ 0
+clause : 68 done; size : 1
+1 ~ 0
+clause : 69 done; size : 1
+1 ~ 0
+clause : 70 done; size : 1
+1 ~ 0
+clause : 71 done; size : 1
+1 ~ 0
+clause : 72 done; size : 1
+1 ~ 0
+clause : 73 done; size : 1
+1 ~ 0
+clause : 74 done; size : 1
+1 ~ 0
+clause : 75 done; size : 1
+1 ~ 0
+clause : 76 done; size : 1
+1 ~ 0
+clause : 77 done; size : 1
+1 ~ 0
+clause : 78 done; size : 1
+1 ~ 0
+clause : 79 done; size : 1
+1 ~ 0
+clause : 80 done; size : 1
+1 ~ 0
+clause : 81 done; size : 1
+1 ~ 0
+clause : 82 done; size : 1
+1 ~ 0
+clause : 83 done; size : 1
+1 ~ 0
+clause : 84 done; size : 1
+1 ~ 0
+clause : 85 done; size : 1
+1 ~ 0
+clause : 86 done; size : 1
+1 ~ 0
+clause : 87 done; size : 1
+1 ~ 0
+clause : 88 done; size : 1
+1 ~ 0
+clause : 89 done; size : 1
+1 ~ 0
+clause : 90 done; size : 1
+1 ~ 0
+clause : 91 done; size : 1
+1 ~ 0
+clause : 92 done; size : 1
+1 ~ 0
+clause : 93 done; size : 1
+1 ~ 0
+clause : 94 done; size : 1
+1 ~ 0
+clause : 95 done; size : 1
+1 ~ 0
+clause : 96 done; size : 1
+1 ~ 0
+clause : 97 done; size : 1
+1 ~ 0
+clause : 98 done; size : 1
+1 ~ 0
+clause : 99 done; size : 1
+1 ~ 0
+clause : 100 done; size : 1
+1 ~ 0
+clause : 101 done; size : 1
+1 ~ 0
+clause : 102 done; size : 1
+1 ~ 0
+clause : 103 done; size : 1
+1 ~ 0
+clause : 104 done; size : 1
+1 ~ 0
+clause : 105 done; size : 1
+1 ~ 0
+clause : 106 done; size : 1
+1 ~ 0
+clause : 107 done; size : 1
+1 ~ 0
+clause : 108 done; size : 1
+1 ~ 0
+clause : 109 done; size : 1
+1 ~ 0
+clause : 110 done; size : 1
+1 ~ 0
+clause : 111 done; size : 1
+1 ~ 0
+clause : 112 done; size : 1
+1 ~ 0
+clause : 113 done; size : 1
+1 ~ 0
+clause : 114 done; size : 1
+1 ~ 0
+clause : 115 done; size : 1
+1 ~ 0
+clause : 116 done; size : 1
+1 ~ 0
+clause : 117 done; size : 1
+1 ~ 0
+clause : 118 done; size : 1
+1 ~ 0
+clause : 119 done; size : 1
+1 ~ 0
+clause : 120 done; size : 1
+1 ~ 0
+clause : 121 done; size : 1
+1 ~ 0
+clause : 122 done; size : 1
+1 ~ 0
+clause : 123 done; size : 1
+1 ~ 0
+clause : 124 done; size : 1
+1 ~ 0
+clause : 125 done; size : 1
+1 ~ 0
+clause : 126 done; size : 1
+1 ~ 0
+clause : 127 done; size : 1
+1 ~ 0
+clause : 128 done; size : 1
+1 ~ 0
+clause : 129 done; size : 1
+1 ~ 0
+clause : 130 done; size : 1
+1 ~ 0
+clause : 131 done; size : 1
+1 ~ 0
+clause : 132 done; size : 1
+1 ~ 0
+clause : 133 done; size : 1
+1 ~ 0
+clause : 134 done; size : 1
+1 ~ 0
+clause : 135 done; size : 1
+1 ~ 0
+clause : 136 done; size : 1
+1 ~ 0
+clause : 137 done; size : 1
+1 ~ 0
+clause : 138 done; size : 1
+1 ~ 0
+clause : 139 done; size : 1
+1 ~ 0
+clause : 140 done; size : 1
+1 ~ 0
+clause : 141 done; size : 1
+1 ~ 0
+clause : 142 done; size : 1
+1 ~ 0
+clause : 143 done; size : 1
+1 ~ 0
+clause : 144 done; size : 1
+1 ~ 0
+clause : 145 done; size : 1
+1 ~ 0
+clause : 146 done; size : 1
+1 ~ 0
+clause : 147 done; size : 1
+1 ~ 0
+clause : 148 done; size : 1
+1 ~ 0
+clause : 149 done; size : 1
+1 ~ 0
+clause : 150 done; size : 1
+1 ~ 0
+clause : 151 done; size : 1
+1 ~ 0
+clause : 152 done; size : 1
+1 ~ 0
+clause : 153 done; size : 1
+1 ~ 0
+clause : 154 done; size : 1
+1 ~ 0
+clause : 155 done; size : 1
+1 ~ 0
+clause : 156 done; size : 1
+1 ~ 0
+clause : 157 done; size : 1
+1 ~ 0
+clause : 158 done; size : 1
+1 ~ 0
+clause : 159 done; size : 1
+1 ~ 0
+clause : 160 done; size : 1
+1 ~ 0
+clause : 161 done; size : 1
+1 ~ 0
+clause : 162 done; size : 1
+1 ~ 0
+clause : 163 done; size : 1
+1 ~ 0
+clause : 164 done; size : 1
+1 ~ 0
+clause : 165 done; size : 1
+1 ~ 0
+clause : 166 done; size : 1
+1 ~ 0
+clause : 167 done; size : 1
+1 ~ 0
+clause : 168 done; size : 1
+1 ~ 0
+clause : 169 done; size : 1
+1 ~ 0
+clause : 170 done; size : 1
+1 ~ 0
+clause : 171 done; size : 1
+1 ~ 0
+clause : 172 done; size : 1
+1 ~ 0
+clause : 173 done; size : 1
+1 ~ 0
+clause : 174 done; size : 1
+1 ~ 0
+clause : 175 done; size : 1
+1 ~ 0
+clause : 176 done; size : 1
+1 ~ 0
+clause : 177 done; size : 1
+1 ~ 0
+clause : 178 done; size : 1
+1 ~ 0
+clause : 179 done; size : 1
+1 ~ 0
+clause : 180 done; size : 1
+1 ~ 0
+clause : 181 done; size : 1
+1 ~ 0
+clause : 182 done; size : 1
+1 ~ 0
+clause : 183 done; size : 1
+1 ~ 0
+clause : 184 done; size : 1
+1 ~ 0
+clause : 185 done; size : 1
+1 ~ 0
+clause : 186 done; size : 1
+1 ~ 0
+clause : 187 done; size : 1
+1 ~ 0
+clause : 188 done; size : 1
+1 ~ 0
+clause : 189 done; size : 1
+1 ~ 0
+clause : 190 done; size : 1
+1 ~ 0
+clause : 191 done; size : 1
+1 ~ 0
+clause : 192 done; size : 1
+1 ~ 0
+clause : 193 done; size : 1
+1 ~ 0
+clause : 194 done; size : 1
+1 ~ 0
+clause : 195 done; size : 1
+1 ~ 0
+clause : 196 done; size : 1
+1 ~ 0
+clause : 197 done; size : 1
+1 ~ 0
+clause : 198 done; size : 1
+1 ~ 0
+clause : 199 done; size : 1
+1 ~ 0
+clause : 200 done; size : 1
+1 ~ 0
+clause : 201 done; size : 1
+1 ~ 0
+clause : 202 done; size : 1
+1 ~ 0
+clause : 203 done; size : 1
+1 ~ 0
+clause : 204 done; size : 1
+1 ~ 0
+clause : 205 done; size : 1
+1 ~ 0
+clause : 206 done; size : 1
+1 ~ 0
+clause : 207 done; size : 1
+1 ~ 0
+clause : 208 done; size : 1
+1 ~ 0
+clause : 209 done; size : 1
+1 ~ 0
+clause : 210 done; size : 1
+1 ~ 0
+clause : 211 done; size : 1
+1 ~ 0
+clause : 212 done; size : 1
+1 ~ 0
+clause : 213 done; size : 1
+1 ~ 0
+clause : 214 done; size : 1
+1 ~ 0
+clause : 215 done; size : 1
+1 ~ 0
+clause : 216 done; size : 1
+1 ~ 0
+clause : 217 done; size : 1
+1 ~ 0
+clause : 218 done; size : 1
+1 ~ 0
+clause : 219 done; size : 1
+1 ~ 0
+clause : 220 done; size : 1
+1 ~ 0
+clause : 221 done; size : 1
+1 ~ 0
+clause : 222 done; size : 1
+1 ~ 0
+clause : 223 done; size : 1
+1 ~ 0
+clause : 224 done; size : 1
+1 ~ 0
+clause : 225 done; size : 1
+1 ~ 0
+clause : 226 done; size : 1
+1 ~ 0
+clause : 227 done; size : 1
+1 ~ 0
+clause : 228 done; size : 1
+1 ~ 0
+clause : 229 done; size : 1
+1 ~ 0
+clause : 230 done; size : 1
+1 ~ 0
+clause : 231 done; size : 1
+1 ~ 0
+clause : 232 done; size : 1
+1 ~ 0
+clause : 233 done; size : 1
+1 ~ 0
+clause : 234 done; size : 1
+1 ~ 0
+clause : 235 done; size : 1
+1 ~ 0
+clause : 236 done; size : 1
+1 ~ 0
+clause : 237 done; size : 1
+1 ~ 0
+clause : 238 done; size : 1
+1 ~ 0
+clause : 239 done; size : 1
+1 ~ 0
+clause : 240 done; size : 1
+1 ~ 0
+clause : 241 done; size : 1
+1 ~ 0
+clause : 242 done; size : 1
+1 ~ 0
+clause : 243 done; size : 1
+1 ~ 0
+clause : 244 done; size : 1
+1 ~ 0
+clause : 245 done; size : 1
+1 ~ 0
+clause : 246 done; size : 1
+1 ~ 0
+clause : 247 done; size : 1
+1 ~ 0
+clause : 248 done; size : 1
+1 ~ 0
+clause : 249 done; size : 1
+1 ~ 0
+clause : 250 done; size : 1
+1 ~ 0
+clause : 251 done; size : 1
+1 ~ 0
+clause : 252 done; size : 1
+1 ~ 0
+clause : 253 done; size : 1
+1 ~ 0
+clause : 254 done; size : 1
+1 ~ 0
+clause : 255 done; size : 1
+1 ~ 0
+clause : 256 done; size : 1
+1 ~ 0
+clause : 257 done; size : 1
+1 ~ 0
+clause : 258 done; size : 1
+1 ~ 0
+clause : 259 done; size : 1
+1 ~ 0
+clause : 260 done; size : 1
+1 ~ 0
+clause : 261 done; size : 1
+1 ~ 0
+clause : 262 done; size : 1
+1 ~ 0
+clause : 263 done; size : 1
+1 ~ 0
+clause : 264 done; size : 1
+1 ~ 0
+clause : 265 done; size : 1
+1 ~ 0
+clause : 266 done; size : 1
+1 ~ 0
+clause : 267 done; size : 1
+1 ~ 0
+clause : 268 done; size : 1
+1 ~ 0
+clause : 269 done; size : 1
+1 ~ 0
+clause : 270 done; size : 1
+1 ~ 0
+clause : 271 done; size : 1
+1 ~ 0
+clause : 272 done; size : 1
+1 ~ 0
+clause : 273 done; size : 1
+1 ~ 0
+clause : 274 done; size : 1
+1 ~ 0
+clause : 275 done; size : 1
+1 ~ 0
+clause : 276 done; size : 1
+1 ~ 0
+clause : 277 done; size : 1
+1 ~ 0
+clause : 278 done; size : 1
+1 ~ 0
+clause : 279 done; size : 1
+1 ~ 0
+clause : 280 done; size : 1
+1 ~ 0
+clause : 281 done; size : 1
+1 ~ 0
+clause : 282 done; size : 1
+1 ~ 0
+clause : 283 done; size : 1
+1 ~ 0
+clause : 284 done; size : 1
+1 ~ 0
+clause : 285 done; size : 1
+1 ~ 0
+clause : 286 done; size : 1
+1 ~ 0
+clause : 287 done; size : 1
+1 ~ 0
+clause : 288 done; size : 1
+1 ~ 0
+clause : 289 done; size : 1
+1 ~ 0
+clause : 290 done; size : 1
+1 ~ 0
+clause : 291 done; size : 1
+1 ~ 0
+clause : 292 done; size : 1
+1 ~ 0
+clause : 293 done; size : 1
+1 ~ 0
+clause : 294 done; size : 1
+1 ~ 0
+clause : 295 done; size : 1
+1 ~ 0
+clause : 296 done; size : 1
+1 ~ 0
+clause : 297 done; size : 1
+1 ~ 0
+clause : 298 done; size : 1
+1 ~ 0
+clause : 299 done; size : 1
+1 ~ 0
+clause : 300 done; size : 1
+1 ~ 0
+clause : 301 done; size : 1
+1 ~ 0
+clause : 302 done; size : 1
+1 ~ 0
+clause : 303 done; size : 1
+1 ~ 0
+clause : 304 done; size : 1
+1 ~ 0
+clause : 305 done; size : 1
+1 ~ 0
+clause : 306 done; size : 1
+1 ~ 0
+clause : 307 done; size : 1
+1 ~ 0
+clause : 308 done; size : 1
+1 ~ 0
+clause : 309 done; size : 1
+1 ~ 0
+clause : 310 done; size : 1
+1 ~ 0
+clause : 311 done; size : 1
+1 ~ 0
+clause : 312 done; size : 1
+1 ~ 0
+clause : 313 done; size : 1
+1 ~ 0
+clause : 314 done; size : 1
+1 ~ 0
+clause : 315 done; size : 1
+1 ~ 0
+clause : 316 done; size : 1
+1 ~ 0
+clause : 317 done; size : 1
+1 ~ 0
+clause : 318 done; size : 1
+1 ~ 0
+clause : 319 done; size : 1
+1 ~ 0
+clause : 320 done; size : 1
+1 ~ 0
+clause : 321 done; size : 1
+1 ~ 0
+clause : 322 done; size : 1
+1 ~ 0
+clause : 323 done; size : 1
+1 ~ 0
+clause : 324 done; size : 1
+1 ~ 0
+clause : 325 done; size : 1
+1 ~ 0
+clause : 326 done; size : 1
+1 ~ 0
+clause : 327 done; size : 1
+1 ~ 0
+clause : 328 done; size : 1
+1 ~ 0
+clause : 329 done; size : 1
+1 ~ 0
+clause : 330 done; size : 1
+1 ~ 0
+clause : 331 done; size : 1
+1 ~ 0
+clause : 332 done; size : 1
+1 ~ 0
+clause : 333 done; size : 1
+1 ~ 0
+clause : 334 done; size : 1
+1 ~ 0
+clause : 335 done; size : 1
+1 ~ 0
+clause : 336 done; size : 1
+1 ~ 0
+clause : 337 done; size : 1
+1 ~ 0
+clause : 338 done; size : 1
+1 ~ 0
+clause : 339 done; size : 1
+1 ~ 0
+clause : 340 done; size : 1
+1 ~ 0
+clause : 341 done; size : 1
+1 ~ 0
+clause : 342 done; size : 1
+1 ~ 0
+clause : 343 done; size : 1
+1 ~ 0
+clause : 344 done; size : 1
+1 ~ 0
+clause : 345 done; size : 1
+1 ~ 0
+clause : 346 done; size : 1
+1 ~ 0
+clause : 347 done; size : 1
+1 ~ 0
+clause : 348 done; size : 1
+1 ~ 0
+clause : 349 done; size : 1
+1 ~ 0
+clause : 350 done; size : 1
+1 ~ 0
+clause : 351 done; size : 1
+1 ~ 0
+clause : 352 done; size : 1
+1 ~ 0
+clause : 353 done; size : 1
+1 ~ 0
+clause : 354 done; size : 1
+1 ~ 0
+clause : 355 done; size : 1
+1 ~ 0
+clause : 356 done; size : 1
+1 ~ 0
+clause : 357 done; size : 1
+1 ~ 0
+clause : 358 done; size : 1
+1 ~ 0
+clause : 359 done; size : 1
+1 ~ 0
+clause : 360 done; size : 1
+1 ~ 0
+clause : 361 done; size : 1
+1 ~ 0
+clause : 362 done; size : 1
+1 ~ 0
+clause : 363 done; size : 1
+1 ~ 0
+clause : 364 done; size : 1
+1 ~ 0
+clause : 365 done; size : 1
+1 ~ 0
+clause : 366 done; size : 1
+1 ~ 0
+clause : 367 done; size : 1
+1 ~ 0
+clause : 368 done; size : 1
+1 ~ 0
+clause : 369 done; size : 1
+1 ~ 0
+clause : 370 done; size : 1
+1 ~ 0
+clause : 371 done; size : 1
+1 ~ 0
+clause : 372 done; size : 1
+1 ~ 0
+clause : 373 done; size : 1
+1 ~ 0
+clause : 374 done; size : 1
+1 ~ 0
+clause : 375 done; size : 1
+1 ~ 0
+clause : 376 done; size : 1
+1 ~ 0
+clause : 377 done; size : 1
+1 ~ 0
+clause : 378 done; size : 1
+1 ~ 0
+clause : 379 done; size : 1
+1 ~ 0
+clause : 380 done; size : 1
+1 ~ 0
+clause : 381 done; size : 1
+1 ~ 0
+clause : 382 done; size : 1
+1 ~ 0
+clause : 383 done; size : 1
+1 ~ 0
+clause : 384 done; size : 1
+1 ~ 0
+clause : 385 done; size : 1
+1 ~ 0
+clause : 386 done; size : 1
+1 ~ 0
+clause : 387 done; size : 1
+1 ~ 0
+clause : 388 done; size : 1
+1 ~ 0
+clause : 389 done; size : 1
+1 ~ 0
+clause : 390 done; size : 1
+1 ~ 0
+clause : 391 done; size : 1
+1 ~ 0
+clause : 392 done; size : 1
+1 ~ 0
+clause : 393 done; size : 1
+1 ~ 0
+clause : 394 done; size : 1
+1 ~ 0
+clause : 395 done; size : 1
+1 ~ 0
+clause : 396 done; size : 1
+1 ~ 0
+clause : 397 done; size : 1
+1 ~ 0
+clause : 398 done; size : 1
+1 ~ 0
+clause : 399 done; size : 1
+1 ~ 0
+clause : 400 done; size : 1
+1 ~ 0
+clause : 401 done; size : 1
+1 ~ 0
+clause : 402 done; size : 1
+1 ~ 0
+clause : 403 done; size : 1
+1 ~ 0
+clause : 404 done; size : 1
+1 ~ 0
+clause : 405 done; size : 1
+1 ~ 0
+clause : 406 done; size : 1
+1 ~ 0
+clause : 407 done; size : 1
+1 ~ 0
+clause : 408 done; size : 1
+1 ~ 0
+clause : 409 done; size : 1
+1 ~ 0
+clause : 410 done; size : 1
+1 ~ 0
+clause : 411 done; size : 1
+1 ~ 0
+clause : 412 done; size : 1
+1 ~ 0
+clause : 413 done; size : 1
+1 ~ 0
+clause : 414 done; size : 1
+1 ~ 0
+clause : 415 done; size : 1
+1 ~ 0
+clause : 416 done; size : 1
+1 ~ 0
+clause : 417 done; size : 1
+1 ~ 0
+clause : 418 done; size : 1
+1 ~ 0
+clause : 419 done; size : 1
+1 ~ 0
+clause : 420 done; size : 1
+1 ~ 0
+clause : 421 done; size : 1
+1 ~ 0
+clause : 422 done; size : 1
+1 ~ 0
+clause : 423 done; size : 1
+1 ~ 0
+clause : 424 done; size : 1
+1 ~ 0
+clause : 425 done; size : 1
+1 ~ 0
+clause : 426 done; size : 1
+1 ~ 0
+clause : 427 done; size : 1
+1 ~ 0
+clause : 428 done; size : 1
+1 ~ 0
+clause : 429 done; size : 1
+1 ~ 0
+clause : 430 done; size : 1
+1 ~ 0
+clause : 431 done; size : 1
+1 ~ 0
+clause : 432 done; size : 1
+1 ~ 0
+clause : 433 done; size : 1
+1 ~ 0
+clause : 434 done; size : 1
+1 ~ 0
+clause : 435 done; size : 1
+1 ~ 0
+clause : 436 done; size : 1
+1 ~ 0
+clause : 437 done; size : 1
+1 ~ 0
+clause : 438 done; size : 1
+1 ~ 0
+clause : 439 done; size : 1
+1 ~ 0
+clause : 440 done; size : 1
+1 ~ 0
+clause : 441 done; size : 1
+1 ~ 0
+clause : 442 done; size : 1
+1 ~ 0
+clause : 443 done; size : 1
+1 ~ 0
+clause : 444 done; size : 1
+1 ~ 0
+clause : 445 done; size : 1
+1 ~ 0
+clause : 446 done; size : 1
+1 ~ 0
+clause : 447 done; size : 1
+1 ~ 0
+clause : 448 done; size : 1
+1 ~ 0
+clause : 449 done; size : 1
+1 ~ 0
+clause : 450 done; size : 1
+1 ~ 0
+clause : 451 done; size : 1
+1 ~ 0
+clause : 452 done; size : 1
+1 ~ 0
+clause : 453 done; size : 1
+1 ~ 0
+clause : 454 done; size : 1
+1 ~ 0
+clause : 455 done; size : 1
+1 ~ 0
+clause : 456 done; size : 1
+1 ~ 0
+clause : 457 done; size : 1
+1 ~ 0
+clause : 458 done; size : 1
+1 ~ 0
+clause : 459 done; size : 1
+1 ~ 0
+clause : 460 done; size : 1
+1 ~ 0
+clause : 461 done; size : 1
+1 ~ 0
+clause : 462 done; size : 1
+1 ~ 0
+clause : 463 done; size : 1
+1 ~ 0
+clause : 464 done; size : 1
+1 ~ 0
+clause : 465 done; size : 1
+1 ~ 0
+clause : 466 done; size : 1
+1 ~ 0
+clause : 467 done; size : 1
+1 ~ 0
+clause : 468 done; size : 1
+1 ~ 0
+clause : 469 done; size : 1
+1 ~ 0
+clause : 470 done; size : 1
+1 ~ 0
+clause : 471 done; size : 1
+1 ~ 0
+clause : 472 done; size : 1
+1 ~ 0
+clause : 473 done; size : 1
+1 ~ 0
+clause : 474 done; size : 1
+1 ~ 0
+clause : 475 done; size : 1
+1 ~ 0
+clause : 476 done; size : 1
+1 ~ 0
+clause : 477 done; size : 1
+1 ~ 0
+clause : 478 done; size : 1
+1 ~ 0
+clause : 479 done; size : 1
+1 ~ 0
+clause : 480 done; size : 1
+1 ~ 0
+clause : 481 done; size : 1
+1 ~ 0
+clause : 482 done; size : 1
+1 ~ 0
+clause : 483 done; size : 1
+1 ~ 0
+clause : 484 done; size : 1
+1 ~ 0
+clause : 485 done; size : 1
+1 ~ 0
+clause : 486 done; size : 1
+1 ~ 0
+clause : 487 done; size : 1
+1 ~ 0
+clause : 488 done; size : 1
+1 ~ 0
+clause : 489 done; size : 1
+1 ~ 0
+clause : 490 done; size : 1
+1 ~ 0
+clause : 491 done; size : 1
+1 ~ 0
+clause : 492 done; size : 1
+1 ~ 0
+clause : 493 done; size : 1
+1 ~ 0
+clause : 494 done; size : 1
+1 ~ 0
+clause : 495 done; size : 1
+1 ~ 0
+clause : 496 done; size : 1
+1 ~ 0
+clause : 497 done; size : 1
+1 ~ 0
+clause : 498 done; size : 1
+1 ~ 0
+clause : 499 done; size : 1
+1 ~ 0
+clause : 500 done; size : 1
+1 ~ 0
+clause : 501 done; size : 1
+1 ~ 0
+clause : 502 done; size : 1
+1 ~ 0
+clause : 503 done; size : 1
+1 ~ 0
+clause : 504 done; size : 1
+1 ~ 0
+clause : 505 done; size : 1
+1 ~ 0
+clause : 506 done; size : 1
+1 ~ 0
+clause : 507 done; size : 1
+1 ~ 0
+clause : 508 done; size : 1
+1 ~ 0
+clause : 509 done; size : 1
+1 ~ 0
+clause : 510 done; size : 1
+1 ~ 0
+clause : 511 done; size : 1
+1 ~ 0
+clause : 512 done; size : 1
+1 ~ 0
+clause : 513 done; size : 1
+1 ~ 0
+clause : 514 done; size : 1
+1 ~ 0
+clause : 515 done; size : 1
+1 ~ 0
+clause : 516 done; size : 1
+1 ~ 0
+clause : 517 done; size : 1
+1 ~ 0
+clause : 518 done; size : 1
+1 ~ 0
+clause : 519 done; size : 1
+1 ~ 0
+clause : 520 done; size : 1
+1 ~ 0
+clause : 521 done; size : 1
+1 ~ 0
+clause : 522 done; size : 1
+1 ~ 0
+clause : 523 done; size : 1
+1 ~ 0
+clause : 524 done; size : 1
+1 ~ 0
+clause : 525 done; size : 1
+1 ~ 0
+clause : 526 done; size : 1
+1 ~ 0
+clause : 527 done; size : 1
+1 ~ 0
+clause : 528 done; size : 1
+1 ~ 0
+clause : 529 done; size : 1
+1 ~ 0
+clause : 530 done; size : 1
+1 ~ 0
+clause : 531 done; size : 1
+1 ~ 0
+clause : 532 done; size : 1
+1 ~ 0
+clause : 533 done; size : 1
+1 ~ 0
+clause : 534 done; size : 1
+1 ~ 0
+clause : 535 done; size : 1
+1 ~ 0
+clause : 536 done; size : 1
+1 ~ 0
+clause : 537 done; size : 1
+1 ~ 0
+clause : 538 done; size : 1
+1 ~ 0
+clause : 539 done; size : 1
+1 ~ 0
+clause : 540 done; size : 1
+1 ~ 0
+clause : 541 done; size : 1
+1 ~ 0
+clause : 542 done; size : 1
+1 ~ 0
+clause : 543 done; size : 1
+1 ~ 0
+clause : 544 done; size : 1
+1 ~ 0
+clause : 545 done; size : 1
+1 ~ 0
+clause : 546 done; size : 1
+1 ~ 0
+clause : 547 done; size : 1
+1 ~ 0
+clause : 548 done; size : 1
+1 ~ 0
+clause : 549 done; size : 1
+1 ~ 0
+clause : 550 done; size : 1
+1 ~ 0
+clause : 551 done; size : 1
+1 ~ 0
+clause : 552 done; size : 1
+1 ~ 0
+clause : 553 done; size : 1
+1 ~ 0
+clause : 554 done; size : 1
+1 ~ 0
+clause : 555 done; size : 1
+1 ~ 0
+clause : 556 done; size : 1
+1 ~ 0
+clause : 557 done; size : 1
+1 ~ 0
+clause : 558 done; size : 1
+1 ~ 0
+clause : 559 done; size : 1
+1 ~ 0
+clause : 560 done; size : 1
+1 ~ 0
+clause : 561 done; size : 1
+1 ~ 0
+clause : 562 done; size : 1
+1 ~ 0
+clause : 563 done; size : 1
+1 ~ 0
+clause : 564 done; size : 1
+1 ~ 0
+clause : 565 done; size : 1
+1 ~ 0
+clause : 566 done; size : 1
+1 ~ 0
+clause : 567 done; size : 1
+1 ~ 0
+clause : 568 done; size : 1
+1 ~ 0
+clause : 569 done; size : 1
+1 ~ 0
+clause : 570 done; size : 1
+1 ~ 0
+clause : 571 done; size : 1
+1 ~ 0
+clause : 572 done; size : 1
+1 ~ 0
+clause : 573 done; size : 1
+1 ~ 0
+clause : 574 done; size : 1
+1 ~ 0
+clause : 575 done; size : 1
+1 ~ 0
+clause : 576 done; size : 1
+1 ~ 0
+clause : 577 done; size : 1
+1 ~ 0
+clause : 578 done; size : 1
+1 ~ 0
+clause : 579 done; size : 1
+1 ~ 0
+clause : 580 done; size : 1
+1 ~ 0
+clause : 581 done; size : 1
+1 ~ 0
+clause : 582 done; size : 1
+1 ~ 0
+clause : 583 done; size : 1
+1 ~ 0
+clause : 584 done; size : 1
+1 ~ 0
+clause : 585 done; size : 1
+1 ~ 0
+clause : 586 done; size : 1
+1 ~ 0
+clause : 587 done; size : 1
+1 ~ 0
+clause : 588 done; size : 1
+1 ~ 0
+clause : 589 done; size : 1
+1 ~ 0
+clause : 590 done; size : 1
+1 ~ 0
+clause : 591 done; size : 1
+1 ~ 0
+clause : 592 done; size : 1
+1 ~ 0
+clause : 593 done; size : 1
+1 ~ 0
+clause : 594 done; size : 1
+1 ~ 0
+clause : 595 done; size : 1
+1 ~ 0
+clause : 596 done; size : 1
+1 ~ 0
+clause : 597 done; size : 1
+1 ~ 0
+clause : 598 done; size : 1
+1 ~ 0
+clause : 599 done; size : 1
+1 ~ 0
+clause : 600 done; size : 1
+1 ~ 0
+clause : 601 done; size : 1
+1 ~ 0
+clause : 602 done; size : 1
+1 ~ 0
+clause : 603 done; size : 1
+1 ~ 0
+clause : 604 done; size : 1
+1 ~ 0
+clause : 605 done; size : 1
+1 ~ 0
+clause : 606 done; size : 1
+1 ~ 0
+clause : 607 done; size : 1
+1 ~ 0
+clause : 608 done; size : 1
+1 ~ 0
+clause : 609 done; size : 1
+1 ~ 0
+clause : 610 done; size : 1
+1 ~ 0
+clause : 611 done; size : 1
+1 ~ 0
+clause : 612 done; size : 1
+1 ~ 0
+clause : 613 done; size : 1
+1 ~ 0
+clause : 614 done; size : 1
+1 ~ 0
+clause : 615 done; size : 1
+1 ~ 0
+clause : 616 done; size : 1
+1 ~ 0
+clause : 617 done; size : 1
+1 ~ 0
+clause : 618 done; size : 1
+1 ~ 0
+clause : 619 done; size : 1
+1 ~ 0
+clause : 620 done; size : 1
+1 ~ 0
+clause : 621 done; size : 1
+1 ~ 0
+clause : 622 done; size : 1
+1 ~ 0
+clause : 623 done; size : 1
+1 ~ 0
+clause : 624 done; size : 1
+1 ~ 0
+clause : 625 done; size : 1
+1 ~ 0
+clause : 626 done; size : 1
+1 ~ 0
+clause : 627 done; size : 1
+1 ~ 0
+clause : 628 done; size : 1
+1 ~ 0
+clause : 629 done; size : 1
+1 ~ 0
+clause : 630 done; size : 1
+1 ~ 0
+clause : 631 done; size : 1
+1 ~ 0
+clause : 632 done; size : 1
+1 ~ 0
+clause : 633 done; size : 1
+1 ~ 0
+clause : 634 done; size : 1
+1 ~ 0
+clause : 635 done; size : 1
+1 ~ 0
+clause : 636 done; size : 1
+1 ~ 0
+clause : 637 done; size : 1
+1 ~ 0
+clause : 638 done; size : 1
+1 ~ 0
+clause : 639 done; size : 1
+1 ~ 0
+clause : 640 done; size : 1
+1 ~ 0
+clause : 641 done; size : 1
+1 ~ 0
+clause : 642 done; size : 1
+1 ~ 0
+clause : 643 done; size : 1
+1 ~ 0
+clause : 644 done; size : 1
+1 ~ 0
+clause : 645 done; size : 1
+1 ~ 0
+clause : 646 done; size : 1
+1 ~ 0
+clause : 647 done; size : 1
+1 ~ 0
+clause : 648 done; size : 1
+1 ~ 0
+clause : 649 done; size : 1
+1 ~ 0
+clause : 650 done; size : 1
+0.0302  1
