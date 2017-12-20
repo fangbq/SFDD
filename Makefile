@@ -10,11 +10,11 @@ T4_OBJS = $(patsubst %.o, objs/%.o, test4.o SFDD.o)
 M_OBJS = $(patsubst %.o, objs/%.o, main.o SFDD.o)
 
 CC	= g++
-CFLAGS	= -Isrc -g -Wall -std=c++0x
+CFLAGS	= -Isrc -g -Wall -std=c++0x -pg
 VPATH = src:tester:objs
 
 
-all: test0 test_vtree_reader sfdd
+all: test0 test2 test_vtree_reader sfdd
 
 # all: test0 test_vtree_reader test2 test3 test4  sfdd
 
@@ -24,8 +24,8 @@ all: test0 test_vtree_reader sfdd
 # test3:	test3.o SFDD.o
 # 		$(CC) $(CFLAGS) $(T3_OBJS) -o test3
 
-# test2:	test2.o SFDD.o
-# 		$(CC) $(CFLAGS) $(T2_OBJS) -o test2
+test2:	test2.o SFDD.o
+		$(CC) $(CFLAGS) $(T2_OBJS) -o test2
 
 test_vtree_reader:	test_vtree_reader.o SFDD.o
 		$(CC) $(CFLAGS) $(T1_OBJS) -o test_vtree_reader

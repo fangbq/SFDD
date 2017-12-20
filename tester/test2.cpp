@@ -15,81 +15,20 @@
 #include "SFDD.h"
 
 using namespace std;
+using namespace std::chrono;
 
 int main(int argc, char** argv) {
+    milliseconds ms = duration_cast< milliseconds >(
+        system_clock::now().time_since_epoch()
+    );
+    srand ( unsigned ( ms.count() ) );
 
     vector<int> vars_order;
     int var_no = 4;
     for (int i = 1; i <= var_no; ++i) vars_order.push_back(i);
+    random_shuffle(vars_order.begin(), vars_order.end(), myrandom);
 
-    Vtree* v = new Vtree(1, var_no, vars_order);
-
-    Manager m(v);
-    SFDD sfdd1 = m.sfddZero();
-    SFDD sfdd2 = m.sfddOne();
-    SFDD sfdd3 = m.sfddVar(1);
-    SFDD sfdd4 = m.sfddVar(-1);
-    SFDD sfdd5 = m.sfddVar(2);
-
-    fstream f;
-
-    /* @test 1-5 */
-    f.open("dotG/test2/f=0⊕0.dot", fstream::out | fstream::trunc);
-    sfdd1.Xor(sfdd1, m).print_dot(f, true);
-    f.close();
-    f.open("dotG/test2/f=0⊕1.dot", fstream::out | fstream::trunc);
-    sfdd1.Xor(sfdd2, m).print_dot(f, true);
-    f.close();
-    f.open("dotG/test2/f=0⊕x1.dot", fstream::out | fstream::trunc);
-    sfdd1.Xor(sfdd3, m).print_dot(f, true);
-    f.close();
-    f.open("dotG/test2/f=0⊕-x1.dot", fstream::out | fstream::trunc);
-    sfdd1.Xor(sfdd4, m).print_dot(f, true);
-    f.close();
-    f.open("dotG/test2/f=0⊕x2.dot", fstream::out | fstream::trunc);
-    sfdd1.Xor(sfdd5, m).print_dot(f, true);
-    f.close();
-
-    /* @test 6-9 */
-    f.open("dotG/test2/f=1⊕1.dot", fstream::out | fstream::trunc);
-    sfdd2.Xor(sfdd2, m).print_dot(f, true);
-    f.close();
-    f.open("dotG/test2/f=1⊕x1.dot", fstream::out | fstream::trunc);
-    sfdd2.Xor(sfdd3, m).print_dot(f, true);
-    f.close();
-    f.open("dotG/test2/f=1⊕-x1.dot", fstream::out | fstream::trunc);
-    sfdd2.Xor(sfdd4, m).print_dot(f, true);
-    f.close();
-    f.open("dotG/test2/f=1⊕x2.dot", fstream::out | fstream::trunc);
-    sfdd2.Xor(sfdd5, m).print_dot(f, true);
-    f.close();
-
-    /* @test 10-12 */
-    f.open("dotG/test2/f=x1⊕x1.dot", fstream::out | fstream::trunc);
-    sfdd3.Xor(sfdd3, m).print_dot(f, true);
-    f.close();
-    f.open("dotG/test2/f=x1⊕-x1.dot", fstream::out | fstream::trunc);
-    sfdd3.Xor(sfdd4, m).print_dot(f, true);
-    f.close();
-    f.open("dotG/test2/f=x1⊕x2.dot", fstream::out | fstream::trunc);
-    sfdd3.Xor(sfdd5, m).print_dot(f, true);
-    f.close();
-
-    /* @test 13-14 */
-    f.open("dotG/test2/f=-x1⊕-x1.dot", fstream::out | fstream::trunc);
-    sfdd4.Xor(sfdd4, m).print_dot(f, true);
-    f.close();
-    f.open("dotG/test2/f=-x1⊕x2.dot", fstream::out | fstream::trunc);
-    sfdd4.Xor(sfdd5, m).print_dot(f, true);
-    f.close();
-
-    /* @test 15 */
-    f.open("dotG/test2/f=x2⊕x2.dot", fstream::out | fstream::trunc);
-    sfdd5.Xor(sfdd5, m).print_dot(f, true);
-    f.close();
-
-
-    f.close();
-
+    Vtree* v = new Vtree(1, var_no*2-1, vars_order, RANDOM_TREE);
+    v->save_vtree_file("test/s1/s1.vtree");
     return 0;
 }

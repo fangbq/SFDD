@@ -27,9 +27,9 @@ Vtree::Vtree(int start_var_index, int end_var_index, vector<int> full_order, VTR
         return;
     }
     switch (t) {
-        case TRIVIAL_TREE:
+        case RANDOM_TREE:
         {
-            int mid = (end_var_index+start_var_index)/2;
+            int mid = myrandom(end_var_index-start_var_index)+start_var_index+1;
             mid = mid%2 ? mid-1 : mid;
             index = mid;
             // cout << mid << endl;
@@ -38,9 +38,15 @@ Vtree::Vtree(int start_var_index, int end_var_index, vector<int> full_order, VTR
             size = lt->size + rt->size + 1;
             break;
         }
-        case RANDOM_TREE:
+        case TRIVIAL_TREE:
         {
-            cout << "vtree error 1" << endl;
+            int mid = (start_var_index+end_var_index)/2;
+            mid = mid%2 ? mid-1 : mid;
+            index = mid;
+            // cout << mid << endl;
+            lt = new Vtree(start_var_index, mid-1, full_order, t);
+            rt = new Vtree(mid+1, end_var_index, full_order, t);
+            size = lt->size + rt->size + 1;
             break;
         }
         default:
@@ -200,10 +206,25 @@ void Vtree::print_dot(fstream& out_dot, bool root) const {
     return;
 }
 
-void Vtree::save_file_as_dot(const string f_name) const {
+void Vtree::print_vtree(fstream& out_dot, bool root) const {
+    if (root) out_dot << "vtree " << size << endl;
+    if (rt) rt->print_vtree(out_dot, false);
+    if (lt) lt->print_vtree(out_dot, false);
+    if (var) out_dot << "L " << index << " " << var << endl;
+    else out_dot << "I " << index << " " << lt->index << " " << rt->index << endl;
+}
+
+void Vtree::save_dot_file(const string f_name) const {
     fstream f;
-    f.open("dotG/test0/"+f_name+".dot", fstream::out | fstream::trunc);
+    f.open(f_name, fstream::out | fstream::trunc);
     print_dot(f, true);
+    f.close();
+}
+
+void Vtree::save_vtree_file(const string f_name) const {
+    fstream f;
+    f.open(f_name, fstream::out | fstream::trunc);
+    print_vtree(f, true);
     f.close();
 }
 
@@ -262,7 +283,7 @@ SFDD& SFDD::operator=(const SFDD& sfdd) {
     return *this;
 }
 
-SFDD& SFDD::reduced(const Manager& m) {
+SFDD& SFDD::reduced(Manager& m) {
 // cout << "reduced..." << endl;
     if (is_terminal()) return *this;
     bool valid = false;
@@ -344,25 +365,28 @@ extern int get_lca(int a, int b, const Vtree& v) {
     return L ? L : R;  // either one of p,q is on one side OR p,q is not in L&R subtrees
 }
 
-int level = 1;
-SFDD& SFDD::normalized(int lca, const Manager& m) {
+SFDD& SFDD::normalized(int lca, Manager& m) {
 // cout << "normalized..." << endl;
     for (vector<Element>::iterator e = elements.begin(); \
     e != elements.end(); ++e) {
         e->prime.normalized(m.vtree->subvtree(vtree_index).lt->index, m);
         e->sub.normalized(m.vtree->subvtree(vtree_index).rt->index, m);
     }
-    level++;
     *this = normalization_1(m.vtree->subvtree(lca), *this, m);
     if (!is_terminal()) value = -1;
     return *this;
 }
 
-SFDD SFDD::Intersection(const SFDD& sfdd, const Manager& m, int print_info) const {
-// cout << "Intersection..." << endl;
-    if (is_empty() || sfdd.is_empty()) cout << "big error" << endl;
+SFDD SFDD::Intersection(const SFDD& sfdd, Manager& m, int print_info) const {
+// cout << "Intersection..." << endl;    
+    addr_t this_id = m.make_or_find(*this), sfdd_id = m.make_or_find(sfdd);
+    addr_t cache = m.read_cache(INTER, this_id, sfdd_id);
+    if (cache != SFDD_NULL)
+        return m.sfdd_nodes_[cache];
+
     if (is_zero()) return *this;
     if (sfdd.is_zero()) return sfdd;
+
     SFDD new_sfdd;
     new_sfdd.vtree_index = vtree_index;
     // normalizing for both sides
@@ -398,13 +422,19 @@ SFDD SFDD::Intersection(const SFDD& sfdd, const Manager& m, int print_info) cons
     }
     new_sfdd.reduced(m);
     if (new_sfdd.is_terminal()) new_sfdd.vtree_index = get_index_by_var[new_sfdd.value/2];
+    
+    addr_t new_sfdd_id = m.make_sfdd(new_sfdd);
+    m.write_cache(INTER, this_id, sfdd_id, new_sfdd_id);
+    m.write_cache(INTER, sfdd_id, this_id, new_sfdd_id);
     return new_sfdd;
 }
 
-SFDD SFDD::Xor(const SFDD& sfdd, const Manager& m, bool do_nml) const {
+SFDD SFDD::Xor(const SFDD& sfdd, Manager& m, bool do_nml) const {
 // cout << "Xor..." << endl;
-    if (is_empty()) return sfdd;
-    if (sfdd.is_empty()) return *this;
+    addr_t this_id = m.make_or_find(*this), sfdd_id = m.make_or_find(sfdd);
+    addr_t cache = m.read_cache(XOR, this_id, sfdd_id);
+    if (cache != SFDD_NULL)
+        return m.sfdd_nodes_[cache];
 
     if (is_zero()) return sfdd;
     if (sfdd.is_zero()) return *this;
@@ -449,13 +479,18 @@ SFDD SFDD::Xor(const SFDD& sfdd, const Manager& m, bool do_nml) const {
     new_sfdd.reduced(m);
     if (new_sfdd.is_terminal()) new_sfdd.vtree_index = get_index_by_var[new_sfdd.value/2];
 
+    addr_t new_sfdd_id = m.make_sfdd(new_sfdd);
+    m.write_cache(XOR, this_id, sfdd_id, new_sfdd_id);
+    m.write_cache(XOR, sfdd_id, this_id, new_sfdd_id);
     return new_sfdd;
 }
 
-SFDD SFDD::And(const SFDD& sfdd, const Manager& m, bool do_nml, int clause_counter) const {
+SFDD SFDD::And(const SFDD& sfdd, Manager& m, bool do_nml, int clause_counter) const {
 // cout << "And..." << endl;
-    if (is_empty()) return sfdd;
-    if (sfdd.is_empty()) return *this;
+    addr_t this_id = m.make_or_find(*this), sfdd_id = m.make_or_find(sfdd);
+    addr_t cache = m.read_cache(AND, this_id, sfdd_id);
+    if (cache != SFDD_NULL)
+        return m.sfdd_nodes_[cache];
 
     if (is_zero()) return *this;
     if (sfdd.is_zero()) return sfdd;
@@ -488,6 +523,8 @@ SFDD SFDD::And(const SFDD& sfdd, const Manager& m, bool do_nml, int clause_count
             for (vector<Element>::const_iterator e2 = normalized_sfdd2.elements.begin();
             e2 != normalized_sfdd2.elements.end(); ++e2) {
                 SFDD prime_product = e1->prime.And(e2->prime, m);
+                if (prime_product.is_zero())
+                    continue;
                 SFDD sub_product = e1->sub.And(e2->sub, m);
                 SFDD tmp_new_sfdd;
                 tmp_new_sfdd.vtree_index = new_sfdd.vtree_index;
@@ -520,16 +557,31 @@ SFDD SFDD::And(const SFDD& sfdd, const Manager& m, bool do_nml, int clause_count
     new_sfdd.reduced(m);
     if (new_sfdd.is_terminal()) new_sfdd.vtree_index = get_index_by_var[new_sfdd.value/2];
 
-
+    addr_t new_sfdd_id = m.make_sfdd(new_sfdd);
+    m.write_cache(AND, this_id, sfdd_id, new_sfdd_id);
+    m.write_cache(AND, sfdd_id, this_id, new_sfdd_id);
     return new_sfdd;
 }
 
-SFDD SFDD::Or(const SFDD& sfdd, const Manager& m, bool do_nml) const {
+SFDD SFDD::Or(const SFDD& sfdd, Manager& m, bool do_nml) const {
 // cout << "Or..." << endl;
+    addr_t this_id = m.make_or_find(*this), sfdd_id = m.make_or_find(sfdd);
+    addr_t cache = m.read_cache(OR, this_id, sfdd_id);
+    if (cache != SFDD_NULL)
+        return m.sfdd_nodes_[cache];
+
     if (is_empty()) return sfdd;
     if (sfdd.is_empty()) return *this;
 
-    return Xor(sfdd, m, true).Xor(And(sfdd, m, true), m, true);
+    SFDD new_sfdd = Xor(sfdd, m, true).Xor(And(sfdd, m, true), m, true);
+    addr_t new_sfdd_id = m.make_sfdd(new_sfdd);
+    m.write_cache(OR, this_id, sfdd_id, new_sfdd_id);
+    m.write_cache(OR, sfdd_id, this_id, new_sfdd_id);
+    return new_sfdd;
+}
+
+SFDD SFDD::Not(Manager& m) const {
+    return Xor(m.sfddOne(), m);
 }
 
 void SFDD::print(int indent) const {
@@ -614,7 +666,7 @@ void SFDD::print_dot(fstream& out_dot, bool root, int depth, string dec_name) co
 
 void SFDD::save_file_as_dot(const string f_name) const {
     fstream f;
-    f.open("dotG/test0/"+f_name+".dot", fstream::out | fstream::trunc);
+    f.open(f_name, fstream::out | fstream::trunc);
     print_dot(f, true);
     f.close();
 }
@@ -653,7 +705,7 @@ void Element::print_dot(fstream& out_dot, int depth, string e_name) const {
     }
 }
 
-Manager::Manager(const Vtree& v) {
+Manager::Manager(const Vtree& v) : cache_table_(INIT_SIZE) {
     vtree = new Vtree(v);
 };
 
@@ -661,22 +713,77 @@ Manager::~Manager() {
     if (vtree != NULL) { delete vtree; vtree = NULL; }
 };
 
-SFDD Manager::sfddZero() const {
+SFDD Manager::sfddZero() {
     SFDD sfdd(0);
-    return sfdd; 
+    size_t node_id = make_or_find(sfdd);
+    return sfdd_nodes_[node_id]; 
 }
-SFDD Manager::sfddOne() const {
+SFDD Manager::sfddOne() {
     SFDD sfdd(1);
-    return sfdd; 
+    size_t node_id = make_or_find(sfdd);
+    return sfdd_nodes_[node_id]; 
 }
 
 SFDD Manager::sfddVar(const int tmp_var) {
     assert(tmp_var != 0);
     SFDD sfdd(tmp_var < 0 ? (0-tmp_var)*2+1 : tmp_var*2, get_index_by_var[abs(tmp_var)]);
-    return sfdd;
+    size_t node_id = make_or_find(sfdd);
+    // cout << node_id << endl;
+    return sfdd_nodes_[node_id];
+    // return sfdd;
 }
 
-extern SFDD normalization_1(const Vtree& v, const SFDD& rsfdd, const Manager& m) {
+addr_t Manager::make_sfdd(const SFDD& new_sfdd) {
+    sfdd_nodes_.emplace_back();
+    size_t node_id = sfdd_nodes_.size()-1;
+    uniq_table_.emplace(new_sfdd, node_id);
+    sfdd_nodes_[node_id] = new_sfdd;
+    return node_id;
+}
+
+addr_t Manager::make_or_find(const SFDD& new_sfdd) {
+    auto res = uniq_table_.find(new_sfdd);
+    if (res != uniq_table_.end()) {
+        return res->second;
+    }
+    return make_sfdd(new_sfdd);
+}
+
+void Manager::write_cache(const OPERATOR_TYPE op, const addr_t lhs, 
+                 const addr_t rhs, const addr_t res) {
+    auto key = calc_key(op, lhs, rhs);
+    cache_table_[key] = std::make_tuple(op, lhs, rhs, res);
+}
+
+void Manager::clear_cache() {
+    for (auto it =  cache_table_.begin(); it != cache_table_.end(); ++it) {
+        *it = std::make_tuple(OPERATOR_TYPE::NULLOP, -1, -1, -1);
+    }
+}
+
+addr_t Manager::read_cache(const OPERATOR_TYPE op, const addr_t lhs, const addr_t rhs) {
+    auto key = calc_key(op, lhs, rhs);
+    auto res = cache_table_[key];
+    
+    if (std::get<0>(res) == op &&
+        std::get<1>(res) == lhs &&
+        std::get<2>(res) == rhs) {
+        // cout << "got one: " << op << " " << lhs << " " << rhs << " " << get<3>(res) << endl;
+        return std::get<3>(res);
+    }
+    return SFDD_NULL;
+}
+
+size_t Manager::calc_key(const OPERATOR_TYPE op, const addr_t lhs,  const addr_t rhs) {
+    size_t key = 0;
+    hash_combine(key, std::hash<int>()(static_cast<int>(op)));
+    hash_combine(key, std::hash<size_t>()(lhs));
+    hash_combine(key, std::hash<size_t>()(rhs));
+    // cout << "cache table size: " << cache_table_.size() << endl;
+    return key % cache_table_.size();
+}
+
+extern SFDD normalization_1(const Vtree& v, const SFDD& rsfdd, Manager& m) {
     SFDD sfdd;
     sfdd.vtree_index = v.index;
     // base case
@@ -714,6 +821,7 @@ extern SFDD normalization_1(const Vtree& v, const SFDD& rsfdd, const Manager& m)
     }
     if (!e1.prime.is_zero()) sfdd.elements.push_back(e1);
     if (!e2.prime.is_zero()) sfdd.elements.push_back(e2);
+    m.make_or_find(sfdd);
     return sfdd;
 }
 
@@ -722,7 +830,7 @@ extern SFDD normalization_1(const Vtree& v, const SFDD& rsfdd, const Manager& m)
  *        are formulas like $f \oplus g$, rsfdd means 'g' in
  *        this kind format.
  */
-extern SFDD normalization_2(const Vtree& v, const SFDD& rsfdd, const Manager& m) {
+extern SFDD normalization_2(const Vtree& v, const SFDD& rsfdd, Manager& m) {
     SFDD sfdd;
     sfdd.vtree_index = v.index;
     // check if constant
@@ -764,5 +872,6 @@ extern SFDD normalization_2(const Vtree& v, const SFDD& rsfdd, const Manager& m)
     }
     if (!e1.prime.is_zero()) sfdd.elements.push_back(e1);
     if (!e2.prime.is_zero()) sfdd.elements.push_back(e2);
+    m.make_or_find(sfdd);
     return sfdd;
 }

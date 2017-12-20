@@ -48,19 +48,20 @@ int main(int argc, char** argv) {
     // vector<int> vars_order;  // order
     // for (int i = 1; i <= var_no; ++i) vars_order.push_back(i);
     // Vtree v(1, var_no*2-1, vars_order);  // vtree
+
     Vtree v(argv[2]);
-    v.save_file_as_dot("vtree");
+    v.save_dot_file("vtree");
     v.print();
     Manager m(v);  // manager
 
-    SFDD fml;
+    SFDD fml = m.sfddOne();
     // struct rusage r_usage;
     int  clause_counter = 1;
     clock_t start = clock();
     vector<SFDD> sfdds;  // not because out memory
     for(int line = 0; line < col_no; ++line)  //read every line number, and save as a clause
     {
-        SFDD clause;
+        SFDD clause = m.sfddZero();
         while (true) {
             int var;
             infile >> var;
@@ -68,7 +69,7 @@ int main(int argc, char** argv) {
             SFDD tmp_var = m.sfddVar(var);
             // cout << "var: " << var << " done" << endl;
             clause = clause.Or(tmp_var, m);
-            clause.print();
+            // clause.print();
             // getrusage(RUSAGE_SELF, &r_usage);
             // cout << "Memory usage = " << r_usage.ru_maxrss << endl;
             // clause.save_file_as_dot(to_string(clause_counter)+"after"+to_string(var));

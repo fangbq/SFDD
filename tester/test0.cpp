@@ -22,7 +22,7 @@ int main(int argc, char** argv) {
     for (int i = 1; i <= var_no; ++i) vars_order.push_back(i);
 
     Vtree v(1, var_no*2-1, vars_order);
-    v.save_file_as_dot("vtree");
+    v.save_dot_file("vtree");
     v.print();
 
     Manager m(v);
@@ -37,12 +37,6 @@ int main(int argc, char** argv) {
 
     SFDD x4 = x1.Xor(x2, m, true);
     x4.print();
-
-    // SFDD x4 = x1.Or(x2, m, true);
-    // x4.save_file_as_dot("f=x17+x7");
-
-    // SFDD x5 = x4.Or(x3, m, true);
-    // x5.save_file_as_dot("f=x17+x7+x16");
     return 0;
 }
 // 
