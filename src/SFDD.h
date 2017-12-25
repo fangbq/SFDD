@@ -81,7 +81,7 @@ public:
     SFDD And(const SFDD& s, Manager & m, bool do_nml = false, int clause_counter = 0) const;
     // SFDD& operator^(const SFDD& s) { return Xor(s); }
     SFDD Or(const SFDD& s, Manager & m, bool do_nml = false) const;
-    SFDD Not(Manager& m) const;
+    inline SFDD Not(Manager& m) const;
     void print(int indent = 0) const;
     void print_dot(fstream & out_dot, bool root = false, int depth = 0, string dec_name = "Dec_0_1") const;
     void save_file_as_dot(const string f_name) const;

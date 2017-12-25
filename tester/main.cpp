@@ -45,12 +45,12 @@ int main(int argc, char** argv) {
     }
     cout << var_no << "  " << col_no << "    ";
 
-    // vector<int> vars_order;  // order
-    // for (int i = 1; i <= var_no; ++i) vars_order.push_back(i);
-    // Vtree v(1, var_no*2-1, vars_order);  // vtree
+    vector<int> vars_order;  // order
+    for (int i = 1; i <= var_no; ++i) vars_order.push_back(i);
+    Vtree v(1, var_no*2-1, vars_order);  // vtree
 
-    Vtree v(argv[2]);
-    v.save_dot_file("vtree");
+    // Vtree v(argv[2]);
+    v.save_dot_file("dotG/test0/vtree");
     v.print();
     Manager m(v);  // manager
 
