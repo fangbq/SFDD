@@ -18,17 +18,20 @@ using namespace std;
 using namespace std::chrono;
 
 int main(int argc, char** argv) {
-    milliseconds ms = duration_cast< milliseconds >(
-        system_clock::now().time_since_epoch()
-    );
-    srand ( unsigned ( ms.count() ) );
 
     vector<int> vars_order;
-    int var_no = 4;
+    int var_no = 18;
     for (int i = 1; i <= var_no; ++i) vars_order.push_back(i);
-    random_shuffle(vars_order.begin(), vars_order.end(), myrandom);
 
-    Vtree* v = new Vtree(1, var_no*2-1, vars_order, RANDOM_TREE);
-    v->save_vtree_file("test/s1/s1.vtree");
+    for (int i = 0; i < 100; ++i) {
+        milliseconds ms = duration_cast< milliseconds >(
+            system_clock::now().time_since_epoch()
+        );
+        srand ( unsigned ( ms.count() ) );
+        random_shuffle(vars_order.begin(), vars_order.end(), myrandom);
+        Vtree* v = new Vtree(1, var_no*2-1, vars_order, RANDOM_TREE);
+        v->save_vtree_file("test/s27/s27_"+to_string(i)+".vtree");
+    }
+
     return 0;
 }

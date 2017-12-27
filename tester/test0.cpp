@@ -35,7 +35,7 @@ int main(int argc, char** argv) {
 
     // SFDD x3 = m.sfddVar(16);
 
-    SFDD x4 = x1.Xor(x2, m, true);
+    SFDD x4 = x1.Xor(x2, m);
     x4.print();
     return 0;
 }

@@ -31,7 +31,7 @@ int main(int argc, char** argv) {
     SFDD x2 = m.sfddVar(2);
     x2.print();
 
-    SFDD x3 = x1.Xor(x2, m, true);
+    SFDD x3 = x1.Xor(x2, m);
     x3.print();
     // SFDD x4 = x1.And(x2, m, true);
     // x4.print();

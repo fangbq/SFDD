@@ -208,10 +208,10 @@ void Vtree::print_dot(fstream& out_dot, bool root) const {
 
 void Vtree::print_vtree(fstream& out_dot, bool root) const {
     if (root) out_dot << "vtree " << size << endl;
-    if (rt) rt->print_vtree(out_dot, false);
     if (lt) lt->print_vtree(out_dot, false);
-    if (var) out_dot << "L " << index << " " << var << endl;
-    else out_dot << "I " << index << " " << lt->index << " " << rt->index << endl;
+    if (rt) rt->print_vtree(out_dot, false);
+    if (var) out_dot << "L " << index-1 << " " << var << endl;
+    else out_dot << "I " << index-1 << " " << lt->index-1 << " " << rt->index-1 << endl;
 }
 
 void Vtree::save_dot_file(const string f_name) const {
@@ -224,13 +224,21 @@ void Vtree::save_dot_file(const string f_name) const {
 void Vtree::save_vtree_file(const string f_name) const {
     fstream f;
     f.open(f_name, fstream::out | fstream::trunc);
+    f << "c ids of vtree nodes start at 0" << endl;
+    f << "c ids of variables start at 1" << endl;
+    f << "c vtree nodes appear bottom-up, children before parents" << endl;
+    f << "c" << endl;
+    f << "c file syntax:" << endl;
+    f << "c vtree number-of-nodes-in-vtree" << endl;
+    f << "c L id-of-leaf-vtree-node id-of-variable" << endl;
+    f << "c I id-of-internal-vtree-node id-of-left-child id-of-right-child" << endl;
+    f << "c" << endl;
     print_vtree(f, true);
     f.close();
 }
 
 int SFDD::size() const {
-    if (is_empty()) return 0;
-    if (is_terminal()) return 1;
+    if (is_terminal()) return 0;
 
     int size = elements.size();
     for (vector<Element>::const_iterator e = elements.begin(); \
@@ -377,7 +385,7 @@ SFDD& SFDD::normalized(int lca, Manager& m) {
     return *this;
 }
 
-SFDD SFDD::Intersection(const SFDD& sfdd, Manager& m, int print_info) const {
+SFDD SFDD::Intersection(const SFDD& sfdd, Manager& m) const {
 // cout << "Intersection..." << endl;    
     if (is_zero()) return *this;
     if (sfdd.is_zero()) return sfdd;
@@ -429,7 +437,7 @@ SFDD SFDD::Intersection(const SFDD& sfdd, Manager& m, int print_info) const {
     return new_sfdd;
 }
 
-SFDD SFDD::Xor(const SFDD& sfdd, Manager& m, bool do_nml) const {
+SFDD SFDD::Xor(const SFDD& sfdd, Manager& m) const {
 // cout << "Xor..." << endl;
 
     if (is_zero()) return sfdd;
@@ -441,11 +449,10 @@ SFDD SFDD::Xor(const SFDD& sfdd, Manager& m, bool do_nml) const {
     if (cache != SFDD_NULL)
         return m.sfdd_nodes_[cache];
 
-
     SFDD new_sfdd;
     new_sfdd.vtree_index = vtree_index;
     SFDD normalized_sfdd1 = *this, normalized_sfdd2 = sfdd;
-    if (do_nml || (!computable_with(sfdd, m) && normalized_sfdd1.vtree_index != normalized_sfdd2.vtree_index)) {
+    if (!computable_with(sfdd, m) && normalized_sfdd1.vtree_index != normalized_sfdd2.vtree_index) {
         int lca = get_lca(normalized_sfdd1.vtree_index, normalized_sfdd2.vtree_index, *m.vtree);
         normalized_sfdd1.normalized(lca, m);
         normalized_sfdd2.normalized(lca, m);
@@ -471,7 +478,7 @@ SFDD SFDD::Xor(const SFDD& sfdd, Manager& m, bool do_nml) const {
             for (vector<Element>::const_iterator e2 = normalized_sfdd2.elements.begin();
             e2 != normalized_sfdd2.elements.end(); ++e2) {
                 Element new_e;
-                new_e.prime = e1->prime.Intersection(e2->prime, m, do_nml);
+                new_e.prime = e1->prime.Intersection(e2->prime, m);
                 if (!new_e.prime.is_zero()) {
                     new_e.sub = e1->sub.Xor(e2->sub, m);
                     new_sfdd.elements.push_back(new_e);
@@ -487,7 +494,7 @@ SFDD SFDD::Xor(const SFDD& sfdd, Manager& m, bool do_nml) const {
     return new_sfdd;
 }
 
-SFDD SFDD::And(const SFDD& sfdd, Manager& m, bool do_nml, int clause_counter) const {
+SFDD SFDD::And(const SFDD& sfdd, Manager& m) const {
 // cout << "And..." << endl;
 
     if (is_zero()) return *this;
@@ -504,7 +511,7 @@ SFDD SFDD::And(const SFDD& sfdd, Manager& m, bool do_nml, int clause_counter) co
     SFDD new_sfdd;
     new_sfdd.vtree_index = vtree_index;
     SFDD normalized_sfdd1 = *this, normalized_sfdd2 = sfdd;
-    if (do_nml || (!computable_with(sfdd, m) && normalized_sfdd1.vtree_index != normalized_sfdd2.vtree_index)) {
+    if (!computable_with(sfdd, m) && normalized_sfdd1.vtree_index != normalized_sfdd2.vtree_index) {
         int lca = get_lca(normalized_sfdd1.vtree_index, normalized_sfdd2.vtree_index, *m.vtree);
         normalized_sfdd1.normalized(lca, m);
         normalized_sfdd2.normalized(lca, m);
@@ -566,14 +573,16 @@ SFDD SFDD::And(const SFDD& sfdd, Manager& m, bool do_nml, int clause_counter) co
     return new_sfdd;
 }
 
-SFDD SFDD::Or(const SFDD& sfdd, Manager& m, bool do_nml) const {
+SFDD SFDD::Or(const SFDD& sfdd, Manager& m) const {
 // cout << "Or..." << endl;
     addr_t this_id = m.make_or_find(*this), sfdd_id = m.make_or_find(sfdd);
     addr_t cache = m.read_cache(OR, this_id, sfdd_id);
     if (cache != SFDD_NULL)
         return m.sfdd_nodes_[cache];
 
-    SFDD new_sfdd = Xor(sfdd, m, true).Xor(And(sfdd, m, true), m, true);
+    SFDD new_sfdd = Xor(sfdd, m).Xor(And(sfdd, m), m);
+    // SFDD new_sfdd = Not(m).And(sfdd.Not(m), m).Not(m);  // method 2
+
     addr_t new_sfdd_id = m.make_sfdd(new_sfdd);
     m.write_cache(OR, this_id, sfdd_id, new_sfdd_id);
     m.write_cache(OR, sfdd_id, this_id, new_sfdd_id);

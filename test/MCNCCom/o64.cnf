@@ -1,0 +1,4 @@
+c CNF file generated from BLIF2CNF script.
+c Original BLIF file was blif/o64.blif
+p cnf 131 1
+NONE131  0

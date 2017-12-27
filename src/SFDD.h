@@ -63,7 +63,6 @@ public:
     inline bool is_terminal() const { return value>-1; }
     inline bool is_positive() const { return value>1 && value%2==0; }
     inline bool is_negative() const { return value>1 && value%2==1; }
-    inline bool is_empty() const { return !is_terminal() && (elements.size()==0);}
     inline bool is_zero() const { return value==0; }
     inline bool is_one() const { return value==1; }
     inline bool is_constant() const { return is_zero() || is_one(); }
@@ -72,15 +71,15 @@ public:
     SFDD& operator=(const SFDD& sfdd);
     SFDD& reduced(Manager& m);  // reducing
     SFDD& normalized(int lca, Manager& m);  // lca must be ancestor of this SFDD!!!
-    SFDD Intersection(const SFDD& s, Manager & m, int print_info = 0) const;
+    SFDD Intersection(const SFDD& s, Manager & m) const;
     /*
      * must nml for the first time, example, x1 xor x2, if not
      * they will be calculated directly, it's not what we want
      */
-    SFDD Xor(const SFDD& s, Manager & m, bool do_nml = false) const;
-    SFDD And(const SFDD& s, Manager & m, bool do_nml = false, int clause_counter = 0) const;
+    SFDD Xor(const SFDD& s, Manager & m) const;
+    SFDD And(const SFDD& s, Manager & m) const;
     // SFDD& operator^(const SFDD& s) { return Xor(s); }
-    SFDD Or(const SFDD& s, Manager & m, bool do_nml = false) const;
+    SFDD Or(const SFDD& s, Manager & m) const;
     inline SFDD Not(Manager& m) const;
     void print(int indent = 0) const;
     void print_dot(fstream & out_dot, bool root = false, int depth = 0, string dec_name = "Dec_0_1") const;

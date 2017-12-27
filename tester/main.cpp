@@ -45,13 +45,12 @@ int main(int argc, char** argv) {
     }
     cout << var_no << "  " << col_no << "    ";
 
-    vector<int> vars_order;  // order
-    for (int i = 1; i <= var_no; ++i) vars_order.push_back(i);
-    Vtree v(1, var_no*2-1, vars_order);  // vtree
+    Vtree v(argv[2]);
 
-    // Vtree v(argv[2]);
-    v.save_dot_file("dotG/test0/vtree");
-    v.print();
+    // vector<int> vars_order;  // order
+    // for (int i = 1; i <= var_no; ++i) vars_order.push_back(i);
+    // Vtree v(1, var_no*2-1, vars_order);  // vtree
+
     Manager m(v);  // manager
 
     SFDD fml = m.sfddOne();
@@ -76,7 +75,7 @@ int main(int argc, char** argv) {
             // cout << endl;
         }
         // clause.save_file_as_dot("clause_"+to_string(clause_counter++));
-        fml = fml.And(clause, m, true, clause_counter);
+        fml = fml.And(clause, m);
         // fml.print();
         // fml.save_file_as_dot("fml_"+to_string(clause_counter-1));
         cout << "clause : " << clause_counter++ << " done; size : " << fml.size() << endl;
