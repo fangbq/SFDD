@@ -1,15 +1,7 @@
 graph {
-	i7 [shape=none, label="7"]
-	i7 -- i3
-	i3 [shape=none, label="3"]
-	i3 -- i2x2
-	i2x2 [shape=none, label="2_x2"]
-	i3 -- i5
-	i5 [shape=none, label="5"]
-	i5 -- i4x4
-	i4x4 [shape=none, label="4_x4"]
-	i5 -- i6x3
-	i6x3 [shape=none, label="6_x3"]
-	i7 -- i8x1
-	i8x1 [shape=none, label="8_x1"]
+	i2 [shape=none, label="2"]
+	i2 -- i1x1
+	i1x1 [shape=none, label="1_x1"]
+	i2 -- i3x2
+	i3x2 [shape=none, label="3_x2"]
 }

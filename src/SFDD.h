@@ -24,6 +24,7 @@ public:
     Vtree* rt = NULL;
     int size = 0;
 public:
+    Vtree() {}
     Vtree(const int index);
     Vtree(const int index, const int var);
     Vtree(const int parent, const int left_child, const int right_child);
@@ -54,6 +55,7 @@ public:
                     */
     vector<Element> elements;
     int vtree_index = 0;  // respect to vtree node
+    int hash_value = 0;
 public:
     SFDD() { elements.clear(); }
     SFDD(const SFDD& s) { value = s.value; elements = s.elements; vtree_index = s.vtree_index; }
@@ -142,6 +144,8 @@ public:
     // for unique table
     addr_t make_sfdd(const SFDD& sfdd);
     addr_t make_or_find(const SFDD& sfdd);  // to avoid storing redundant sfdds
+    void print_sfdd_nodes() const;
+    void print_unique_table() const;
 
     // for cache table
     void write_cache(const OPERATOR_TYPE op, const addr_t lhs, 
@@ -149,6 +153,7 @@ public:
     void clear_cache();
     addr_t read_cache(const OPERATOR_TYPE op, const addr_t lhs, const addr_t rhs);
     size_t calc_key(const OPERATOR_TYPE op, const addr_t lhs,  const addr_t rhs);
+    void print_cache_table() const;
 };
 
 

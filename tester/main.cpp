@@ -45,11 +45,15 @@ int main(int argc, char** argv) {
     }
     cout << var_no << "  " << col_no << "    ";
 
-    Vtree v(argv[2]);
+    Vtree v;
 
-    // vector<int> vars_order;  // order
-    // for (int i = 1; i <= var_no; ++i) vars_order.push_back(i);
-    // Vtree v(1, var_no*2-1, vars_order);  // vtree
+    if (argv[2])
+        v = *new Vtree(argv[2]);
+    else {
+        vector<int> vars_order;
+        for (int i = 1; i <= var_no; ++i) vars_order.push_back(i);
+            v = *new Vtree(1, var_no*2-1, vars_order, TRIVIAL_TREE);
+    }
 
     Manager m(v);  // manager
 

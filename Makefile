@@ -10,7 +10,7 @@ T4_OBJS = $(patsubst %.o, objs/%.o, test4.o SFDD.o)
 M_OBJS = $(patsubst %.o, objs/%.o, main.o SFDD.o)
 
 CC	= g++
-CFLAGS	= -Isrc -g -Wall -std=c++0x -pg
+CFLAGS	= -Isrc -g -Wall -std=c++0x
 VPATH = src:tester:objs
 
 

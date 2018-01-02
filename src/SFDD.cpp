@@ -312,9 +312,9 @@ SFDD& SFDD::reduced(Manager& m) {
     }
     // 1.2 return false if all elements' subs are false
     if (!valid) elements.clear();
-    if (size()==0) value = 0;
+    if (elements.size()==0) value = 0;
 
-    // 2 compressing (necessary)
+    // 2 compressing
     for (vector<Element>::iterator e1 = elements.begin(); \
     e1 != elements.end(); ) {
         bool is_delete = false;
@@ -431,7 +431,7 @@ SFDD SFDD::Intersection(const SFDD& sfdd, Manager& m) const {
     }
     new_sfdd.reduced(m);
     
-    addr_t new_sfdd_id = m.make_sfdd(new_sfdd);
+    addr_t new_sfdd_id = m.make_or_find(new_sfdd);
     m.write_cache(INTER, this_id, sfdd_id, new_sfdd_id);
     m.write_cache(INTER, sfdd_id, this_id, new_sfdd_id);
     return new_sfdd;
@@ -458,6 +458,10 @@ SFDD SFDD::Xor(const SFDD& sfdd, Manager& m) const {
         normalized_sfdd2.normalized(lca, m);
         new_sfdd.vtree_index = lca;
     }
+
+    cout << "after normalization ========================= " << endl;
+    m.print_cache_table();
+    cout << "============================================= " << endl;
 
     if (normalized_sfdd1.is_terminal() && normalized_sfdd2.is_terminal()) {
         // base case
@@ -488,7 +492,7 @@ SFDD SFDD::Xor(const SFDD& sfdd, Manager& m) const {
     }
     new_sfdd.reduced(m);
 
-    addr_t new_sfdd_id = m.make_sfdd(new_sfdd);
+    addr_t new_sfdd_id = m.make_or_find(new_sfdd);
     m.write_cache(XOR, this_id, sfdd_id, new_sfdd_id);
     m.write_cache(XOR, sfdd_id, this_id, new_sfdd_id);
     return new_sfdd;
@@ -567,7 +571,7 @@ SFDD SFDD::And(const SFDD& sfdd, Manager& m) const {
     }
     new_sfdd.reduced(m);
 
-    addr_t new_sfdd_id = m.make_sfdd(new_sfdd);
+    addr_t new_sfdd_id = m.make_or_find(new_sfdd);
     m.write_cache(AND, this_id, sfdd_id, new_sfdd_id);
     m.write_cache(AND, sfdd_id, this_id, new_sfdd_id);
     return new_sfdd;
@@ -743,6 +747,12 @@ SFDD Manager::sfddVar(const int tmp_var) {
 }
 
 addr_t Manager::make_sfdd(const SFDD& new_sfdd) {
+    // cout << "+++++++++++++++++++++++++++++++" << endl;
+    // print_unique_table();
+    // cout << "can't find this node: ******** " << endl;
+    // new_sfdd.print();
+    // cout << "+++++++++++++++++++++++++++++++" << endl;
+
     sfdd_nodes_.emplace_back();
     size_t node_id = sfdd_nodes_.size()-1;
     uniq_table_.emplace(new_sfdd, node_id);
@@ -756,6 +766,25 @@ addr_t Manager::make_or_find(const SFDD& new_sfdd) {
         return res->second;
     }
     return make_sfdd(new_sfdd);
+}
+
+void Manager::print_sfdd_nodes() const {
+    cout << "sfdd_nodes_:-------------------------------" << endl;
+    int i = 0;
+    for (auto& sfdd_node: sfdd_nodes_) {
+        cout << "Node " << i++ << ":" << endl;
+        sfdd_node.print();
+        cout << endl;
+    }
+}
+
+void Manager::print_unique_table() const {
+    cout << "unique_table:-------------------------------" << endl;
+    for (auto& x: uniq_table_) {
+        cout << "Node addr_t: " << x.second << endl;
+        x.first.print();
+        cout << endl;
+    }
 }
 
 void Manager::write_cache(const OPERATOR_TYPE op, const addr_t lhs, 
@@ -792,13 +821,23 @@ size_t Manager::calc_key(const OPERATOR_TYPE op, const addr_t lhs,  const addr_t
     return key % cache_table_.size();
 }
 
+void Manager::print_cache_table() const {
+    cout << "cache_table:-------------------------------" << endl;
+    for (auto& x: cache_table_) {
+        cout << get<0>(x) << get<1>(x) << get<2>(x) << get<3>(x) << endl;
+    }
+}
+
 extern SFDD normalization_1(const Vtree& v, const SFDD& rsfdd, Manager& m) {
     SFDD sfdd;
     sfdd.vtree_index = v.index;
     // base case
     if (v.var || (!rsfdd.is_terminal() && v.index == rsfdd.vtree_index)) {
         sfdd = rsfdd;
-        sfdd.vtree_index = v.index;
+        if (sfdd.is_constant())
+            sfdd.vtree_index = 0;
+        else
+            sfdd.vtree_index = v.index;
         return sfdd;
     }
 
@@ -830,7 +869,7 @@ extern SFDD normalization_1(const Vtree& v, const SFDD& rsfdd, Manager& m) {
     }
     if (!e1.prime.is_zero()) sfdd.elements.push_back(e1);
     if (!e2.prime.is_zero()) sfdd.elements.push_back(e2);
-    m.make_or_find(sfdd);
+    // m.make_or_find(sfdd);
     return sfdd;
 }
 
@@ -846,8 +885,8 @@ extern SFDD normalization_2(const Vtree& v, const SFDD& rsfdd, Manager& m) {
     if (v.var) {
         if (rsfdd.is_one()) sfdd.value = v.var*2;
         else if (rsfdd.is_zero()) sfdd.value = v.var*2+1;
-        else if (rsfdd.value%2 == 0) sfdd.value = 1;
-        else sfdd.value = 0;
+        else if (rsfdd.value%2 == 0) { sfdd.value = 1; sfdd.vtree_index = 0; }
+        else { sfdd.value = 0; sfdd.vtree_index = 0; }
         return sfdd;
     }
     if (v.index == rsfdd.vtree_index)
@@ -881,6 +920,6 @@ extern SFDD normalization_2(const Vtree& v, const SFDD& rsfdd, Manager& m) {
     }
     if (!e1.prime.is_zero()) sfdd.elements.push_back(e1);
     if (!e2.prime.is_zero()) sfdd.elements.push_back(e2);
-    m.make_or_find(sfdd);
+    // m.make_or_find(sfdd);
     return sfdd;
 }
