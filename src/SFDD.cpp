@@ -386,13 +386,18 @@ SFDD& SFDD::normalized(int lca, Manager& m) {
 }
 
 SFDD SFDD::Intersection(const SFDD& sfdd, Manager& m) const {
-// cout << "Intersection..." << endl;    
+// cout << "Intersection..." << endl;  
     if (is_zero()) return *this;
     if (sfdd.is_zero()) return sfdd;
 
     addr_t this_id = m.make_or_find(*this), sfdd_id = m.make_or_find(sfdd);
     if (this_id == sfdd_id) return m.sfdd_nodes_[this_id];
     addr_t cache = m.read_cache(INTER, this_id, sfdd_id);
+    // cout << "finding : ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << endl;
+    // cout << INTER << " " << this_id << " " << sfdd_id << endl;
+    // cout << " in : --- " << endl;
+    // m.print_cache_table();
+    // cout << "got cache : " << cache << endl;
     if (cache != SFDD_NULL)
         return m.sfdd_nodes_[cache];
 
@@ -458,10 +463,6 @@ SFDD SFDD::Xor(const SFDD& sfdd, Manager& m) const {
         normalized_sfdd2.normalized(lca, m);
         new_sfdd.vtree_index = lca;
     }
-
-    cout << "after normalization ========================= " << endl;
-    m.print_cache_table();
-    cout << "============================================= " << endl;
 
     if (normalized_sfdd1.is_terminal() && normalized_sfdd2.is_terminal()) {
         // base case
