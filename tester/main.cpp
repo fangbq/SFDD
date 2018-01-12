@@ -82,7 +82,7 @@ int main(int argc, char** argv) {
         fml = fml.And(clause, m);
         // fml.print();
         // fml.save_file_as_dot("fml_"+to_string(clause_counter-1));
-        cout << "clause : " << clause_counter++ << " done; size : " << fml.size() << endl;
+        // cout << "clause : " << clause_counter++ << " done; size : " << fml.size() << endl;
     }
     clock_t finish = clock();
     double ptime = (double)(finish - start) / CLOCKS_PER_SEC;  //BDD time

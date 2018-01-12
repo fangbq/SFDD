@@ -7,37 +7,39 @@ c vtree number-of-nodes-in-vtree
 c L id-of-leaf-vtree-node id-of-variable
 c I id-of-internal-vtree-node id-of-left-child id-of-right-child
 c
-vtree 33
-L 0 14
-L 2 2
-L 4 9
-I 3 2 4
-I 1 0 3
-L 6 4
+vtree 35
+L 0 2
+L 2 18
+I 1 0 2
+L 4 4
+L 6 5
 L 8 17
 I 7 6 8
-L 10 16
-I 9 7 10
-I 5 1 9
-L 12 5
-L 14 15
-I 13 12 14
-I 11 5 13
-L 16 12
-L 18 1
-L 20 8
+I 5 4 7
+L 10 8
+L 12 16
+I 11 10 12
+I 9 5 11
+L 14 6
+L 16 15
+I 15 14 16
+L 18 13
+L 20 10
 I 19 18 20
-I 17 16 19
-L 22 10
-L 24 3
-L 26 13
+I 17 15 19
+L 22 11
+L 24 12
+L 26 7
 I 25 24 26
 I 23 22 25
-I 21 17 23
-L 28 6
-L 30 7
-I 29 28 30
-L 32 11
-I 31 29 32
-I 27 21 31
-I 15 11 27
+L 28 9
+I 27 23 28
+I 21 17 27
+L 30 3
+I 29 21 30
+I 13 9 29
+L 32 14
+L 34 1
+I 33 32 34
+I 31 13 33
+I 3 1 31

@@ -26,5 +26,5 @@ timeout() {
 
 for n in $( seq 0 99 ); do
     echo ${n}
-    ./sfdd ~/github/SFDD/test/MCNCCom/t.cnf ~/github/SFDD/test/t/t_${n}.vtree -M -r0
+    timeout 120 "./sdd -c test/MCNCCom/t.cnf -v test/t/t_${n}.vtree -M -r0"
 done
