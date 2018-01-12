@@ -103,7 +103,7 @@ public:
     void print_dot(fstream& out_dot, int depth, string e_name) const;
 };
 
-
+namespace std {
 template <> struct hash<SFDD> {
     std::size_t operator()(const SFDD& n) const {
         size_t h = 0;
@@ -121,7 +121,7 @@ template <> struct hash<SFDD> {
         return h;
     }
 };
-
+}
 
 class Manager {
 public:

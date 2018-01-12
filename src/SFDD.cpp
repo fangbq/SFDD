@@ -264,7 +264,7 @@ bool SFDD::operator==(const SFDD& sfdd) const {
         for (vector<Element>::const_iterator e1 = elements.begin(); \
         e1 != elements.end(); ++e1) {
             bool found_equivalent = false;
-            for (int i = 0; i < sfdd.elements.size(); ++i) {
+            for (size_t i = 0; i < sfdd.elements.size(); ++i) {
                 if (equaled_elements.find(i) == equaled_elements.end()
                 && e1->equals(sfdd.elements[i])) {
                     equaled_elements.insert(i);
