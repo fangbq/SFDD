@@ -82,7 +82,7 @@ int main(int argc, char** argv) {
         fml = fml.And(clause, m);
         // fml.print();
         // fml.save_file_as_dot("fml_"+to_string(clause_counter-1));
-        cout << "clause : " << clause_counter++ << " done; size : " << fml.size() << endl;
+        // cout << "clause : " << clause_counter++ << " done; size : " << fml.size() << endl;
     }
     clock_t finish = clock();
     double ptime = (double)(finish - start) / CLOCKS_PER_SEC;  //BDD time
@@ -90,7 +90,7 @@ int main(int argc, char** argv) {
     cout.precision(4);
     cout.setf(ios::fixed);
     cout << ptime << "  " << fml.size() << endl;
-    // fml.save_file_as_dot("s1");
+    // fml.save_file_as_dot("sddpaper_eg");
     // fstream f;
     // f.open("dotG/iscas89/f=s1.dot", fstream::out | fstream::trunc);
     // fml.print_dot(f, true);

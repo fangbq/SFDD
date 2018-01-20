@@ -62,7 +62,7 @@ public:
     ~SFDD() { value = -1; elements.clear(); vtree_index = 0; }
     SFDD(int v, int i = 0) { elements.clear(); value = v; vtree_index = i; }
     int size() const;
-    inline bool is_terminal() const { return value>-1; }
+    inline bool is_terminal() const { return value!=-1; }
     inline bool is_positive() const { return value>1 && value%2==0; }
     inline bool is_negative() const { return value>1 && value%2==1; }
     inline bool is_zero() const { return value==0; }
