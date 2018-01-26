@@ -1,0 +1,78 @@
+digraph zsdd {
+overlap=false
+{rank=same; n39}
+{rank=same; n13 n12 n38}
+{rank=same; n32}
+n32[label= "3",style=filled,fillcolor=gray95,shape=circle,height=.25,width=.25]; 
+n32e0 [label= "<L>&#177;A|<R>",
+shape=record,
+fontsize=20,
+fontname="Times-Italic",
+fillcolor=white,
+style=filled,
+fixedsize=true,
+height=.30,
+width=.65];
+n32->n32e0 [arraysize=.50];n32e0:R:c->n38[arrowsize=.50,tailclip=false,arrowtail=dot,dir=both];
+n32e1 [label= "<L>B|<R>",
+shape=record,
+fontsize=20,
+fontname="Times-Italic",
+fillcolor=white,
+style=filled,
+fixedsize=true,
+height=.30,
+width=.65];
+n32->n32e1 [arraysize=.50];n32e1:R:c->n12[arrowsize=.50,tailclip=false,arrowtail=dot,dir=both];
+n32e2 [label= "<L>|<R>",
+shape=record,
+fontsize=20,
+fontname="Times-Italic",
+fillcolor=white,
+style=filled,
+fixedsize=true,
+height=.30,
+width=.65];
+n32->n32e2 [arraysize=.50];n32e2:L:c->n39[arrowsize=.50,tailclip=false,arrowtail=dot,dir=both];
+n32e2:R:c->n13[arrowsize=.50,tailclip=false,arrowtail=dot,dir=both];
+n13[label= "5",style=filled,fillcolor=gray95,shape=circle,height=.25,width=.25]; 
+n13e0 [label= "<L>&#177;D|<R>&#177;C",
+shape=record,
+fontsize=20,
+fontname="Times-Italic",
+fillcolor=white,
+style=filled,
+fixedsize=true,
+height=.30,
+width=.65];
+n13->n13e0 [arraysize=.50];n39[label= "1",style=filled,fillcolor=gray95,shape=circle,height=.25,width=.25]; 
+n39e0 [label= "<L>B|<R>A",
+shape=record,
+fontsize=20,
+fontname="Times-Italic",
+fillcolor=white,
+style=filled,
+fixedsize=true,
+height=.30,
+width=.65];
+n39->n39e0 [arraysize=.50];n12[label= "5",style=filled,fillcolor=gray95,shape=circle,height=.25,width=.25]; 
+n12e0 [label= "<L>&#177;D|<R>C",
+shape=record,
+fontsize=20,
+fontname="Times-Italic",
+fillcolor=white,
+style=filled,
+fixedsize=true,
+height=.30,
+width=.65];
+n12->n12e0 [arraysize=.50];n38[label= "5",style=filled,fillcolor=gray95,shape=circle,height=.25,width=.25]; 
+n38e0 [label= "<L>D|<R>C",
+shape=record,
+fontsize=20,
+fontname="Times-Italic",
+fillcolor=white,
+style=filled,
+fixedsize=true,
+height=.30,
+width=.65];
+n38->n38e0 [arraysize=.50];}

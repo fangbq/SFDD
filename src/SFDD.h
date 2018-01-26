@@ -61,7 +61,7 @@ public:
     SFDD(const SFDD& s) { value = s.value; elements = s.elements; vtree_index = s.vtree_index; }
     ~SFDD() { value = -1; elements.clear(); vtree_index = 0; }
     SFDD(int v, int i = 0) { elements.clear(); value = v; vtree_index = i; }
-    int size() const;
+    int size(const Manager& m) const;
     inline bool is_terminal() const { return value!=-1; }
     inline bool is_positive() const { return value>1 && value%2==0; }
     inline bool is_negative() const { return value>1 && value%2==1; }
@@ -83,24 +83,24 @@ public:
     // SFDD& operator^(const SFDD& s) { return Xor(s); }
     SFDD Or(const SFDD& s, Manager & m) const;
     inline SFDD Not(Manager& m) const;
-    void print(int indent = 0) const;
-    void print_dot(fstream & out_dot, bool root = false, int depth = 0, string dec_name = "Dec_0_1") const;
-    void save_file_as_dot(const string f_name) const;
+    // void print(int indent = 0) const;
+    // void print_dot(fstream & out_dot, bool root = false, int depth = 0, string dec_name = "Dec_0_1") const;
+    // void save_file_as_dot(const string f_name) const;
 };
 
 
 class Element {
 public:
-    SFDD prime;
-    SFDD sub;
+    addr_t prime;
+    addr_t sub;
 public:
     Element() {}
     Element(const Element& e) { prime = e.prime; sub = e.sub; }
     inline bool equals(const Element& e) const {
         return prime==e.prime && sub==e.sub;
-    };
+    };/*
     void print(int indent, int counter) const;
-    void print_dot(fstream& out_dot, int depth, string e_name) const;
+    void print_dot(fstream& out_dot, int depth, string e_name) const;*/
 };
 
 namespace std {

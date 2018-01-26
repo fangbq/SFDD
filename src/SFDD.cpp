@@ -237,14 +237,41 @@ void Vtree::save_vtree_file(const string f_name) const {
     f.close();
 }
 
-int SFDD::size() const {
+int SFDD::size(const Manager& m) const {
     if (is_terminal()) return 0;
 
-    int size = elements.size();
-    for (vector<Element>::const_iterator e = elements.begin(); \
-    e != elements.end(); ++e) {
-        size += e->prime.size();
-        size += e->sub.size();
+    unordered_set<addr_t> nodes;
+    stack<addr_t> unexpanded;
+    unexpanded.push(m.uniq_table_.at(*this));
+    while (!unexpanded.empty()) {
+        addr_t e = unexpanded.top();
+        unexpanded.pop();
+
+        nodes.insert(e);
+        if (e < 0) {
+            continue;
+        }                
+        const SFDD& n = m.sfdd_nodes_[e];
+        if (n.value >= 0) {
+            for (const Element e : n.elements) {
+                if (nodes.find(e.prime) == nodes.end()) {
+                    nodes.insert(e.prime);
+                    unexpanded.push(e.prime);
+                }
+                if (nodes.find(e.sub) == nodes.end()) {
+                    nodes.insert(e.sub);
+                    unexpanded.push(e.sub);
+                }
+            }
+        }
+    }
+    unsigned long long int size = 0LLU;
+    for (const auto i : nodes) {
+        if (i < 0) continue;
+        const SFDD& n = m.sfdd_nodes_[i];
+        if (n.value >= 0) {
+            size += n.elements.size();
+        }
     }
     return size;
 }
@@ -301,9 +328,9 @@ SFDD& SFDD::reduced(Manager& m) {
     for (vector<Element>::iterator e = elements.begin(); \
     e != elements.end(); ) {
         // 1.1 removes those elements that primes are false
-        if (e->prime.reduced(m).is_zero()) {
+        if (m.sfdd_nodes_[e->prime].reduced(m).is_zero()) {
             e = elements.erase(e);
-        } else if (!e->sub.reduced(m).is_zero()) {
+        } else if (!m.sfdd_nodes_[e->sub].reduced(m).is_zero()) {
             valid = true;
             ++e;
         } else {
@@ -323,7 +350,7 @@ SFDD& SFDD::reduced(Manager& m) {
             // cout << "big equal..." << endl;
             if (e1 != e2 && e1->sub==e2->sub) {
                 is_delete = true;
-                e2->prime = e2->prime.Xor(e1->prime, m).reduced(m);
+                e2->prime = m.uniq_table_.at(m.sfdd_nodes_[e2->prime].Xor(m.sfdd_nodes_[e1->prime], m).reduced(m));
                 e1 = elements.erase(e1);
                 break;
             }
@@ -337,23 +364,23 @@ SFDD& SFDD::reduced(Manager& m) {
     SFDD tmp = *this;
     if (elements.size() == 1) {
         // {(f, 1)} -> f
-        if (elements[0].sub.is_one()) {
-            *this = tmp.elements[0].prime;
+        if (m.sfdd_nodes_[elements[0].sub].is_one()) {
+            *this = m.sfdd_nodes_[tmp.elements[0].prime];
         }
     } else if (elements.size() == 2) {
         // {(f, 1), (other-pi-terms\f, 0)} -> f
         // {(1, f), (other-pi-terms\1, 0)} -> f
-        if (elements[0].sub.is_zero()) {
-            if (elements[1].sub.is_one()) {
-                *this = tmp.elements[1].prime;
-            } else if (elements[1].prime.is_one()) {
-                *this = tmp.elements[1].sub;
+        if (m.sfdd_nodes_[elements[0].sub].is_zero()) {
+            if (m.sfdd_nodes_[elements[1].sub].is_one()) {
+                *this = m.sfdd_nodes_[tmp.elements[1].prime];
+            } else if (m.sfdd_nodes_[elements[1].prime].is_one()) {
+                *this = m.sfdd_nodes_[tmp.elements[1].sub];
             }
-        } else if (elements[1].sub.is_zero()) {
-            if (elements[0].sub.is_one()) {
-                *this = tmp.elements[0].prime;
-            } else if (elements[0].prime.is_one()) {
-                *this = tmp.elements[0].sub;
+        } else if (m.sfdd_nodes_[elements[1].sub].is_zero()) {
+            if (m.sfdd_nodes_[elements[0].sub].is_one()) {
+                *this = m.sfdd_nodes_[tmp.elements[0].prime];
+            } else if (m.sfdd_nodes_[elements[0].prime].is_one()) {
+                *this = m.sfdd_nodes_[tmp.elements[0].sub];
             }
         }
     }
@@ -377,8 +404,8 @@ SFDD& SFDD::normalized(int lca, Manager& m) {
 // cout << "normalized..." << endl;
     for (vector<Element>::iterator e = elements.begin(); \
     e != elements.end(); ++e) {
-        e->prime.normalized(m.vtree->subvtree(vtree_index).lt->index, m);
-        e->sub.normalized(m.vtree->subvtree(vtree_index).rt->index, m);
+        m.sfdd_nodes_[e->prime].normalized(m.vtree->subvtree(vtree_index).lt->index, m);
+        m.sfdd_nodes_[e->sub].normalized(m.vtree->subvtree(vtree_index).rt->index, m);
     }
     *this = normalization_1(m.vtree->subvtree(lca), *this, m);
     if (!is_terminal()) value = -1;
@@ -426,9 +453,9 @@ SFDD SFDD::Intersection(const SFDD& sfdd, Manager& m) const {
             for (vector<Element>::const_iterator e2 = normalized_sfdd2.elements.begin();
             e2 != normalized_sfdd2.elements.end(); ++e2) {
                 Element new_e;
-                new_e.prime = e1->prime.Intersection(e2->prime, m);
-                if (!new_e.prime.is_zero()) {
-                    new_e.sub = e1->sub.Intersection(e2->sub, m);
+                new_e.prime = m.make_or_find(m.sfdd_nodes_[e1->prime].Intersection(m.sfdd_nodes_[e2->prime], m));
+                if (!m.sfdd_nodes_[new_e.prime].is_zero()) {
+                    new_e.sub = m.make_or_find(m.sfdd_nodes_[e1->sub].Intersection(m.sfdd_nodes_[e2->sub], m));
                     new_sfdd.elements.push_back(new_e);
                 }
             }
@@ -483,9 +510,9 @@ SFDD SFDD::Xor(const SFDD& sfdd, Manager& m) const {
             for (vector<Element>::const_iterator e2 = normalized_sfdd2.elements.begin();
             e2 != normalized_sfdd2.elements.end(); ++e2) {
                 Element new_e;
-                new_e.prime = e1->prime.Intersection(e2->prime, m);
-                if (!new_e.prime.is_zero()) {
-                    new_e.sub = e1->sub.Xor(e2->sub, m);
+                new_e.prime = m.make_or_find(m.sfdd_nodes_[e1->prime].Intersection(m.sfdd_nodes_[e2->prime], m));
+                if (!m.sfdd_nodes_[new_e.prime].is_zero()) {
+                    new_e.sub = m.make_or_find(m.sfdd_nodes_[e1->sub].Xor(m.sfdd_nodes_[e2->sub], m));
                     new_sfdd.elements.push_back(new_e);
                 }
             }
@@ -538,32 +565,32 @@ SFDD SFDD::And(const SFDD& sfdd, Manager& m) const {
         e1 != normalized_sfdd1.elements.end(); ++e1) {
             for (vector<Element>::const_iterator e2 = normalized_sfdd2.elements.begin();
             e2 != normalized_sfdd2.elements.end(); ++e2) {
-                SFDD prime_product = e1->prime.And(e2->prime, m);
+                SFDD prime_product = m.sfdd_nodes_[e1->prime].And(m.sfdd_nodes_[e2->prime], m);
                 if (prime_product.is_zero())
                     continue;
-                SFDD sub_product = e1->sub.And(e2->sub, m);
+                SFDD sub_product = m.sfdd_nodes_[e1->sub].And(m.sfdd_nodes_[e2->sub], m);
                 SFDD tmp_new_sfdd;
                 tmp_new_sfdd.vtree_index = new_sfdd.vtree_index;
                 for (vector<Element>::const_iterator new_e = new_sfdd.elements.begin();
                 new_e != new_sfdd.elements.end(); ++new_e) {
                     Element inter_e;
-                    inter_e.prime = new_e->prime.Intersection(prime_product, m);
-                    if (!inter_e.prime.is_zero()) {
+                    inter_e.prime = m.make_or_find(m.sfdd_nodes_[new_e->prime].Intersection(prime_product, m));
+                    if (!m.sfdd_nodes_[inter_e.prime].is_zero()) {
                         Element origin_e;
-                        inter_e.sub = new_e->sub.Xor(sub_product, m);
+                        inter_e.sub = m.make_or_find(m.sfdd_nodes_[new_e->sub].Xor(sub_product, m));
                         tmp_new_sfdd.elements.push_back(inter_e);  // add inter-ele
-                        origin_e.prime = new_e->prime.Xor(inter_e.prime, m);
+                        origin_e.prime = m.make_or_find(m.sfdd_nodes_[new_e->prime].Xor(m.sfdd_nodes_[inter_e.prime], m));
                         origin_e.sub = new_e->sub;
                         tmp_new_sfdd.elements.push_back(origin_e);  // add orig-ele
-                        prime_product = prime_product.Xor(inter_e.prime, m);
+                        prime_product = prime_product.Xor(m.sfdd_nodes_[inter_e.prime], m);
                     } else {
                         tmp_new_sfdd.elements.push_back(*new_e);
                     }
                 }
                 if (!prime_product.is_zero()) {
                     Element last_e;  // last element that has removed all common parts with others
-                    last_e.prime = prime_product;
-                    last_e.sub = sub_product;
+                    last_e.prime = m.make_or_find(prime_product);
+                    last_e.sub = m.make_or_find(sub_product);
                     tmp_new_sfdd.elements.push_back(last_e);  // add last element
                 }
                 new_sfdd = tmp_new_sfdd;
@@ -597,7 +624,7 @@ SFDD SFDD::Or(const SFDD& sfdd, Manager& m) const {
 inline SFDD SFDD::Not(Manager& m) const {
     return Xor(m.sfddOne(), m);
 }
-
+/*
 void SFDD::print(int indent) const {
     if (elements.empty()) {
         for (int i = 0; i < indent; ++i) cout << " ";
@@ -620,7 +647,7 @@ void SFDD::print(int indent) const {
     }
     return;
 }
-
+*/
 static set<string> node_names;
 
 string check_dec_name(string node_name) {
@@ -635,7 +662,7 @@ string check_dec_name(string node_name) {
         return node_name;
     }
 }
-
+/*
 void SFDD::print_dot(fstream& out_dot, bool root, int depth, string dec_name) const {
     if (root) {
         out_dot << "digraph G {" << endl;
@@ -718,7 +745,7 @@ void Element::print_dot(fstream& out_dot, int depth, string e_name) const {
         sub.print_dot(out_dot, false, depth, dec_name);
     }
 }
-
+*/
 Manager::Manager(const Vtree& v) : cache_table_(INIT_SIZE) {
     vtree = new Vtree(v);
 };
@@ -768,7 +795,7 @@ addr_t Manager::make_or_find(const SFDD& new_sfdd) {
     }
     return make_sfdd(new_sfdd);
 }
-
+/*
 void Manager::print_sfdd_nodes() const {
     cout << "sfdd_nodes_:-------------------------------" << endl;
     int i = 0;
@@ -787,7 +814,7 @@ void Manager::print_unique_table() const {
         cout << endl;
     }
 }
-
+*/
 void Manager::write_cache(const OPERATOR_TYPE op, const addr_t lhs, 
                  const addr_t rhs, const addr_t res) {
     auto key = calc_key(op, lhs, rhs);
