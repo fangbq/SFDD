@@ -83,9 +83,9 @@ public:
     // SFDD& operator^(const SFDD& s) { return Xor(s); }
     SFDD Or(const SFDD& s, Manager & m) const;
     inline SFDD Not(Manager& m) const;
-    // void print(int indent = 0) const;
-    // void print_dot(fstream & out_dot, bool root = false, int depth = 0, string dec_name = "Dec_0_1") const;
-    // void save_file_as_dot(const string f_name) const;
+    void print(const Manager& m, int indent = 0) const;
+    void print_dot(fstream & out_dot, const Manager& m, bool root = false, int depth = 0, string dec_name = "Dec_0_1") const;
+    void save_file_as_dot(const string f_name, const Manager& m) const;
 };
 
 
@@ -98,9 +98,9 @@ public:
     Element(const Element& e) { prime = e.prime; sub = e.sub; }
     inline bool equals(const Element& e) const {
         return prime==e.prime && sub==e.sub;
-    };/*
-    void print(int indent, int counter) const;
-    void print_dot(fstream& out_dot, int depth, string e_name) const;*/
+    };
+    void print(int indent, int counter, const Manager& m) const;
+    void print_dot(fstream& out_dot, int depth, string e_name, const Manager& m) const;
 };
 
 namespace std {
@@ -113,8 +113,8 @@ template <> struct hash<SFDD> {
             return h;
         } else if (n.value >= 0) {
             for (const auto& e : n.elements) {
-                hash_combine(h, hash<SFDD>()(e.prime));
-                hash_combine(h, hash<SFDD>()(e.sub));
+                hash_combine(h, hash<addr_t>()(e.prime));
+                hash_combine(h, hash<addr_t>()(e.sub));
             }
             hash_combine(h, hash<int>()(n.vtree_index));
         } 

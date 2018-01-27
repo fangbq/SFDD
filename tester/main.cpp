@@ -52,7 +52,7 @@ int main(int argc, char** argv) {
     else {
         vector<int> vars_order;
         for (int i = 1; i <= var_no; ++i) vars_order.push_back(i);
-            v = *new Vtree(1, var_no*2-1, vars_order, TRIVIAL_TREE);
+        v = *new Vtree(1, var_no*2-1, vars_order, TRIVIAL_TREE);
     }
 
     Manager m(v);  // manager
@@ -82,14 +82,14 @@ int main(int argc, char** argv) {
         fml = fml.And(clause, m);
         // fml.print();
         // fml.save_file_as_dot("fml_"+to_string(clause_counter-1));
-        // cout << "clause : " << clause_counter++ << " done; size : " << fml.size() << endl;
+        cout << "clause : " << clause_counter++ << " done; size : " << fml.size(m) << endl;
     }
     clock_t finish = clock();
     double ptime = (double)(finish - start) / CLOCKS_PER_SEC;  //BDD time
     cout.setf(ios::showpoint);
     cout.precision(4);
     cout.setf(ios::fixed);
-    cout << ptime << "  " << fml.size() << endl;
+    cout << ptime << "  " << fml.size(m) << endl;
     // fml.save_file_as_dot("sddpaper_eg");
     // fstream f;
     // f.open("dotG/iscas89/f=s1.dot", fstream::out | fstream::trunc);

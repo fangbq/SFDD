@@ -243,16 +243,14 @@ int SFDD::size(const Manager& m) const {
     unordered_set<addr_t> nodes;
     stack<addr_t> unexpanded;
     unexpanded.push(m.uniq_table_.at(*this));
+
     while (!unexpanded.empty()) {
         addr_t e = unexpanded.top();
         unexpanded.pop();
 
-        nodes.insert(e);
-        if (e < 0) {
-            continue;
-        }                
+        nodes.insert(e);      
         const SFDD& n = m.sfdd_nodes_[e];
-        if (n.value >= 0) {
+        if (n.value < 0) {
             for (const Element e : n.elements) {
                 if (nodes.find(e.prime) == nodes.end()) {
                     nodes.insert(e.prime);
@@ -267,9 +265,8 @@ int SFDD::size(const Manager& m) const {
     }
     unsigned long long int size = 0LLU;
     for (const auto i : nodes) {
-        if (i < 0) continue;
         const SFDD& n = m.sfdd_nodes_[i];
-        if (n.value >= 0) {
+        if (n.value < 0) {
             size += n.elements.size();
         }
     }
@@ -624,8 +621,8 @@ SFDD SFDD::Or(const SFDD& sfdd, Manager& m) const {
 inline SFDD SFDD::Not(Manager& m) const {
     return Xor(m.sfddOne(), m);
 }
-/*
-void SFDD::print(int indent) const {
+
+void SFDD::print(const Manager& m, int indent) const {
     if (elements.empty()) {
         for (int i = 0; i < indent; ++i) cout << " ";
         if (value < 2) {
@@ -643,11 +640,11 @@ void SFDD::print(int indent) const {
     int counter = 1;
     for (vector<Element>::const_iterator e = elements.begin();
     e != elements.end(); ++e) {
-        e->print(indent+1, counter++);
+        e->print(indent+1, counter++, m);
     }
     return;
 }
-*/
+
 static set<string> node_names;
 
 string check_dec_name(string node_name) {
@@ -662,8 +659,8 @@ string check_dec_name(string node_name) {
         return node_name;
     }
 }
-/*
-void SFDD::print_dot(fstream& out_dot, bool root, int depth, string dec_name) const {
+
+void SFDD::print_dot(fstream& out_dot, const Manager& m, bool root, int depth, string dec_name) const {
     if (root) {
         out_dot << "digraph G {" << endl;
         if (is_terminal()) {
@@ -700,35 +697,35 @@ void SFDD::print_dot(fstream& out_dot, bool root, int depth, string dec_name) co
     e != elements.end(); ++e) {
         e_name = check_dec_name(e_name);
         out_dot << "\t" << dec_name << " -> " << e_name << endl;
-        e->print_dot(out_dot, depth, e_name);
+        e->print_dot(out_dot, depth, e_name, m);
     }
     if (root) out_dot << "}" << endl;
 }
 
-void SFDD::save_file_as_dot(const string f_name) const {
+void SFDD::save_file_as_dot(const string f_name, const Manager& m) const {
     fstream f;
     f.open(f_name, fstream::out | fstream::trunc);
-    print_dot(f, true);
+    print_dot(f, m, true);
     f.close();
 }
 
-void Element::print(int indent, int counter) const {
+void Element::print(int indent, int counter, const Manager& m) const {
     for (int i = 0; i < indent; ++i) cout << " ";
     cout << "E" << counter << "p:" << endl;
-    prime.print(indent+1);
+    m.sfdd_nodes_[prime].print(m, indent+1);
     for (int i = 0; i < indent; ++i) cout << " ";
     cout << "E" << counter << "s:" << endl;
-    sub.print(indent+1);
+    m.sfdd_nodes_[sub].print(m, indent+1);
 }
 
-void Element::print_dot(fstream& out_dot, int depth, string e_name) const {
+void Element::print_dot(fstream& out_dot, int depth, string e_name, const Manager& m) const {
     out_dot << "\t" << e_name << " [shape=record,label=\"<f0> ";
     bool prime_out_edge = false;
     bool sub_out_edge = false;
-    if (prime.is_terminal()) prime.print_dot(out_dot);
+    if (m.sfdd_nodes_[prime].is_terminal()) m.sfdd_nodes_[prime].print_dot(out_dot, m);
     else { out_dot << "●"; prime_out_edge = true; }
     out_dot << "|<f1> ";
-    if (sub.is_terminal()) sub.print_dot(out_dot);
+    if (m.sfdd_nodes_[sub].is_terminal()) m.sfdd_nodes_[sub].print_dot(out_dot, m);
     else { out_dot << "●"; sub_out_edge = true; }
     out_dot << "\"]" << endl;
     ++depth;
@@ -736,16 +733,16 @@ void Element::print_dot(fstream& out_dot, int depth, string e_name) const {
         string dec_name = "Dec_" + to_string(depth) + "_1";
         dec_name = check_dec_name(dec_name);
         out_dot << "\t" << e_name << ":f0 -> " << dec_name << endl;
-        prime.print_dot(out_dot, false, depth, dec_name);
+        m.sfdd_nodes_[prime].print_dot(out_dot, m, false, depth, dec_name);
     }
     if (sub_out_edge) {
         string dec_name = "Dec_" + to_string(depth) + "_1";
         dec_name = check_dec_name(dec_name);
         out_dot << "\t" << e_name << ":f1 -> " << dec_name << endl;
-        sub.print_dot(out_dot, false, depth, dec_name);
+        m.sfdd_nodes_[sub].print_dot(out_dot, m, false, depth, dec_name);
     }
 }
-*/
+
 Manager::Manager(const Vtree& v) : cache_table_(INIT_SIZE) {
     vtree = new Vtree(v);
 };
@@ -795,13 +792,13 @@ addr_t Manager::make_or_find(const SFDD& new_sfdd) {
     }
     return make_sfdd(new_sfdd);
 }
-/*
+
 void Manager::print_sfdd_nodes() const {
     cout << "sfdd_nodes_:-------------------------------" << endl;
     int i = 0;
     for (auto& sfdd_node: sfdd_nodes_) {
         cout << "Node " << i++ << ":" << endl;
-        sfdd_node.print();
+        sfdd_node.print(*this);
         cout << endl;
     }
 }
@@ -810,11 +807,11 @@ void Manager::print_unique_table() const {
     cout << "unique_table:-------------------------------" << endl;
     for (auto& x: uniq_table_) {
         cout << "Node addr_t: " << x.second << endl;
-        x.first.print();
+        x.first.print(*this);
         cout << endl;
     }
 }
-*/
+
 void Manager::write_cache(const OPERATOR_TYPE op, const addr_t lhs, 
                  const addr_t rhs, const addr_t res) {
     auto key = calc_key(op, lhs, rhs);
@@ -872,31 +869,31 @@ extern SFDD normalization_1(const Vtree& v, const SFDD& rsfdd, Manager& m) {
     Element e1, e2;
     if (rsfdd.is_zero()) {
         // rule 1.(d)
-        e1.prime = normalization_2(*v.lt, m.sfddZero(), m);
-        e1.sub = normalization_1(*v.rt, m.sfddZero(), m);
+        e1.prime = m.make_or_find(normalization_2(*v.lt, m.sfddZero(), m));
+        e1.sub = m.make_or_find(normalization_1(*v.rt, m.sfddZero(), m));
         sfdd.elements.push_back(e1);
         return sfdd;
     } else if (rsfdd.is_one()) {
         // rule 1.(c)
-        e1.prime = normalization_1(*v.lt, m.sfddOne(), m);
-        e1.sub = normalization_1(*v.rt, m.sfddOne(), m);  // normalization
-        e2.prime = normalization_2(*v.lt, m.sfddOne(), m);
-        e2.sub = normalization_1(*v.rt, m.sfddZero(), m);
+        e1.prime = m.make_or_find(normalization_1(*v.lt, m.sfddOne(), m));
+        e1.sub = m.make_or_find(normalization_1(*v.rt, m.sfddOne(), m));  // normalization
+        e2.prime = m.make_or_find(normalization_2(*v.lt, m.sfddOne(), m));
+        e2.sub = m.make_or_find(normalization_1(*v.rt, m.sfddZero(), m));
     } else if (rsfdd.vtree_index < v.index) {
         // rule 1.(a)
-        e1.prime = normalization_1(*v.lt, rsfdd, m);  // normalization
-        e1.sub = normalization_1(*v.rt, m.sfddOne(), m);
-        e2.prime = normalization_2(*v.lt, rsfdd, m);
-        e2.sub = normalization_1(*v.rt, m.sfddZero(), m);
+        e1.prime = m.make_or_find(normalization_1(*v.lt, rsfdd, m));  // normalization
+        e1.sub = m.make_or_find(normalization_1(*v.rt, m.sfddOne(), m));
+        e2.prime = m.make_or_find(normalization_2(*v.lt, rsfdd, m));
+        e2.sub = m.make_or_find(normalization_1(*v.rt, m.sfddZero(), m));
     } else {
         // rule 1.(b)
-        e1.prime = normalization_1(*v.lt, m.sfddOne(), m);
-        e1.sub = normalization_1(*v.rt, rsfdd, m);  // normalization
-        e2.prime = normalization_2(*v.lt, m.sfddOne(), m);
-        e2.sub = normalization_1(*v.rt, m.sfddZero(), m);
+        e1.prime = m.make_or_find(normalization_1(*v.lt, m.sfddOne(), m));
+        e1.sub = m.make_or_find(normalization_1(*v.rt, rsfdd, m));  // normalization
+        e2.prime = m.make_or_find(normalization_2(*v.lt, m.sfddOne(), m));
+        e2.sub = m.make_or_find(normalization_1(*v.rt, m.sfddZero(), m));
     }
-    if (!e1.prime.is_zero()) sfdd.elements.push_back(e1);
-    if (!e2.prime.is_zero()) sfdd.elements.push_back(e2);
+    if (!m.sfdd_nodes_[e1.prime].is_zero()) sfdd.elements.push_back(e1);
+    if (!m.sfdd_nodes_[e2.prime].is_zero()) sfdd.elements.push_back(e2);
     // m.make_or_find(sfdd);
     return sfdd;
 }
@@ -923,31 +920,31 @@ extern SFDD normalization_2(const Vtree& v, const SFDD& rsfdd, Manager& m) {
     Element e1, e2;
     if (rsfdd.is_zero()) {
         // rule 2.(d)
-        e1.prime = normalization_2(*v.lt, m.sfddZero(), m);
-        e1.sub = normalization_2(*v.rt, m.sfddZero(), m);
+        e1.prime = m.make_or_find(normalization_2(*v.lt, m.sfddZero(), m));
+        e1.sub = m.make_or_find(normalization_2(*v.rt, m.sfddZero(), m));
         sfdd.elements.push_back(e1);
         return sfdd;
     } else if (rsfdd.is_one()) {
         // rule 2.(c)
-        e1.prime = normalization_1(*v.lt, m.sfddOne(), m);
-        e1.sub = normalization_2(*v.rt, m.sfddOne(), m);  // normalization
-        e2.prime = normalization_2(*v.lt, m.sfddOne(), m);
-        e2.sub = normalization_2(*v.rt, m.sfddZero(), m);
+        e1.prime = m.make_or_find(normalization_1(*v.lt, m.sfddOne(), m));
+        e1.sub = m.make_or_find(normalization_2(*v.rt, m.sfddOne(), m));  // normalization
+        e2.prime = m.make_or_find(normalization_2(*v.lt, m.sfddOne(), m));
+        e2.sub = m.make_or_find(normalization_2(*v.rt, m.sfddZero(), m));
     } else if (rsfdd.vtree_index < v.index) {
         // rule 2.(a)
-        e1.prime = normalization_1(*v.lt, rsfdd, m);  // normalization
-        e1.sub = normalization_2(*v.rt, m.sfddOne(), m);
-        e2.prime = normalization_2(*v.lt, rsfdd, m);
-        e2.sub = normalization_2(*v.rt, m.sfddZero(), m);
+        e1.prime = m.make_or_find(normalization_1(*v.lt, rsfdd, m));  // normalization
+        e1.sub = m.make_or_find(normalization_2(*v.rt, m.sfddOne(), m));
+        e2.prime = m.make_or_find(normalization_2(*v.lt, rsfdd, m));
+        e2.sub = m.make_or_find(normalization_2(*v.rt, m.sfddZero(), m));
     } else {
         // rule 2.(b)
-        e1.prime = normalization_1(*v.lt, m.sfddOne(), m);
-        e1.sub = normalization_2(*v.rt, rsfdd, m);  // normalization
-        e2.prime = normalization_2(*v.lt, m.sfddOne(), m);
-        e2.sub = normalization_2(*v.rt, m.sfddZero(), m);
+        e1.prime = m.make_or_find(normalization_1(*v.lt, m.sfddOne(), m));
+        e1.sub = m.make_or_find(normalization_2(*v.rt, rsfdd, m));  // normalization
+        e2.prime = m.make_or_find(normalization_2(*v.lt, m.sfddOne(), m));
+        e2.sub = m.make_or_find(normalization_2(*v.rt, m.sfddZero(), m));
     }
-    if (!e1.prime.is_zero()) sfdd.elements.push_back(e1);
-    if (!e2.prime.is_zero()) sfdd.elements.push_back(e2);
+    if (!m.sfdd_nodes_[e1.prime].is_zero()) sfdd.elements.push_back(e1);
+    if (!m.sfdd_nodes_[e2.prime].is_zero()) sfdd.elements.push_back(e2);
     // m.make_or_find(sfdd);
     return sfdd;
 }

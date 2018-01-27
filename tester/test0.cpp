@@ -32,14 +32,14 @@ int main(int argc, char** argv) {
     SFDD x2 = m.sfddVar(2);
 
     SFDD x4 = x1.Xor(x2, m);
-    // x4.print();
+    x4.print(m);
 
-    m.print_sfdd_nodes();
+    // m.print_sfdd_nodes();
 
     // if (m.sfdd_nodes_[2]==m.sfdd_nodes_[6]) cout << "haha" << endl;
-    // m.print_unique_table();
-    m.print_cache_table();
-    // cout << x4.size() << endl;
+    m.print_unique_table();
+    // m.print_cache_table();
+    cout << x4.size(m) << endl;
     return 0;
 }
 // 
