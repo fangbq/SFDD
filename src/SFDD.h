@@ -31,7 +31,7 @@ public:
     Vtree(int start_var_index, int end_var_index, vector<int> full_order, VTREE_TYPE t = TRIVIAL_TREE);
     Vtree(const Vtree& v);
     Vtree(const string& file_name);  // import from file
-    Vtree& merge(const Vtree& hat);
+    Vtree merge(const Vtree& hat);
     ~Vtree();
     Vtree subvtree(int index) const;  // return subvtree whose root is index
     // set<int>  get_variables() const;
@@ -71,8 +71,8 @@ public:
     bool computable_with(const SFDD& sfdd, const Manager& m) const;
     bool operator==(const SFDD& sfdd) const;
     SFDD& operator=(const SFDD& sfdd);
-    SFDD& reduced(Manager& m);  // reducing
-    SFDD& normalized(int lca, Manager& m);  // lca must be ancestor of this SFDD!!!
+    SFDD reduced(Manager& m) const;  // reducing
+    SFDD normalized(int lca, Manager& m) const;  // lca must be ancestor of this SFDD!!!
     SFDD Intersection(const SFDD& s, Manager & m) const;
     /*
      * must nml for the first time, example, x1 xor x2, if not
