@@ -284,23 +284,11 @@ bool SFDD::operator==(const SFDD& sfdd) const {
     if (is_terminal() && sfdd.is_terminal()) {
         return value == sfdd.value;
     } else if (elements.size() == sfdd.elements.size()) {
-        set<int> equaled_elements;
+        vector<Element>::const_iterator e2 = sfdd.elements.begin();
         for (vector<Element>::const_iterator e1 = elements.begin(); \
-        e1 != elements.end(); ++e1) {
-            bool found_equivalent = false;
-            for (size_t i = 0; i < sfdd.elements.size(); ++i) {
-                if (equaled_elements.find(i) == equaled_elements.end()
-                && e1->equals(sfdd.elements[i])) {
-                    equaled_elements.insert(i);
-                    found_equivalent = true;
-                    break;
-                }
-            }
-            if (!found_equivalent) {
-                // cout << "no eq" << endl;
+        e1 != elements.end(); ++e1, ++e2)
+            if (!(*e1 == *e2))
                 return false;
-            }
-        }
         // cout << "no eq" << endl;
         return true;
     }
@@ -779,16 +767,12 @@ SFDD Manager::sfddVar(const int tmp_var) {
 }
 
 addr_t Manager::make_sfdd(const SFDD& new_sfdd) {
-    // cout << "+++++++++++++++++++++++++++++++" << endl;
-    // print_unique_table();
-    // cout << "can't find this node: ******** " << endl;
-    // new_sfdd.print();
-    // cout << "+++++++++++++++++++++++++++++++" << endl;
-
+    SFDD sorted_sfdd = new_sfdd;
+    sort(sorted_sfdd.elements.begin(), sorted_sfdd.elements.end(), less_than_element());
     sfdd_nodes_.emplace_back();
     size_t node_id = sfdd_nodes_.size()-1;
-    uniq_table_.emplace(new_sfdd, node_id);
-    sfdd_nodes_[node_id] = new_sfdd;
+    uniq_table_.emplace(sorted_sfdd, node_id);
+    sfdd_nodes_[node_id] = sorted_sfdd;
     return node_id;
 }
 

@@ -99,8 +99,22 @@ public:
     inline bool equals(const Element& e) const {
         return prime==e.prime && sub==e.sub;
     };
+    inline bool operator==(const Element& e) const { return prime==e.prime && sub==e.sub; }
     void print(int indent, int counter, const Manager& m) const;
     void print_dot(fstream& out_dot, int depth, string e_name, const Manager& m) const;
+};
+
+struct less_than_element
+{
+    inline bool operator() (const Element& lhs, const Element& rhs)
+    {
+        if (lhs.prime < rhs.prime)
+            return true;
+        else if (lhs.prime == rhs.prime)
+            return lhs.sub < rhs.sub;
+        else
+            return false;
+    }
 };
 
 namespace std {
