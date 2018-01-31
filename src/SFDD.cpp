@@ -242,7 +242,11 @@ int SFDD::size(const Manager& m) const {
 
     unordered_set<addr_t> nodes;
     stack<addr_t> unexpanded;
-    unexpanded.push(m.uniq_table_.at(*this));
+// cout << "haha 1.5" << endl;
+// m.print_unique_table();
+// print(m);
+addr_t ss = m.uniq_table_.at(*this);
+    unexpanded.push(ss);
 
     while (!unexpanded.empty()) {
         addr_t e = unexpanded.top();
@@ -263,6 +267,7 @@ int SFDD::size(const Manager& m) const {
             }
         }
     }
+
     unsigned long long int size = 0LLU;
     for (const auto i : nodes) {
         const SFDD& n = m.sfdd_nodes_[i];
@@ -284,12 +289,10 @@ bool SFDD::operator==(const SFDD& sfdd) const {
     if (is_terminal() && sfdd.is_terminal()) {
         return value == sfdd.value;
     } else if (elements.size() == sfdd.elements.size()) {
-        vector<Element>::const_iterator e2 = sfdd.elements.begin();
-        for (vector<Element>::const_iterator e1 = elements.begin(); \
-        e1 != elements.end(); ++e1, ++e2)
-            if (!(*e1 == *e2))
+        vector<Element> lhs = elements, rhs = sfdd.elements;
+        for (size_t i = 0; i < lhs.size(); ++i)
+            if (!(lhs[i] == rhs[i]))
                 return false;
-        // cout << "no eq" << endl;
         return true;
     }
     // cout << "no eq" << endl;
@@ -376,7 +379,7 @@ SFDD SFDD::reduced(Manager& m) const {
     }
 
     if (reduced_sfdd.is_terminal()) reduced_sfdd.vtree_index = get_index_by_var[reduced_sfdd.value/2];
-    return reduced_sfdd;
+    return m.sfdd_nodes_[m.make_or_find(reduced_sfdd)];
 }
 
 extern int get_lca(int a, int b, const Vtree& v) {
@@ -400,8 +403,7 @@ SFDD SFDD::normalized(int lca, Manager& m) const {
     }
     normalized_sfdd = normalization_1(m.vtree->subvtree(lca), normalized_sfdd, m);
     if (!normalized_sfdd.is_terminal()) normalized_sfdd.value = -1;
-    m.make_or_find(normalized_sfdd);
-    return normalized_sfdd;
+    return m.sfdd_nodes_[m.make_or_find(normalized_sfdd)];
 }
 
 SFDD SFDD::Intersection(const SFDD& sfdd, Manager& m) const {
@@ -458,7 +460,7 @@ SFDD SFDD::Intersection(const SFDD& sfdd, Manager& m) const {
     addr_t new_sfdd_id = m.make_or_find(new_sfdd);
     m.write_cache(INTER, this_id, sfdd_id, new_sfdd_id);
     m.write_cache(INTER, sfdd_id, this_id, new_sfdd_id);
-    return new_sfdd;
+    return m.sfdd_nodes_[new_sfdd_id];
 }
 
 SFDD SFDD::Xor(const SFDD& sfdd, Manager& m) const {
@@ -515,7 +517,7 @@ SFDD SFDD::Xor(const SFDD& sfdd, Manager& m) const {
     addr_t new_sfdd_id = m.make_or_find(new_sfdd);
     m.write_cache(XOR, this_id, sfdd_id, new_sfdd_id);
     m.write_cache(XOR, sfdd_id, this_id, new_sfdd_id);
-    return new_sfdd;
+    return m.sfdd_nodes_[new_sfdd_id];
 }
 
 SFDD SFDD::And(const SFDD& sfdd, Manager& m) const {
@@ -594,7 +596,7 @@ SFDD SFDD::And(const SFDD& sfdd, Manager& m) const {
     addr_t new_sfdd_id = m.make_or_find(new_sfdd);
     m.write_cache(AND, this_id, sfdd_id, new_sfdd_id);
     m.write_cache(AND, sfdd_id, this_id, new_sfdd_id);
-    return new_sfdd;
+    return m.sfdd_nodes_[new_sfdd_id];
 }
 
 SFDD SFDD::Or(const SFDD& sfdd, Manager& m) const {
@@ -607,10 +609,10 @@ SFDD SFDD::Or(const SFDD& sfdd, Manager& m) const {
     SFDD new_sfdd = Xor(sfdd, m).Xor(And(sfdd, m), m);
     // SFDD new_sfdd = Not(m).And(sfdd.Not(m), m).Not(m);  // method 2
 
-    addr_t new_sfdd_id = m.make_sfdd(new_sfdd);
+    addr_t new_sfdd_id = m.make_or_find(new_sfdd);
     m.write_cache(OR, this_id, sfdd_id, new_sfdd_id);
     m.write_cache(OR, sfdd_id, this_id, new_sfdd_id);
-    return new_sfdd;
+    return m.sfdd_nodes_[new_sfdd_id];
 }
 
 inline SFDD SFDD::Not(Manager& m) const {
@@ -767,21 +769,21 @@ SFDD Manager::sfddVar(const int tmp_var) {
 }
 
 addr_t Manager::make_sfdd(const SFDD& new_sfdd) {
-    SFDD sorted_sfdd = new_sfdd;
-    sort(sorted_sfdd.elements.begin(), sorted_sfdd.elements.end(), less_than_element());
     sfdd_nodes_.emplace_back();
     size_t node_id = sfdd_nodes_.size()-1;
-    uniq_table_.emplace(sorted_sfdd, node_id);
-    sfdd_nodes_[node_id] = sorted_sfdd;
+    uniq_table_.emplace(new_sfdd, node_id);
+    sfdd_nodes_[node_id] = new_sfdd;
     return node_id;
 }
 
 addr_t Manager::make_or_find(const SFDD& new_sfdd) {
-    auto res = uniq_table_.find(new_sfdd);
+    SFDD sorted_sfdd = new_sfdd;
+    sort(sorted_sfdd.elements.begin(), sorted_sfdd.elements.end(), less_than_element());
+    auto res = uniq_table_.find(sorted_sfdd);
     if (res != uniq_table_.end()) {
         return res->second;
     }
-    return make_sfdd(new_sfdd);
+    return make_sfdd(sorted_sfdd);
 }
 
 void Manager::print_sfdd_nodes() const {

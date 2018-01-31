@@ -16,36 +16,39 @@
 int main(int argc, char** argv) {
 
     vector<int> vars_order;
-    int var_no = 4;
+    int var_no = 2;
     if (argv[1])
         var_no = stoi(argv[1]);
     for (int i = 1; i <= var_no; ++i) vars_order.push_back(i);
 
     Vtree v(1, var_no*2-1, vars_order);
-    v.save_dot_file("vtree");
-    v.print();
+    // v.save_dot_file("vtree");
+    // v.print();
 
     Manager m(v);
 
+    m.sfddZero();
+    m.sfddOne();
     SFDD x1 = m.sfddVar(1);
     
-    SFDD x2 = m.sfddVar(3);
+    SFDD x2 = m.sfddVar(2);
 
     SFDD x3 = x1.Xor(x2, m);
+    // cout << x3.size(m) << endl;
+
+    m.print_sfdd_nodes();
+
+    sort(x3.elements.begin(), x3.elements.end(), less_than_element());
     x3.print(m);
-    cout << x3.size(m) << endl;
+    // SFDD x4 = x1.And(x3, m);
+    // x4.print(m);
 
-    m.print_sfdd_nodes();
-
-    SFDD x4 = x1.Xor(x3, m);
-    x4.print(m);
-
-    m.print_sfdd_nodes();
+    // m.print_sfdd_nodes();
 
     // if (m.sfdd_nodes_[2]==m.sfdd_nodes_[6]) cout << "haha" << endl;
     // m.print_unique_table();
     // m.print_cache_table();
-    cout << x4.size(m) << endl;
+    cout << x3.size(m) << endl;
     return 0;
 }
 // 

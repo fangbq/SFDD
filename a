@@ -1,288 +1,37 @@
-Vtree Size: 7
-4  x0
- 2  x0
-  1  x1
-  3  x2
- 6  x0
-  5  x3
-  7  x4
-Dec 4:
- E1p:
-  x1 ~ 1
- E1s:
-  1 ~ 0
- E2p:
-  1 ~ 0
- E2s:
-  x3 ~ 5
- E3p:
-  Dec 2:
-   E1p:
-    -x1 ~ 1
-   E1s:
-    x2 ~ 3
- E3s:
-  0 ~ 0
-4
 sfdd_nodes_:-------------------------------
 Node 0:
-x1 ~ 1
-
-Node 1:
-x3 ~ 5
-
-Node 2:
 1 ~ 0
 
-Node 3:
+Node 1:
 0 ~ 0
 
-Node 4:
-Dec 2:
- E1p:
-  x1 ~ 1
- E1s:
-  1 ~ 0
- E2p:
-  1 ~ 0
- E2s:
-  0 ~ 0
-
-Node 5:
-Dec 6:
- E1p:
-  1 ~ 0
- E1s:
-  1 ~ 0
- E2p:
-  x3 ~ 5
- E2s:
-  0 ~ 0
-
-Node 6:
-x2 ~ 3
-
-Node 7:
--x2 ~ 3
-
-Node 8:
-Dec 2:
- E1p:
-  x1 ~ 1
- E1s:
-  x2 ~ 3
- E2p:
-  1 ~ 0
- E2s:
-  -x2 ~ 3
-
-Node 9:
--x3 ~ 5
-
-Node 10:
-Dec 6:
- E1p:
-  -x3 ~ 5
- E1s:
-  0 ~ 0
-
-Node 11:
-Dec 4:
- E1p:
-  Dec 2:
-   E1p:
-    x1 ~ 1
-   E1s:
-    1 ~ 0
-   E2p:
-    1 ~ 0
-   E2s:
-    0 ~ 0
- E1s:
-  Dec 6:
-   E1p:
-    1 ~ 0
-   E1s:
-    1 ~ 0
-   E2p:
-    x3 ~ 5
-   E2s:
-    0 ~ 0
- E2p:
-  Dec 2:
-   E1p:
-    x1 ~ 1
-   E1s:
-    x2 ~ 3
-   E2p:
-    1 ~ 0
-   E2s:
-    -x2 ~ 3
- E2s:
-  Dec 6:
-   E1p:
-    -x3 ~ 5
-   E1s:
-    0 ~ 0
-
-Node 12:
-Dec 2:
- E1p:
-  1 ~ 0
- E1s:
-  1 ~ 0
- E2p:
-  x1 ~ 1
- E2s:
-  0 ~ 0
-
-Node 13:
-Dec 6:
- E1p:
-  x3 ~ 5
- E1s:
-  1 ~ 0
- E2p:
-  1 ~ 0
- E2s:
-  0 ~ 0
-
-Node 14:
-Dec 2:
- E1p:
-  1 ~ 0
- E1s:
-  x2 ~ 3
- E2p:
-  x1 ~ 1
- E2s:
-  -x2 ~ 3
-
-Node 15:
-Dec 4:
- E1p:
-  Dec 2:
-   E1p:
-    1 ~ 0
-   E1s:
-    1 ~ 0
-   E2p:
-    x1 ~ 1
-   E2s:
-    0 ~ 0
- E1s:
-  Dec 6:
-   E1p:
-    x3 ~ 5
-   E1s:
-    1 ~ 0
-   E2p:
-    1 ~ 0
-   E2s:
-    0 ~ 0
- E2p:
-  Dec 2:
-   E1p:
-    1 ~ 0
-   E1s:
-    x2 ~ 3
-   E2p:
-    x1 ~ 1
-   E2s:
-    -x2 ~ 3
- E2s:
-  Dec 6:
-   E1p:
-    -x3 ~ 5
-   E1s:
-    0 ~ 0
-
-Node 16:
-x1 ~ 0
-
-Node 17:
-x3 ~ 0
-
-Node 18:
--x1 ~ 1
-
-Node 19:
-Dec 2:
- E1p:
-  -x1 ~ 1
- E1s:
-  x2 ~ 3
-
-Node 20:
-Dec 4:
- E1p:
-  x1 ~ 1
- E1s:
-  1 ~ 0
- E2p:
-  1 ~ 0
- E2s:
-  x3 ~ 5
- E3p:
-  Dec 2:
-   E1p:
-    -x1 ~ 1
-   E1s:
-    x2 ~ 3
- E3s:
-  0 ~ 0
-
-Dec 4:
- E1p:
-  -1 ~ 0
- E1s:
-  Dec 6:
-   E1p:
-    -1 ~ 0
-   E1s:
-    -1 ~ 0
- E2p:
-  Dec 2:
-   E1p:
-    -1 ~ 0
-   E1s:
-    -1 ~ 0
- E2s:
-  -1 ~ 0
-sfdd_nodes_:-------------------------------
-Node 0:
--1 ~ 1
-
-Node 1:
--1 ~ 5
-
 Node 2:
--1 ~ 0
+x1 ~ 1
 
 Node 3:
--1 ~ 0
+x3 ~ 5
 
 Node 4:
 Dec 2:
  E1p:
-  -1 ~ 1
+  1 ~ 0
  E1s:
-  -1 ~ 0
+  0 ~ 0
  E2p:
-  -1 ~ 0
+  x1 ~ 1
  E2s:
-  -1 ~ 0
+  1 ~ 0
 
 Node 5:
 Dec 6:
  E1p:
-  -1 ~ 0
+  1 ~ 0
  E1s:
-  -1 ~ 0
+  1 ~ 0
  E2p:
-  -1 ~ 5
+  x3 ~ 5
  E2s:
-  -1 ~ 0
+  0 ~ 0
 
 Node 6:
 x2 ~ 3
@@ -293,13 +42,13 @@ Node 7:
 Node 8:
 Dec 2:
  E1p:
-  -1 ~ 1
+  1 ~ 0
  E1s:
-  x2 ~ 3
- E2p:
-  -1 ~ 0
- E2s:
   -x2 ~ 3
+ E2p:
+  x1 ~ 1
+ E2s:
+  x2 ~ 3
 
 Node 9:
 -x3 ~ 5
@@ -309,77 +58,77 @@ Dec 6:
  E1p:
   -x3 ~ 5
  E1s:
-  -1 ~ 0
+  0 ~ 0
 
 Node 11:
 Dec 4:
  E1p:
   Dec 2:
    E1p:
-    -1 ~ 1
+    1 ~ 0
    E1s:
-    -1 ~ 0
+    0 ~ 0
    E2p:
-    -1 ~ 0
+    x1 ~ 1
    E2s:
-    -1 ~ 0
+    1 ~ 0
  E1s:
   Dec 6:
    E1p:
-    -1 ~ 0
+    1 ~ 0
    E1s:
-    -1 ~ 0
+    1 ~ 0
    E2p:
-    -1 ~ 5
+    x3 ~ 5
    E2s:
-    -1 ~ 0
+    0 ~ 0
  E2p:
   Dec 2:
    E1p:
-    -1 ~ 1
+    1 ~ 0
    E1s:
-    x2 ~ 3
-   E2p:
-    -1 ~ 0
-   E2s:
     -x2 ~ 3
+   E2p:
+    x1 ~ 1
+   E2s:
+    x2 ~ 3
  E2s:
   Dec 6:
    E1p:
     -x3 ~ 5
    E1s:
-    -1 ~ 0
+    0 ~ 0
 
 Node 12:
 Dec 2:
  E1p:
-  -1 ~ 0
+  1 ~ 0
  E1s:
-  -1 ~ 0
+  1 ~ 0
  E2p:
-  -1 ~ 1
+  x1 ~ 1
  E2s:
-  -1 ~ 0
+  0 ~ 0
 
 Node 13:
 Dec 6:
  E1p:
-  -1 ~ 5
+  1 ~ 0
  E1s:
-  -1 ~ 0
+  0 ~ 0
  E2p:
-  -1 ~ 0
+  x3 ~ 5
  E2s:
-  -1 ~ 0
+  1 ~ 0
 
 Node 14:
 Dec 2:
  E1p:
-  -1 ~ 0
+  1 ~ 0
  E1s:
   x2 ~ 3
  E2p:
-  -1 ~ 1
+  x1 ~ 1
  E2s:
   -x2 ~ 3
 
@@ -388,31 +137,31 @@ Dec 4:
  E1p:
   Dec 2:
    E1p:
-    -1 ~ 0
+    1 ~ 0
    E1s:
-    -1 ~ 0
+    1 ~ 0
    E2p:
-    -1 ~ 1
+    x1 ~ 1
    E2s:
-    -1 ~ 0
+    0 ~ 0
  E1s:
   Dec 6:
    E1p:
-    -1 ~ 5
+    1 ~ 0
    E1s:
-    -1 ~ 0
+    0 ~ 0
    E2p:
-    -1 ~ 0
+    x3 ~ 5
    E2s:
-    -1 ~ 0
+    1 ~ 0
  E2p:
   Dec 2:
    E1p:
-    -1 ~ 0
+    1 ~ 0
    E1s:
     x2 ~ 3
    E2p:
-    -1 ~ 1
+    x1 ~ 1
    E2s:
     -x2 ~ 3
  E2s:
@@ -420,34 +169,28 @@ Dec 4:
    E1p:
     -x3 ~ 5
    E1s:
-    -1 ~ 0
+    0 ~ 0
 
 Node 16:
-x1 ~ 0
-
-Node 17:
-x3 ~ 0
-
-Node 18:
 -x1 ~ 1
 
-Node 19:
+Node 17:
 Dec 2:
  E1p:
   -x1 ~ 1
  E1s:
   x2 ~ 3
 
-Node 20:
+Node 18:
 Dec 4:
  E1p:
-  -1 ~ 1
+  1 ~ 0
  E1s:
-  -1 ~ 0
+  x3 ~ 5
  E2p:
-  -1 ~ 0
+  x1 ~ 1
  E2s:
-  -1 ~ 5
+  1 ~ 0
  E3p:
   Dec 2:
    E1p:
@@ -455,73 +198,170 @@ Dec 4:
    E1s:
     x2 ~ 3
  E3s:
-  -1 ~ 0
+  0 ~ 0
 
-Node 21:
--1 ~ 1
-
-Node 22:
--1 ~ 3
-
-Node 23:
+Node 19:
 Dec 2:
  E1p:
-  -1 ~ 1
+  1 ~ 0
  E1s:
-  -1 ~ 3
+  0 ~ 0
+ E2p:
+  x1 ~ 1
+ E2s:
+  1 ~ 0
+
+Node 20:
+Dec 2:
+ E1p:
+  1 ~ 0
+ E1s:
+  -x2 ~ 3
+ E2p:
+  x1 ~ 1
+ E2s:
+  x2 ~ 3
+
+Node 21:
+Dec 4:
+ E1p:
+  Dec 2:
+   E1p:
+    1 ~ 0
+   E1s:
+    0 ~ 0
+   E2p:
+    x1 ~ 1
+   E2s:
+    1 ~ 0
+ E1s:
+  Dec 6:
+   E1p:
+    1 ~ 0
+   E1s:
+    1 ~ 0
+   E2p:
+    x3 ~ 5
+   E2s:
+    0 ~ 0
+ E2p:
+  Dec 2:
+   E1p:
+    1 ~ 0
+   E1s:
+    -x2 ~ 3
+   E2p:
+    x1 ~ 1
+   E2s:
+    x2 ~ 3
+ E2s:
+  Dec 6:
+   E1p:
+    -x3 ~ 5
+   E1s:
+    0 ~ 0
+
+Node 22:
+Dec 6:
+ E1p:
+  1 ~ 0
+ E1s:
+  0 ~ 0
+ E2p:
+  x3 ~ 5
+ E2s:
+  1 ~ 0
+
+Node 23:
+Dec 4:
+ E1p:
+  Dec 2:
+   E1p:
+    1 ~ 0
+   E1s:
+    1 ~ 0
+   E2p:
+    x1 ~ 1
+   E2s:
+    0 ~ 0
+ E1s:
+  Dec 6:
+   E1p:
+    1 ~ 0
+   E1s:
+    0 ~ 0
+   E2p:
+    x3 ~ 5
+   E2s:
+    1 ~ 0
+ E2p:
+  Dec 2:
+   E1p:
+    1 ~ 0
+   E1s:
+    x2 ~ 3
+   E2p:
+    x1 ~ 1
+   E2s:
+    -x2 ~ 3
+ E2s:
+  Dec 6:
+   E1p:
+    -x3 ~ 5
+   E1s:
+    0 ~ 0
 
 Node 24:
--1 ~ 7
+Dec 2:
+ E1p:
+  1 ~ 0
+ E1s:
+  0 ~ 0
+ E2p:
+  x1 ~ 1
+ E2s:
+  1 ~ 0
 
 Node 25:
 Dec 6:
  E1p:
-  -1 ~ 5
+  1 ~ 0
  E1s:
-  -1 ~ 7
+  0 ~ 0
  E2p:
-  -1 ~ 0
+  x3 ~ 5
  E2s:
-  -1 ~ 0
+  1 ~ 0
 
 Node 26:
 Dec 4:
  E1p:
-  Dec 2:
-   E1p:
-    -1 ~ 1
-   E1s:
-    -1 ~ 0
-   E2p:
-    -1 ~ 0
-   E2s:
-    -1 ~ 0
+  x1 ~ 1
  E1s:
-  Dec 6:
-   E1p:
-    -1 ~ 0
-   E1s:
-    -1 ~ 0
-   E2p:
-    -1 ~ 5
-   E2s:
-    -1 ~ 0
+  x3 ~ 5
  E2p:
   Dec 2:
    E1p:
-    -1 ~ 1
+    1 ~ 0
    E1s:
-    -1 ~ 3
- E2s:
-  Dec 6:
-   E1p:
-    -1 ~ 5
-   E1s:
-    -1 ~ 7
+    -x2 ~ 3
    E2p:
-    -1 ~ 0
+    x1 ~ 1
    E2s:
-    -1 ~ 0
+    x2 ~ 3
+ E2s:
+  0 ~ 0
+
+Node 27:
+Dec 4:
+ E1p:
+  1 ~ 0
+ E1s:
+  x3 ~ 5
+ E2p:
+  x1 ~ 1
+ E2s:
+  1 ~ 0
  E3p:
   Dec 2:
    E1p:
@@ -529,67 +369,372 @@ Dec 4:
    E1s:
     x2 ~ 3
  E3s:
-  Dec 6:
-   E1p:
-    -x3 ~ 5
-   E1s:
-    -1 ~ 0
-
-Node 27:
--1 ~ 0
+  0 ~ 0
 
 Node 28:
 Dec 2:
  E1p:
-  -1 ~ 0
+  1 ~ 0
  E1s:
-  -1 ~ 0
+  0 ~ 0
+ E2p:
+  x1 ~ 1
+ E2s:
+  1 ~ 0
 
 Node 29:
--1 ~ 5
-
-Node 30:
-Dec 6:
- E1p:
-  -1 ~ 0
- E1s:
-  -1 ~ 0
-
-Node 31:
-Dec 2:
- E1p:
-  -1 ~ 0
- E1s:
-  x2 ~ 3
-
-Node 32:
-Dec 2:
- E1p:
-  -1 ~ 1
- E1s:
-  -1 ~ 3
- E2p:
-  -1 ~ 0
- E2s:
-  -1 ~ 3
-
-Node 33:
 Dec 4:
  E1p:
-  -1 ~ 0
+  1 ~ 0
  E1s:
-  Dec 6:
+  x3 ~ 5
+ E2p:
+  x1 ~ 1
+ E2s:
+  -x3 ~ 5
+ E3p:
+  Dec 2:
    E1p:
-    -1 ~ 0
+    -x1 ~ 1
    E1s:
-    -1 ~ 0
+    x2 ~ 3
+ E3s:
+  0 ~ 0
+
+Node 30:
+Dec 4:
+ E1p:
+  1 ~ 0
+ E1s:
+  x3 ~ 5
+ E2p:
+  x1 ~ 1
+ E2s:
+  -x3 ~ 5
+ E3p:
+  Dec 2:
+   E1p:
+    -x1 ~ 1
+   E1s:
+    x2 ~ 3
+ E3s:
+  0 ~ 0
+
+unique_table:-------------------------------
+Node addr_t: 29
+Dec 4:
+ E1p:
+  1 ~ 0
+ E1s:
+  x3 ~ 5
+ E2p:
+  x1 ~ 1
+ E2s:
+  -x3 ~ 5
+ E3p:
+  Dec 2:
+   E1p:
+    -x1 ~ 1
+   E1s:
+    x2 ~ 3
+ E3s:
+  0 ~ 0
+
+Node addr_t: 26
+Dec 4:
+ E1p:
+  x1 ~ 1
+ E1s:
+  x3 ~ 5
  E2p:
   Dec 2:
    E1p:
-    -1 ~ 0
+    1 ~ 0
    E1s:
-    -1 ~ 0
+    -x2 ~ 3
+   E2p:
+    x1 ~ 1
+   E2s:
+    x2 ~ 3
  E2s:
-  -1 ~ 0
+  0 ~ 0
 
-4
+Node addr_t: 23
+Dec 4:
+ E1p:
+  Dec 2:
+   E1p:
+    1 ~ 0
+   E1s:
+    1 ~ 0
+   E2p:
+    x1 ~ 1
+   E2s:
+    0 ~ 0
+ E1s:
+  Dec 6:
+   E1p:
+    1 ~ 0
+   E1s:
+    0 ~ 0
+   E2p:
+    x3 ~ 5
+   E2s:
+    1 ~ 0
+ E2p:
+  Dec 2:
+   E1p:
+    1 ~ 0
+   E1s:
+    x2 ~ 3
+   E2p:
+    x1 ~ 1
+   E2s:
+    -x2 ~ 3
+ E2s:
+  Dec 6:
+   E1p:
+    -x3 ~ 5
+   E1s:
+    0 ~ 0
+
+Node addr_t: 21
+Dec 4:
+ E1p:
+  Dec 2:
+   E1p:
+    1 ~ 0
+   E1s:
+    0 ~ 0
+   E2p:
+    x1 ~ 1
+   E2s:
+    1 ~ 0
+ E1s:
+  Dec 6:
+   E1p:
+    1 ~ 0
+   E1s:
+    1 ~ 0
+   E2p:
+    x3 ~ 5
+   E2s:
+    0 ~ 0
+ E2p:
+  Dec 2:
+   E1p:
+    1 ~ 0
+   E1s:
+    -x2 ~ 3
+   E2p:
+    x1 ~ 1
+   E2s:
+    x2 ~ 3
+ E2s:
+  Dec 6:
+   E1p:
+    -x3 ~ 5
+   E1s:
+    0 ~ 0
+
+Node addr_t: 18
+Dec 4:
+ E1p:
+  1 ~ 0
+ E1s:
+  x3 ~ 5
+ E2p:
+  x1 ~ 1
+ E2s:
+  1 ~ 0
+ E3p:
+  Dec 2:
+   E1p:
+    -x1 ~ 1
+   E1s:
+    x2 ~ 3
+ E3s:
+  0 ~ 0
+
+Node addr_t: 15
+Dec 4:
+ E1p:
+  Dec 2:
+   E1p:
+    1 ~ 0
+   E1s:
+    1 ~ 0
+   E2p:
+    x1 ~ 1
+   E2s:
+    0 ~ 0
+ E1s:
+  Dec 6:
+   E1p:
+    1 ~ 0
+   E1s:
+    0 ~ 0
+   E2p:
+    x3 ~ 5
+   E2s:
+    1 ~ 0
+ E2p:
+  Dec 2:
+   E1p:
+    1 ~ 0
+   E1s:
+    x2 ~ 3
+   E2p:
+    x1 ~ 1
+   E2s:
+    -x2 ~ 3
+ E2s:
+  Dec 6:
+   E1p:
+    -x3 ~ 5
+   E1s:
+    0 ~ 0
+
+Node addr_t: 11
+Dec 4:
+ E1p:
+  Dec 2:
+   E1p:
+    1 ~ 0
+   E1s:
+    0 ~ 0
+   E2p:
+    x1 ~ 1
+   E2s:
+    1 ~ 0
+ E1s:
+  Dec 6:
+   E1p:
+    1 ~ 0
+   E1s:
+    1 ~ 0
+   E2p:
+    x3 ~ 5
+   E2s:
+    0 ~ 0
+ E2p:
+  Dec 2:
+   E1p:
+    1 ~ 0
+   E1s:
+    -x2 ~ 3
+   E2p:
+    x1 ~ 1
+   E2s:
+    x2 ~ 3
+ E2s:
+  Dec 6:
+   E1p:
+    -x3 ~ 5
+   E1s:
+    0 ~ 0
+
+Node addr_t: 7
+-x2 ~ 3
+
+Node addr_t: 6
+x2 ~ 3
+
+Node addr_t: 13
+Dec 6:
+ E1p:
+  1 ~ 0
+ E1s:
+  0 ~ 0
+ E2p:
+  x3 ~ 5
+ E2s:
+  1 ~ 0
+
+Node addr_t: 0
+1 ~ 0
+
+Node addr_t: 1
+0 ~ 0
+
+Node addr_t: 10
+Dec 6:
+ E1p:
+  -x3 ~ 5
+ E1s:
+  0 ~ 0
+
+Node addr_t: 5
+Dec 6:
+ E1p:
+  1 ~ 0
+ E1s:
+  1 ~ 0
+ E2p:
+  x3 ~ 5
+ E2s:
+  0 ~ 0
+
+Node addr_t: 16
+-x1 ~ 1
+
+Node addr_t: 2
+x1 ~ 1
+
+Node addr_t: 3
+x3 ~ 5
+
+Node addr_t: 9
+-x3 ~ 5
+
+Node addr_t: 17
+Dec 2:
+ E1p:
+  -x1 ~ 1
+ E1s:
+  x2 ~ 3
+
+Node addr_t: 14
+Dec 2:
+ E1p:
+  1 ~ 0
+ E1s:
+  x2 ~ 3
+ E2p:
+  x1 ~ 1
+ E2s:
+  -x2 ~ 3
+
+Node addr_t: 12
+Dec 2:
+ E1p:
+  1 ~ 0
+ E1s:
+  1 ~ 0
+ E2p:
+  x1 ~ 1
+ E2s:
+  0 ~ 0
+
+Node addr_t: 8
+Dec 2:
+ E1p:
+  1 ~ 0
+ E1s:
+  -x2 ~ 3
+ E2p:
+  x1 ~ 1
+ E2s:
+  x2 ~ 3
+
+Node addr_t: 4
+Dec 2:
+ E1p:
+  1 ~ 0
+ E1s:
+  0 ~ 0
+ E2p:
+  x1 ~ 1
+ E2s:
+  1 ~ 0
+

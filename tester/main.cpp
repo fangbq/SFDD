@@ -61,7 +61,6 @@ int main(int argc, char** argv) {
     // struct rusage r_usage;
     int  clause_counter = 1;
     clock_t start = clock();
-    vector<SFDD> sfdds;  // not because out memory
     for(int line = 0; line < col_no; ++line)  //read every line number, and save as a clause
     {
         SFDD clause = m.sfddZero();
@@ -70,8 +69,8 @@ int main(int argc, char** argv) {
             infile >> var;
             if (var == 0) break;
             SFDD tmp_var = m.sfddVar(var);
-            // cout << "var: " << var << " done" << endl;
             clause = clause.Or(tmp_var, m);
+            // cout << "var: " << var << " done;" << endl;
             // clause.print();
             // getrusage(RUSAGE_SELF, &r_usage);
             // cout << "Memory usage = " << r_usage.ru_maxrss << endl;
@@ -82,7 +81,9 @@ int main(int argc, char** argv) {
         fml = fml.And(clause, m);
         // fml.print();
         // fml.save_file_as_dot("fml_"+to_string(clause_counter-1));
-        cout << "clause : " << clause_counter++ << " done; size : " << fml.size(m) << endl;
+        // m.print_sfdd_nodes();
+        // m.print_unique_table();
+        cout << "clause : " << clause_counter++ << " done; " << fml.size(m) << endl;
     }
     clock_t finish = clock();
     double ptime = (double)(finish - start) / CLOCKS_PER_SEC;  //BDD time
