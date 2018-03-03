@@ -70,6 +70,7 @@ int main(int argc, char** argv) {
             if (var == 0) break;
             SFDD tmp_var = m.sfddVar(var);
             clause = clause.Or(tmp_var, m);
+            clause = clause.trimmed(m);
             // cout << "var: " << var << " done;" << endl;
             // clause.print();
             // getrusage(RUSAGE_SELF, &r_usage);
@@ -79,6 +80,7 @@ int main(int argc, char** argv) {
         }
         // clause.save_file_as_dot("clause_"+to_string(clause_counter++));
         fml = fml.And(clause, m);
+        fml = fml.trimmed(m);
         // fml.print();
         // fml.save_file_as_dot("fml_"+to_string(clause_counter-1));
         // m.print_sfdd_nodes();

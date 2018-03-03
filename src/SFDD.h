@@ -72,19 +72,22 @@ public:
     bool operator==(const SFDD& sfdd) const;
     SFDD& operator=(const SFDD& sfdd);
     SFDD reduced(Manager& m) const;  // reducing
+    SFDD compressed(Manager& m) const;  // compressing
+    SFDD trimmed(Manager& m) const;  // trimming
     SFDD normalized(int lca, Manager& m) const;  // lca must be ancestor of this SFDD!!!
-    SFDD Intersection(const SFDD& s, Manager & m) const;
+    SFDD apply(const SFDD& s, Manager& m, const OPERATOR_TYPE op) const;
+    SFDD Intersection(const SFDD& s, Manager& m) const;
     /*
      * must nml for the first time, example, x1 xor x2, if not
      * they will be calculated directly, it's not what we want
      */
-    SFDD Xor(const SFDD& s, Manager & m) const;
-    SFDD And(const SFDD& s, Manager & m) const;
+    SFDD Xor(const SFDD& s, Manager& m) const;
+    SFDD And(const SFDD& s, Manager& m) const;
     // SFDD& operator^(const SFDD& s) { return Xor(s); }
-    SFDD Or(const SFDD& s, Manager & m) const;
+    SFDD Or(const SFDD& s, Manager& m) const;
     inline SFDD Not(Manager& m) const;
     void print(const Manager& m, int indent = 0) const;
-    void print_dot(fstream & out_dot, const Manager& m, bool root = false, int depth = 0, string dec_name = "Dec_0_1") const;
+    void print_dot(fstream& out_dot, const Manager& m, bool root = false, int depth = 0, string dec_name = "Dec_0_1") const;
     void save_file_as_dot(const string f_name, const Manager& m) const;
 };
 
