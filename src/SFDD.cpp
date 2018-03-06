@@ -485,6 +485,9 @@ SFDD SFDD::apply(const SFDD& sfdd, Manager& m, const OPERATOR_TYPE op) const {
             cout << "Shouldn't be here! Vtree error 3" << endl;
             ;
     }
+
+    new_sfdd = new_sfdd.reduced(m);
+
     addr_t new_sfdd_id = m.make_or_find(new_sfdd);
     m.write_cache(op, this_id, sfdd_id, new_sfdd_id);
     m.write_cache(op, sfdd_id, this_id, new_sfdd_id);
@@ -516,7 +519,6 @@ SFDD SFDD::Intersection(const SFDD& sfdd, Manager& m) const {
             }
         }
     }
-    new_sfdd = new_sfdd.reduced(m);
     return new_sfdd;
 }
 
@@ -550,7 +552,6 @@ SFDD SFDD::Xor(const SFDD& sfdd, Manager& m) const {
             }
         }
     }
-    new_sfdd = new_sfdd.reduced(m);
     return new_sfdd;
 }
 
@@ -605,7 +606,6 @@ SFDD SFDD::And(const SFDD& sfdd, Manager& m) const {
             }
         }
     }
-    new_sfdd = new_sfdd.reduced(m);
     return new_sfdd;
 }
 
