@@ -654,7 +654,7 @@ SFDD SFDD::And(const SFDD& sfdd, Manager& m) const {
 SFDD SFDD::Or(const SFDD& sfdd, Manager& m) const {
 // cout << "Or..." << endl;
 
-    SFDD new_sfdd = Xor(sfdd, m).Xor(And(sfdd, m), m);
+    SFDD new_sfdd = apply(XOR, sfdd, m).apply(XOR, apply(AND, sfdd, m), m);
     // SFDD new_sfdd = Not(m).And(sfdd.Not(m), m).Not(m);  // method 2
 
     return new_sfdd;
