@@ -74,8 +74,9 @@ public:
     SFDD reduced(Manager& m) const;  // reducing
     SFDD compressed(Manager& m) const;  // compressing
     SFDD trimmed(Manager& m) const;  // trimming
+    SFDD light_trimming(Manager& m) const;
     SFDD normalized(int lca, Manager& m) const;  // lca must be ancestor of this SFDD!!!
-    SFDD apply(const SFDD& s, Manager& m, const OPERATOR_TYPE op) const;
+    SFDD apply(const OPERATOR_TYPE op, const SFDD& s, Manager& m) const;
     SFDD Intersection(const SFDD& s, Manager& m) const;
     /*
      * must nml for the first time, example, x1 xor x2, if not

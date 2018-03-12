@@ -334,7 +334,7 @@ SFDD SFDD::reduced(Manager& m) const {
     if (!valid) reduced_sfdd.elements.clear();
     if (reduced_sfdd.elements.size()==0) reduced_sfdd.value = 0;
 
-    reduced_sfdd = reduced_sfdd.compressed(m);
+    reduced_sfdd = reduced_sfdd.compressed(m).trimmed(m);
 
     if (reduced_sfdd.is_terminal()) reduced_sfdd.vtree_index = get_index_by_var[reduced_sfdd.value/2];
     return m.sfdd_nodes_[m.make_or_find(reduced_sfdd)];
@@ -351,7 +351,7 @@ SFDD SFDD::compressed(Manager& m) const {
             // cout << "big equal..." << endl;
             if (e1 != e2 && e1->sub==e2->sub) {
                 is_delete = true;
-                e2->prime = m.make_or_find(m.sfdd_nodes_[e2->prime].Xor(m.sfdd_nodes_[e1->prime], m).compressed(m));
+                e2->prime = m.make_or_find(m.sfdd_nodes_[e2->prime].Xor(m.sfdd_nodes_[e1->prime], m));
                 e1 = new_sfdd.elements.erase(e1);
                 break;
             }
@@ -393,6 +393,33 @@ SFDD SFDD::trimmed(Manager& m) const {
     return m.sfdd_nodes_[m.make_or_find(new_sfdd)];
 }
 
+SFDD SFDD::light_trimming(Manager& m) const {
+    SFDD new_sfdd = *this, tmp = *this;
+    // light_trimming
+// cout << "light_trimming..." << endl;
+    if (new_sfdd.elements.size() == 2) {
+        // {(1, 1), (other-pi-terms\1, 0)} -> 1
+        // {(1, 0), (other-pi-terms\1, 0)} -> 0
+        if (m.sfdd_nodes_[new_sfdd.elements[0].prime].is_one() && \
+            m.sfdd_nodes_[new_sfdd.elements[1].sub].is_zero()) {
+            if (m.sfdd_nodes_[new_sfdd.elements[0].sub].is_one()) {
+                new_sfdd = m.sfddOne();
+            } else if (m.sfdd_nodes_[new_sfdd.elements[0].sub].is_zero()) {
+                new_sfdd = m.sfddZero();
+            }
+        } else if (m.sfdd_nodes_[new_sfdd.elements[1].prime].is_one() && \
+                   m.sfdd_nodes_[new_sfdd.elements[0].sub].is_zero()) {
+            if (m.sfdd_nodes_[new_sfdd.elements[1].sub].is_one()) {
+                new_sfdd = m.sfddOne();
+            } else if (m.sfdd_nodes_[new_sfdd.elements[1].sub].is_zero()) {
+                new_sfdd = m.sfddZero();
+            }
+        }
+    }
+    if (new_sfdd.is_terminal()) new_sfdd.vtree_index = get_index_by_var[new_sfdd.value/2];
+    return m.sfdd_nodes_[m.make_or_find(new_sfdd)];
+}
+
 extern int get_lca(int a, int b, const Vtree& v) {
 // cout << "get_lca..." << endl;
     // if (!&v) return 0;
@@ -418,7 +445,7 @@ SFDD SFDD::normalized(int lca, Manager& m) const {
 }
 
 
-SFDD SFDD::apply(const SFDD& sfdd, Manager& m, const OPERATOR_TYPE op) const {
+SFDD SFDD::apply(const OPERATOR_TYPE op, const SFDD& sfdd, Manager& m) const {
     addr_t this_id = m.make_or_find(*this), sfdd_id = m.make_or_find(sfdd);
 
     switch (op) {
@@ -443,6 +470,10 @@ SFDD SFDD::apply(const SFDD& sfdd, Manager& m, const OPERATOR_TYPE op) const {
             if (is_one()) return sfdd;
             if (sfdd.is_one()) return *this;
             if (this_id == sfdd_id) return m.sfdd_nodes_[this_id];
+            break;
+        }
+        case OR:
+        {
             break;
         }
         default:
@@ -481,6 +512,11 @@ SFDD SFDD::apply(const SFDD& sfdd, Manager& m, const OPERATOR_TYPE op) const {
             new_sfdd = normalized_sfdd1.And(normalized_sfdd2, m);
             break;
         }
+        case OR:
+        {
+            new_sfdd = normalized_sfdd1.Or(normalized_sfdd2, m);
+            break;
+        }
         default:
             cout << "Shouldn't be here! Vtree error 3" << endl;
             ;
@@ -497,6 +533,7 @@ SFDD SFDD::apply(const SFDD& sfdd, Manager& m, const OPERATOR_TYPE op) const {
 SFDD SFDD::Intersection(const SFDD& sfdd, Manager& m) const {
 // cout << "Intersection..." << endl;  
     SFDD new_sfdd;
+    new_sfdd.vtree_index = vtree_index;
     if (is_terminal() && sfdd.is_terminal()) {
         // base case
         if (*this==sfdd || sfdd.is_negative())
@@ -519,12 +556,14 @@ SFDD SFDD::Intersection(const SFDD& sfdd, Manager& m) const {
             }
         }
     }
+    new_sfdd = new_sfdd.compressed(m).light_trimming(m);
     return new_sfdd;
 }
 
 SFDD SFDD::Xor(const SFDD& sfdd, Manager& m) const {
 // cout << "Xor..." << endl;
     SFDD new_sfdd;
+    new_sfdd.vtree_index = vtree_index;
     if (is_terminal() && sfdd.is_terminal()) {
         // base case
         if (*this==sfdd) {
@@ -552,12 +591,14 @@ SFDD SFDD::Xor(const SFDD& sfdd, Manager& m) const {
             }
         }
     }
+    new_sfdd = new_sfdd.compressed(m).light_trimming(m);
     return new_sfdd;
 }
 
 SFDD SFDD::And(const SFDD& sfdd, Manager& m) const {
 // cout << "And..." << endl;
     SFDD new_sfdd;
+    new_sfdd.vtree_index = vtree_index;
     if (is_terminal() && sfdd.is_terminal()) {
         // base case
         if (is_zero() || sfdd.is_zero()) {
@@ -606,23 +647,17 @@ SFDD SFDD::And(const SFDD& sfdd, Manager& m) const {
             }
         }
     }
+    new_sfdd = new_sfdd.compressed(m).light_trimming(m);
     return new_sfdd;
 }
 
 SFDD SFDD::Or(const SFDD& sfdd, Manager& m) const {
 // cout << "Or..." << endl;
-    addr_t this_id = m.make_or_find(*this), sfdd_id = m.make_or_find(sfdd);
-    addr_t cache = m.read_cache(OR, this_id, sfdd_id);
-    if (cache != SFDD_NULL)
-        return m.sfdd_nodes_[cache];
 
     SFDD new_sfdd = Xor(sfdd, m).Xor(And(sfdd, m), m);
     // SFDD new_sfdd = Not(m).And(sfdd.Not(m), m).Not(m);  // method 2
 
-    addr_t new_sfdd_id = m.make_or_find(new_sfdd);
-    m.write_cache(OR, this_id, sfdd_id, new_sfdd_id);
-    m.write_cache(OR, sfdd_id, this_id, new_sfdd_id);
-    return m.sfdd_nodes_[new_sfdd_id];
+    return new_sfdd;
 }
 
 inline SFDD SFDD::Not(Manager& m) const {
