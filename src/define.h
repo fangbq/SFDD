@@ -1,22 +1,14 @@
 #ifndef DEFINE_H
 #define DEFINE_H
 
-#include <iostream>
-#include <fstream>
-#include <sstream>
-#include <string>
-#include <vector>
-#include <stack>
-#include <map>
-#include <set>
-#include <cassert>
-#include <unordered_map>
-#include <unordered_set>
-#include <algorithm>
-#include <array>
-#include <chrono>
 
-using namespace std;
+#include <unordered_set>
+#include <map>
+#include <cassert>
+#include <chrono>
+#include <utility>
+
+namespace sfdd {
 
 enum OPERATOR_TYPE {
 	NULLOP,
@@ -43,7 +35,10 @@ inline void hash_combine(size_t& seed, size_t value) {
     seed ^= value + 0x9e3779b9 + (seed<<6) + (seed>>2);
 }
 
+
 // random generator function:
 inline int myrandom (int i) { return std::rand()%i;}
+
+} // namespace sfdd
 
 #endif

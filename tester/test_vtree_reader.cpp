@@ -16,22 +16,22 @@ using namespace std;
 
 int main(int argc, char** argv) {
 
-    Vtree v(argv[1]);
-    v.print();
+    // Vtree v(argv[1]);
+    // v.print();
     // fstream f;
     // f.open("dotG/test_vtree_reader/vtree.dot", fstream::out | fstream::trunc);
     // v.print_dot(f, true);
     // f.close();
 
-    Manager m(v);
+    // Manager m(v);
 
-    SFDD x1 = m.sfddVar(1);
+    // SFDD x1 = m.sfddVar(1);
     // x1.print();
     
-    SFDD x2 = m.sfddVar(2);
+    // SFDD x2 = m.sfddVar(2);
     // x2.print();
 
-    SFDD x3 = x1.Xor(x2, m);
+    // SFDD x3 = x1.Xor(x2, m);
     // x3.print();
     // SFDD x4 = x1.And(x2, m, true);
     // x4.print();

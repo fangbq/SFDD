@@ -22,31 +22,25 @@ int main(int argc, char** argv) {
     for (int i = 1; i <= var_no; ++i) vars_order.push_back(i);
 
     Vtree v(1, var_no*2-1, vars_order);
-    // v.save_dot_file("vtree");
+    v.save_dot_file("vtree");
     v.print();
 
     Manager m(v);
 
     SFDD x1 = m.sfddVar(1);
-    
-    SFDD x2 = m.sfddVar(3);
+    SFDD x2 = m.sfddVar(2);
+    SFDD x3 = m.sfddVar(3);
+    SFDD x4 = m.sfddVar(4);
 
-    SFDD x3 = x1.apply(OR, x2, m);
-    // cout << x3.size(m) << endl;
+    SFDD x5 = x1.And(x2, m).Xor(x2.And(x3,m), m).Xor(x3.And(x4,m), m);
+    SFDD x6 = x1.Xor(x2, m).And(x3.Xor(x4, m), m).Xor(x1.And(x2, m).And(x3.Xor(x4, m).Not(m), m), m);
+    x6.print(m);
+    normalization_2(v, m.sfddZero(), m).print(m);
 
-    // m.print_sfdd_nodes();
-
-    // sort(x3.elements.begin(), x3.elements.end(), less_than_element());
-    x3.print(m);
-    // SFDD x4 = x1.And(x3, m);
-    // x4.print(m);
-
-    // m.print_sfdd_nodes();
-
-    // if (m.sfdd_nodes_[2]==m.sfdd_nodes_[6]) cout << "haha" << endl;
-    // m.print_unique_table();
-    // m.print_cache_table();
-    cout << x3.size(m) << endl;
+    if (m.sfdd_nodes_[2]==m.sfdd_nodes_[6]) cout << "haha" << endl;
+    m.print_unique_table();
+    m.print_cache_table();
+    cout << x6.size(m) << endl;
     return 0;
 }
 // 

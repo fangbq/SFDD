@@ -1,0 +1,21 @@
+
+digraph vtree {
+
+overlap=false
+
+n3 [label="3",fontname="Times",shape="plaintext",fontsize=12,fixedsize=true,width=.2,height=.18]; 
+n1 [label="1",fontname="Times",shape="plaintext",fontsize=12,fixedsize=true,width=.2,height=.18]; 
+n0 [label="A",fontname="Times-Italic",fontsize=14,shape="plaintext",fixedsize=true,width=.25,height=.25]; 
+n2 [label="B",fontname="Times-Italic",fontsize=14,shape="plaintext",fixedsize=true,width=.25,height=.25]; 
+n5 [label="5",fontname="Times",shape="plaintext",fontsize=12,fixedsize=true,width=.2,height=.18]; 
+n4 [label="C",fontname="Times-Italic",fontsize=14,shape="plaintext",fixedsize=true,width=.25,height=.25]; 
+n6 [label="D",fontname="Times-Italic",fontsize=14,shape="plaintext",fixedsize=true,width=.25,height=.25]; 
+n3->n1 [arrowhead=none];
+n1->n0 [headclip=true,arrowhead=none,headlabel="0",labelfontname="Times",labelfontsize=10];
+n1->n2 [headclip=true,arrowhead=none,headlabel="2",labelfontname="Times",labelfontsize=10];
+n3->n5 [arrowhead=none];
+n5->n4 [headclip=true,arrowhead=none,headlabel="4",labelfontname="Times",labelfontsize=10];
+n5->n6 [headclip=true,arrowhead=none,headlabel="6",labelfontname="Times",labelfontsize=10];
+
+
+}

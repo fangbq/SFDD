@@ -25,9 +25,9 @@ int main(int argc, char** argv) {
         );
         srand ( unsigned ( ms.count() ) );
         random_shuffle(vars_order.begin(), vars_order.end(), myrandom);
-        Vtree* v = new Vtree(1, var_no*2-1, vars_order, RANDOM_TREE);
+        // Vtree* v = new Vtree(1, var_no*2-1, vars_order, RANDOM_TREE);
         string test_name = argv[1];
-        v->save_vtree_file("test/"+test_name+"/"+test_name+"_"+to_string(i)+".vtree");
+        // v->save_vtree_file("test/"+test_name+"/"+test_name+"_"+to_string(i)+".vtree");
     }
 
     return 0;
