@@ -5,7 +5,10 @@
 #include <algorithm>
 #include <sstream>
 #include <string>
+#include <unordered_map>
+#include <libgen.h>
 #include "sfdd.h"
+#include "readVerilog.h"
 
 
 extern std::map<int, int> get_index_by_var;
@@ -48,27 +51,24 @@ addr_t Manager::sfddVar(const int tmp_var) {
 unsigned long long Manager::size(const addr_t sfdd_id) const {
     if (sfdd_nodes_[sfdd_id].is_terminal()) return 0;
 
-    std::unordered_set<addr_t> nodes;
+    std::unordered_set<addr_t> node_ids;
     std::stack<addr_t> unexpanded;
-// cout << "haha 1.5" << endl;
-// m.print_unique_table();
-// print(m);
     unexpanded.push(sfdd_id);
 
     while (!unexpanded.empty()) {
         addr_t e = unexpanded.top();
         unexpanded.pop();
 
-        nodes.insert(e);      
+        node_ids.insert(e);      
         const SfddNode& n = sfdd_nodes_[e];
         if (n.value < 0) {
             for (const Element e : n.elements) {
-                if (nodes.find(e.first) == nodes.end()) {
-                    nodes.insert(e.first);
+                if (node_ids.find(e.first) == node_ids.end()) {
+                    node_ids.insert(e.first);
                     unexpanded.push(e.first);
                 }
-                if (nodes.find(e.second) == nodes.end()) {
-                    nodes.insert(e.second);
+                if (node_ids.find(e.second) == node_ids.end()) {
+                    node_ids.insert(e.second);
                     unexpanded.push(e.second);
                 }
             }
@@ -76,7 +76,45 @@ unsigned long long Manager::size(const addr_t sfdd_id) const {
     }
 
     unsigned long long int size = 0LLU;
-    for (const auto i : nodes) {
+    for (const auto i : node_ids) {
+        const SfddNode& n = sfdd_nodes_[i];
+        if (n.value < 0) {
+            size += n.elements.size();
+        }
+    }
+    return size;
+}
+
+unsigned long long Manager::size(const std::unordered_set<addr_t> sfdd_ids) const {
+    std::unordered_set<addr_t> node_ids;
+    std::stack<addr_t> unexpanded;
+    for (const auto id : sfdd_ids) {
+        if (sfdd_nodes_[id].is_terminal()) continue;
+        unexpanded.push(id);
+    }
+
+    while (!unexpanded.empty()) {
+        addr_t e = unexpanded.top();
+        unexpanded.pop();
+
+        node_ids.insert(e);      
+        const SfddNode& n = sfdd_nodes_[e];
+        if (n.value < 0) {
+            for (const Element e : n.elements) {
+                if (node_ids.find(e.first) == node_ids.end()) {
+                    node_ids.insert(e.first);
+                    unexpanded.push(e.first);
+                }
+                if (node_ids.find(e.second) == node_ids.end()) {
+                    node_ids.insert(e.second);
+                    unexpanded.push(e.second);
+                }
+            }
+        }
+    }
+
+    unsigned long long int size = 0LLU;
+    for (const auto i : node_ids) {
         const SfddNode& n = sfdd_nodes_[i];
         if (n.value < 0) {
             size += n.elements.size();
@@ -634,6 +672,111 @@ void Manager::print(const SfddNode& sfdd_node, int indent) const {
         for (int i = 0; i < indent; ++i) std::cout << " ";
         std::cout << "E" << counter++ << "s:" << std::endl;
         print(e.second, indent+1);
+    }
+    return;
+}
+
+addr_t Manager::cnf_to_sfdd(const std::string cnf_file, const std::string vtree_file) {
+    // read *.cnf
+    std::ifstream infile(cnf_file, std::ios::in);
+    std::string file_name = static_cast<std::string>(cnf_file);
+    std::cout << file_name.substr(file_name.find_last_of("/")+1, file_name.length()-file_name.find_last_of("/")) << "\t";
+    if(!infile)
+    {
+        std::cerr << "open infile error!" << std::endl;
+        exit(1);
+    }
+    int var_no = 0, col_no = 0;  // Number of variables and number of clauses
+    std::string line;
+    while (!infile.eof()) {
+        std::getline(infile, line);
+
+        if (line.length() == 0 || line[0] == 'c')
+            ; //cout << "IGNORE LINE\n";
+        else {
+            var_no = stoi(line.substr(6, line.find_last_of(' ')-6));  //  p cnf a b; this line can't end with ' '
+            col_no = stoi(line.substr(line.find_last_of(' ')+1, line.length()-line.find_last_of(' ')));
+            break;
+        }
+    }
+    std::cout << var_no << "  " << col_no << "    ";
+    if (vtree_file.empty()) {
+        std::vector<int> vars_order;
+        for (int i = 1; i <= var_no; ++i) vars_order.push_back(i);
+        vtree = new Vtree(1, var_no*2-1, vars_order);
+    } else {
+        vtree = new Vtree(vtree_file);
+    }
+
+    // v.save_vtree_file("s27_ balanced.vtree");
+
+    // make sfdd literal by literal
+    addr_t fml = true_;
+    int  clause_counter = 1;
+    for(int line = 0; line < col_no; ++line)  //read every line number, and save as a clause
+    {
+        addr_t clause = false_;
+        while (true) {
+            int var;
+            infile >> var;
+            if (var == 0) break;
+            addr_t tmp_var = sfddVar(var);
+            clause = Or(clause, tmp_var);
+        }
+        fml = And(fml, clause);
+        std::cout << "clause : " << clause_counter++ << " done; " << size(fml) << std::endl;
+    }
+    return fml;
+}
+
+std::unordered_set<addr_t> Manager::verilog_to_sfdds(char* cnf_file, const std::string vtree_file) {
+    logicNet *net = readVerilog(cnf_file);
+
+    if (vtree_file.empty()) {
+        std::vector<int> vars_order;
+        for (unsigned int i = 1; i <= net->Nin; ++i) vars_order.push_back(i);
+        vtree = new Vtree(1, net->Nin*2-1, vars_order);
+    } else {
+        vtree = new Vtree(vtree_file);
+    }
+    // int var_count = net->Nin;
+
+    std::unordered_set<addr_t> ids;
+    // int  clause_counter = 1;
+    for(unsigned int i = 0; i < net->Nout; ++i){
+        output_one_sfdd(&(net->output[i]));
+        addr_t node_id = (addr_t)((net->output[i]).func);
+        // std::cout << "output " << clause_counter++ << ": node_id: " << node_id << " done; " << size(node_id) << std::endl;
+        ids.emplace(node_id);
+    }
+    // print_sfdd_nodes();
+    std::string test_name(basename(cnf_file));
+    std::cout << test_name << "\t\t" << net->Nin << "\t" << net->Nout << "\t" << net->Nwire << "\t";
+    freeLogicNet(net);
+    return ids;
+}
+
+void Manager::output_one_sfdd(logicVar *var) {
+    // build SFDD literal
+    if(VARTYPE(var->info) == _INPUT_){
+        var->func = sfddVar(var->varIndex);
+        return;
+    }
+    // build SFDD formulae
+    unsigned int gateType = GATETYPE(var->info);
+    if(gateType == _XOR_ || gateType == _AND_ || gateType == _OR_){
+        output_one_sfdd(var->A);  output_one_sfdd(var->B);
+        addr_t funcA = (addr_t)(var->A->func);
+        addr_t funcB = (addr_t)(var->B->func);
+        if(gateType == _XOR_)       { var->func = Xor(funcA, funcB); }
+        else if(gateType == _AND_)  { var->func = And(funcA, funcB); }
+        else                { var->func = Or(funcA, funcB); }
+    }else{  // INV or BUF
+        output_one_sfdd(var->A);
+        addr_t funcA = (addr_t)(var->A->func);
+        
+        if(gateType == _INV_)       { var->func = Not(funcA); }
+        else                { var->func = funcA; }
     }
     return;
 }

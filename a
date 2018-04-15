@@ -1,5 +1,0 @@
-g++ -c -Isrc -g -Wall -std=c++0x -pg tester/test0.cpp -o ./objs/test0.o -O0
-g++ -c -Isrc -g -Wall -std=c++0x -pg src/SFDD.cpp -o ./objs/SFDD.o -O0
-g++ -c -Isrc -g -Wall -std=c++0x -pg tester/test2.cpp -o ./objs/test2.o -O0
-g++ -c -Isrc -g -Wall -std=c++0x -pg tester/test_vtree_reader.cpp -o ./objs/test_vtree_reader.o -O0
-g++ -c -Isrc -g -Wall -std=c++0x -pg tester/main.cpp -o ./objs/main.o -O0

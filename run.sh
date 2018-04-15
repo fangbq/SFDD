@@ -14,9 +14,7 @@ timeout() {
     # (spawn accepts one command)
     command="/bin/sh -c \"$2\""
 
-    expect -c "set echo \"-noecho\";
-        set timeout $time; spawn -noecho $command;
-        expect timeout { exit 1 } eof { exit 0 }"    
+    expect -c "set echo \"-noecho\"; set timeout $time; spawn -noecho $command; expect timeout { exit 1 } eof { exit 0 }"    
 
     if [ $? = 1 ] ; then
         echo "Timeout after ${time} seconds"
@@ -24,28 +22,12 @@ timeout() {
 
 }
 
-test_cases_file="test/test_cases"
-test0="./test0"
-test_vtree_reader="./test_vtree_reader"
-test2="./test3"
-test3="./test3"
-test4="./test4"
-prog="./sfdd"
+echo -e "Benchmarks\tInputs\tOutputs\tWires\tNode Count\tRuntime (s)"
 
-# cat $test_cases_file | while read oneline
-# do
-#     $prog test/$oneline
-#     # timeout 1800 "$prog test/$oneline"
-# done
-
-# The following loops open all pictures in dot
-# killall Preview
-for foldername in dotG/test0; do
-    for filename in $foldername/*.dot; do
-        # echo haha
-        dot -Tpng $filename -o $filename.png
-        # open $filename.png
-    done
+test_cases_file="./benchmarks/test_cases"
+program="./src/sfdd"
+cat $test_cases_file | while read verilog_and_vtree_
+do
+    timeout 1800 "$program $verilog_and_vtree_"
 done
-
 exit 0

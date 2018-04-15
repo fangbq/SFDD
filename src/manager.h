@@ -8,6 +8,7 @@
 #include <vector>
 #include <stack>
 #include <functional>
+#include "readVerilog.h"
 
 
 namespace sfdd {
@@ -35,6 +36,7 @@ public:
 
     // size of sfdd
     unsigned long long size(const addr_t sfdd_id) const;
+    unsigned long long size(const std::unordered_set<addr_t> sfdd_ids) const;
 
     // operations
     bool computable_with(const SfddNode& l_node, const SfddNode& r_node) const;
@@ -72,6 +74,11 @@ public:
     // print node
     void print(const addr_t addr_, int indent = 0) const;
     void print(const SfddNode& sfdd_node, int indent = 0) const;
+
+    // read cnf file
+    addr_t cnf_to_sfdd(const std::string cnf_file, const std::string vtree_file = "");
+    std::unordered_set<addr_t> verilog_to_sfdds(char*, const std::string vtree_file = "");
+    void output_one_sfdd(logicVar *var);
 };
 
 } // namespace sfdd
