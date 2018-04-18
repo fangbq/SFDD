@@ -203,27 +203,25 @@ addr_t Manager::reduced(const SfddNode& sfdd_node) {
 SfddNode Manager::normalized(const addr_t sfdd_id, int lca) {
 // cout << "normalized..." << endl;
     addr_t normalized_id = normalization_1(vtree->subvtree(lca), sfdd_id);
-    SfddNode normalized_node = sfdd_nodes_[normalized_id];
-    if (!normalized_node.is_terminal()) normalized_node.value = -1;
-    return normalized_node;
+    return sfdd_nodes_[normalized_id];
 }
 
 addr_t Manager::normalization_1(const Vtree& v, const addr_t rsfdd_id) {
     SfddNode sfdd_node, rsfdd_node=sfdd_nodes_[rsfdd_id];
     sfdd_node.vtree_index = v.index;
     // base case
-    if (v.var || (!rsfdd_node.is_terminal() && v.index == rsfdd_node.vtree_index)) {
+    if (v.var || v.index == rsfdd_node.vtree_index) {
         return rsfdd_id;
     }
 
     Element e1, e2;
-    if (rsfdd_node.is_zero()) {
+    if (rsfdd_id == false_) {
         // rule 1.(d)
         e1.first = normalization_2(*v.lt, false_);
         e1.second = normalization_1(*v.rt, false_);
         sfdd_node.elements.push_back(e1);
         return make_or_find(sfdd_node);
-    } else if (rsfdd_node.is_one()) {
+    } else if (rsfdd_id == true_) {
         // rule 1.(c)
         e1.first = normalization_1(*v.lt, true_);
         e1.second = normalization_1(*v.rt, true_);  // normalization
@@ -257,8 +255,8 @@ addr_t Manager::normalization_2(const Vtree& v, const addr_t rsfdd_id) {
     sfdd_node.vtree_index = v.index;
     // check if constant
     if (v.var) {
-        if (rsfdd_node.is_one()) sfdd_node.value = v.var*2;
-        else if (rsfdd_node.is_zero()) sfdd_node.value = v.var*2+1;
+        if (rsfdd_id == true_) sfdd_node.value = v.var*2;
+        else if (rsfdd_id == false_) sfdd_node.value = v.var*2+1;
         else if (rsfdd_node.value%2 == 0) { sfdd_node.value = 1; sfdd_node.vtree_index = 0; }
         else return false_;
         return make_or_find(sfdd_node);
@@ -267,13 +265,13 @@ addr_t Manager::normalization_2(const Vtree& v, const addr_t rsfdd_id) {
         return Xor(normalization_2(v, false_), rsfdd_id);
 
     Element e1, e2;
-    if (rsfdd_node.is_zero()) {
+    if (rsfdd_id == false_) {
         // rule 2.(d)
         e1.first = normalization_2(*v.lt, false_);
         e1.second = normalization_2(*v.rt, false_);
         sfdd_node.elements.push_back(e1);
         return make_or_find(sfdd_node);
-    } else if (rsfdd_node.is_one()) {
+    } else if (rsfdd_id == true_) {
         // rule 2.(c)
         e1.first = normalization_1(*v.lt, true_);
         e1.second = normalization_2(*v.rt, true_);  // normalization
