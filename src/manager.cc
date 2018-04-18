@@ -123,13 +123,6 @@ unsigned long long Manager::size(const std::unordered_set<addr_t> sfdd_ids) cons
     return size;
 }
 
-bool Manager::computable_with(const SfddNode& l_node, const SfddNode& r_node) const {
-    return l_node.is_terminal() && r_node.is_terminal() && \
-        (l_node.is_constant() || r_node.is_constant() || \
-        l_node.vtree_index == r_node.vtree_index);
-        // !l_node.is_constant() && !r_node.is_constant() && l_node.vtree_index == r_node.vtree_index;
-}
-
 addr_t Manager::reduced(const SfddNode& sfdd_node) {
 // cout << "reduced..." << endl;
     SfddNode reduced_node = sfdd_node;
@@ -220,12 +213,7 @@ addr_t Manager::normalization_1(const Vtree& v, const addr_t rsfdd_id) {
     sfdd_node.vtree_index = v.index;
     // base case
     if (v.var || (!rsfdd_node.is_terminal() && v.index == rsfdd_node.vtree_index)) {
-        sfdd_node = rsfdd_node;
-        if (sfdd_node.is_constant())
-            sfdd_node.vtree_index = 0;
-        else
-            sfdd_node.vtree_index = v.index;
-        return make_or_find(sfdd_node);
+        return rsfdd_id;
     }
 
     Element e1, e2;
@@ -256,7 +244,7 @@ addr_t Manager::normalization_1(const Vtree& v, const addr_t rsfdd_id) {
     }
     if (e1.first != false_) sfdd_node.elements.push_back(e1);
     if (e2.first != false_) sfdd_node.elements.push_back(e2);
-    return make_or_find(sfdd_node);
+    return make_or_find(sfdd_node);  // must return a address, because each prime and sub is a address
 }
 
 /*
@@ -314,7 +302,7 @@ addr_t Manager::Intersection(const addr_t lhs, const addr_t rhs) {
     if (lhs > rhs) return Intersection(rhs, lhs);
 
     if (lhs == false_) return lhs;
-    // if (lhs == true_) return IntersectionOne( reduced(sfdd_nodes_[rhs]));
+    if (lhs == true_) return IntersectionOne(rhs);
     if (lhs == rhs) return lhs;
     
     addr_t cache = read_cache(INTER, lhs, rhs);
@@ -325,8 +313,7 @@ addr_t Manager::Intersection(const addr_t lhs, const addr_t rhs) {
     new_node.vtree_index = sfdd_nodes_[lhs].vtree_index;
     // normalizing for both sides
     SfddNode normalized_sfdd1 = sfdd_nodes_[lhs], normalized_sfdd2 = sfdd_nodes_[rhs];
-    if (!computable_with(normalized_sfdd1, normalized_sfdd2) &&
-        normalized_sfdd1.vtree_index != normalized_sfdd2.vtree_index) {
+    if (normalized_sfdd1.vtree_index != normalized_sfdd2.vtree_index) {
         int lca = vtree->get_lca(normalized_sfdd1.vtree_index, normalized_sfdd2.vtree_index);
         normalized_sfdd1 = normalized(lhs, lca);
         normalized_sfdd2 = normalized(rhs, lca);
@@ -365,17 +352,9 @@ addr_t Manager::IntersectionOne(const addr_t sfdd_id) {
     SfddNode sfdd_node = sfdd_nodes_[sfdd_id];
     if (sfdd_node.is_negative()) return true_;
     else if (sfdd_node.is_positive()) return false_;
-// std::cout << "this int one -----------------------" << std::endl;
-// print(sfdd_node);
-    for (const auto& e : sfdd_node.elements) {
-        addr_t new_second = reduced(sfdd_nodes_[e.second]);
-        if (IntersectionOne(e.first) == true_ && new_second == true_) {
-
-// std::cout << "got true -----------------------" << std::endl;
-            return true_;
-        }
-    }
-// std::cout << "got false -----------------------" << std::endl;
+    for (const auto& e : sfdd_node.elements)
+        if (IntersectionOne(e.first) == true_)
+            return IntersectionOne(e.second);
     return false_;
 }
 
@@ -384,7 +363,7 @@ addr_t Manager::Xor(const addr_t lhs, const addr_t rhs) {
     if (lhs > rhs) return Xor(rhs, lhs);
 
     if (lhs == false_) return rhs;
-    // if (lhs == true_) return XorOne(reduced(sfdd_nodes_[rhs]));
+    if (lhs == true_) return XorOne(rhs);
 
     if (lhs == rhs) return false_;
     
@@ -396,8 +375,7 @@ addr_t Manager::Xor(const addr_t lhs, const addr_t rhs) {
     SfddNode new_node;
     new_node.vtree_index = sfdd_nodes_[lhs].vtree_index;
     SfddNode normalized_sfdd1 = sfdd_nodes_[lhs], normalized_sfdd2 = sfdd_nodes_[rhs];
-    if (!computable_with(normalized_sfdd1, normalized_sfdd2) &&
-        normalized_sfdd1.vtree_index != normalized_sfdd2.vtree_index) {
+    if (normalized_sfdd1.vtree_index != normalized_sfdd2.vtree_index) {
         int lca = vtree->get_lca(normalized_sfdd1.vtree_index, normalized_sfdd2.vtree_index);
         normalized_sfdd1 = normalized(lhs, lca);
         normalized_sfdd2 = normalized(rhs, lca);
@@ -444,8 +422,13 @@ addr_t Manager::XorOne(const addr_t sfdd_id) {
         new_node.value = sfdd_node.value^1;
     }
     for (const auto& e : sfdd_node.elements) {
-        Element new_e(e.first, XorOne(e.second));
-        new_node.elements.push_back(new_e);
+        if (IntersectionOne(e.first) == true_) {
+            Element new_e1(true_, XorOne(e.second)), new_e2(XorOne(e.first), e.second);
+            new_node.elements.push_back(new_e1);
+            new_node.elements.push_back(new_e2);
+        } else {
+            new_node.elements.push_back(e);
+        }
     }
     return reduced(new_node);
 }
@@ -466,8 +449,7 @@ addr_t Manager::And(const addr_t lhs, const addr_t rhs) {
     SfddNode new_node;
     new_node.vtree_index = sfdd_nodes_[lhs].vtree_index;
     SfddNode normalized_sfdd1 = sfdd_nodes_[lhs], normalized_sfdd2 = sfdd_nodes_[rhs];
-    if (!computable_with(normalized_sfdd1, normalized_sfdd2) &&
-        normalized_sfdd1.vtree_index != normalized_sfdd2.vtree_index) {
+    if (normalized_sfdd1.vtree_index != normalized_sfdd2.vtree_index) {
         int lca = vtree->get_lca(normalized_sfdd1.vtree_index, normalized_sfdd2.vtree_index);
         normalized_sfdd1 = normalized(lhs, lca);
         normalized_sfdd2 = normalized(rhs, lca);

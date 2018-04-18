@@ -8,11 +8,7 @@ bool SfddNode::operator==(const SfddNode& sfdd_node) const {
     if (is_terminal() && sfdd_node.is_terminal()) {
         return value == sfdd_node.value;
     } else if (elements.size() == sfdd_node.elements.size()) {
-        std::vector<Element> lhs = elements, rhs = sfdd_node.elements;
-        for (size_t i = 0; i < lhs.size(); ++i)
-            if (!(lhs[i] == rhs[i]))
-                return false;
-        return true;
+        return elements == sfdd_node.elements;
     }
     // cout << "no eq" << endl;
     return false;

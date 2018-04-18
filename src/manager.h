@@ -39,7 +39,6 @@ public:
     unsigned long long size(const std::unordered_set<addr_t> sfdd_ids) const;
 
     // operations
-    bool computable_with(const SfddNode& l_node, const SfddNode& r_node) const;
     addr_t reduced(const SfddNode& sfdd_node);  // reducing
     SfddNode normalized(const addr_t sfdd_id, int lca);  // lca must be ancestor of this SFDD!!!
     addr_t normalization_1(const Vtree& v, const addr_t rsfdd_id);
