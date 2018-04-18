@@ -37,14 +37,22 @@ int main(int argc, char** argv) {
     Manager manager;
     // cout << "Benchmarks\tInputs\tOutputs\tWires\tNode Count\tRuntime (s)" << endl;  // table header
     clock_t start = clock();
-    // addr_t fml = manager.cnf_to_sfdd(argv[1]);  // for CNF file
-    unordered_set<addr_t> fmls = manager.verilog_to_sfdds(argv[1], argv[2]);  // for Verilog file
+    string vtree_file = "";
+    bool input_cnf_file = false;
+    if (argv[2]) vtree_file = argv[2];
+    if (strstr(argv[1], "cnf")) input_cnf_file = true;
+    addr_t fml;
+    unordered_set<addr_t> fmls;
+    if (input_cnf_file)
+        fml = manager.cnf_to_sfdd(argv[1], vtree_file);  // for CNF file
+    else
+        fmls = manager.verilog_to_sfdds(argv[1], vtree_file);  // for Verilog file
     clock_t finish = clock();
     double ptime = (double)(finish - start) / CLOCKS_PER_SEC;  // runtime
     cout.setf(ios::showpoint);
     cout.precision(4);
     cout.setf(ios::fixed);
-    cout << manager.size(fmls) << "\t\t" << ptime << endl;
+    cout << (input_cnf_file ? manager.size(fml) : manager.size(fmls)) << "\t\t" << ptime << endl;
 
 
 /*

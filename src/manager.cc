@@ -125,8 +125,9 @@ unsigned long long Manager::size(const std::unordered_set<addr_t> sfdd_ids) cons
 
 bool Manager::computable_with(const SfddNode& l_node, const SfddNode& r_node) const {
     return l_node.is_terminal() && r_node.is_terminal() && \
-    	(l_node.is_constant() || r_node.is_constant() || \
+        (l_node.is_constant() || r_node.is_constant() || \
         l_node.vtree_index == r_node.vtree_index);
+        // !l_node.is_constant() && !r_node.is_constant() && l_node.vtree_index == r_node.vtree_index;
 }
 
 addr_t Manager::reduced(const SfddNode& sfdd_node) {
@@ -214,6 +215,100 @@ SfddNode Manager::normalized(const addr_t sfdd_id, int lca) {
     return normalized_node;
 }
 
+addr_t Manager::normalization_1(const Vtree& v, const addr_t rsfdd_id) {
+    SfddNode sfdd_node, rsfdd_node=sfdd_nodes_[rsfdd_id];
+    sfdd_node.vtree_index = v.index;
+    // base case
+    if (v.var || (!rsfdd_node.is_terminal() && v.index == rsfdd_node.vtree_index)) {
+        sfdd_node = rsfdd_node;
+        if (sfdd_node.is_constant())
+            sfdd_node.vtree_index = 0;
+        else
+            sfdd_node.vtree_index = v.index;
+        return make_or_find(sfdd_node);
+    }
+
+    Element e1, e2;
+    if (rsfdd_node.is_zero()) {
+        // rule 1.(d)
+        e1.first = normalization_2(*v.lt, false_);
+        e1.second = normalization_1(*v.rt, false_);
+        sfdd_node.elements.push_back(e1);
+        return make_or_find(sfdd_node);
+    } else if (rsfdd_node.is_one()) {
+        // rule 1.(c)
+        e1.first = normalization_1(*v.lt, true_);
+        e1.second = normalization_1(*v.rt, true_);  // normalization
+        e2.first = normalization_2(*v.lt, true_);
+        e2.second = normalization_1(*v.rt, false_);
+    } else if (rsfdd_node.vtree_index < v.index) {
+        // rule 1.(a)
+        e1.first = normalization_1(*v.lt, rsfdd_id);  // normalization
+        e1.second = normalization_1(*v.rt, true_);
+        e2.first = normalization_2(*v.lt, rsfdd_id);
+        e2.second = normalization_1(*v.rt, false_);
+    } else {
+        // rule 1.(b)
+        e1.first = normalization_1(*v.lt, true_);
+        e1.second = normalization_1(*v.rt, rsfdd_id);  // normalization
+        e2.first = normalization_2(*v.lt, true_);
+        e2.second = normalization_1(*v.rt, false_);
+    }
+    if (e1.first != false_) sfdd_node.elements.push_back(e1);
+    if (e2.first != false_) sfdd_node.elements.push_back(e2);
+    return make_or_find(sfdd_node);
+}
+
+/*
+ * @para: v - vtree, rsfdd_node - in compiling rules 2 and 3, there
+ *        are formulas like $f \oplus g$, rsfdd_node means 'g' in
+ *        this kind format.
+ */
+addr_t Manager::normalization_2(const Vtree& v, const addr_t rsfdd_id) {
+    SfddNode sfdd_node, rsfdd_node=sfdd_nodes_[rsfdd_id];
+    sfdd_node.vtree_index = v.index;
+    // check if constant
+    if (v.var) {
+        if (rsfdd_node.is_one()) sfdd_node.value = v.var*2;
+        else if (rsfdd_node.is_zero()) sfdd_node.value = v.var*2+1;
+        else if (rsfdd_node.value%2 == 0) { sfdd_node.value = 1; sfdd_node.vtree_index = 0; }
+        else return false_;
+        return make_or_find(sfdd_node);
+    }
+    if (v.index == rsfdd_node.vtree_index)
+        return Xor(normalization_2(v, false_), rsfdd_id);
+
+    Element e1, e2;
+    if (rsfdd_node.is_zero()) {
+        // rule 2.(d)
+        e1.first = normalization_2(*v.lt, false_);
+        e1.second = normalization_2(*v.rt, false_);
+        sfdd_node.elements.push_back(e1);
+        return make_or_find(sfdd_node);
+    } else if (rsfdd_node.is_one()) {
+        // rule 2.(c)
+        e1.first = normalization_1(*v.lt, true_);
+        e1.second = normalization_2(*v.rt, true_);  // normalization
+        e2.first = normalization_2(*v.lt, true_);
+        e2.second = normalization_2(*v.rt, false_);
+    } else if (rsfdd_node.vtree_index < v.index) {
+        // rule 2.(a)
+        e1.first = normalization_1(*v.lt, rsfdd_id);  // normalization
+        e1.second = normalization_2(*v.rt, true_);
+        e2.first = normalization_2(*v.lt, rsfdd_id);
+        e2.second = normalization_2(*v.rt, false_);
+    } else {
+        // rule 2.(b) 
+        e1.first = normalization_1(*v.lt, true_);
+        e1.second = normalization_2(*v.rt, rsfdd_id);  // normalization
+        e2.first = normalization_2(*v.lt, true_);
+        e2.second = normalization_2(*v.rt, false_);
+    }
+    if (e1.first != false_) sfdd_node.elements.push_back(e1);
+    if (e2.first != false_) sfdd_node.elements.push_back(e2);
+    return make_or_find(sfdd_node);
+}
+
 addr_t Manager::Intersection(const addr_t lhs, const addr_t rhs) {
 // cout << "Intersection..." << endl;
     if (lhs > rhs) return Intersection(rhs, lhs);
@@ -230,7 +325,8 @@ addr_t Manager::Intersection(const addr_t lhs, const addr_t rhs) {
     new_node.vtree_index = sfdd_nodes_[lhs].vtree_index;
     // normalizing for both sides
     SfddNode normalized_sfdd1 = sfdd_nodes_[lhs], normalized_sfdd2 = sfdd_nodes_[rhs];
-    if (!computable_with(normalized_sfdd1, normalized_sfdd2) && normalized_sfdd1.vtree_index != normalized_sfdd2.vtree_index) {
+    if (!computable_with(normalized_sfdd1, normalized_sfdd2) &&
+        normalized_sfdd1.vtree_index != normalized_sfdd2.vtree_index) {
         int lca = vtree->get_lca(normalized_sfdd1.vtree_index, normalized_sfdd2.vtree_index);
         normalized_sfdd1 = normalized(lhs, lca);
         normalized_sfdd2 = normalized(rhs, lca);
@@ -300,7 +396,8 @@ addr_t Manager::Xor(const addr_t lhs, const addr_t rhs) {
     SfddNode new_node;
     new_node.vtree_index = sfdd_nodes_[lhs].vtree_index;
     SfddNode normalized_sfdd1 = sfdd_nodes_[lhs], normalized_sfdd2 = sfdd_nodes_[rhs];
-    if (!computable_with(normalized_sfdd1, normalized_sfdd2) && normalized_sfdd1.vtree_index != normalized_sfdd2.vtree_index) {
+    if (!computable_with(normalized_sfdd1, normalized_sfdd2) &&
+        normalized_sfdd1.vtree_index != normalized_sfdd2.vtree_index) {
         int lca = vtree->get_lca(normalized_sfdd1.vtree_index, normalized_sfdd2.vtree_index);
         normalized_sfdd1 = normalized(lhs, lca);
         normalized_sfdd2 = normalized(rhs, lca);
@@ -369,7 +466,8 @@ addr_t Manager::And(const addr_t lhs, const addr_t rhs) {
     SfddNode new_node;
     new_node.vtree_index = sfdd_nodes_[lhs].vtree_index;
     SfddNode normalized_sfdd1 = sfdd_nodes_[lhs], normalized_sfdd2 = sfdd_nodes_[rhs];
-    if (!computable_with(normalized_sfdd1, normalized_sfdd2) && normalized_sfdd1.vtree_index != normalized_sfdd2.vtree_index) {
+    if (!computable_with(normalized_sfdd1, normalized_sfdd2) &&
+        normalized_sfdd1.vtree_index != normalized_sfdd2.vtree_index) {
         int lca = vtree->get_lca(normalized_sfdd1.vtree_index, normalized_sfdd2.vtree_index);
         normalized_sfdd1 = normalized(lhs, lca);
         normalized_sfdd2 = normalized(rhs, lca);
@@ -525,100 +623,6 @@ void Manager::print_cache_table() const {
     }
 }
 
-addr_t Manager::normalization_1(const Vtree& v, const addr_t rsfdd_id) {
-    SfddNode sfdd_node, rsfdd_node=sfdd_nodes_[rsfdd_id];
-    sfdd_node.vtree_index = v.index;
-    // base case
-    if (v.var || (!rsfdd_node.is_terminal() && v.index == rsfdd_node.vtree_index)) {
-        sfdd_node = rsfdd_node;
-        if (sfdd_node.is_constant())
-            sfdd_node.vtree_index = 0;
-        else
-            sfdd_node.vtree_index = v.index;
-        return make_or_find(sfdd_node);
-    }
-
-    Element e1, e2;
-    if (rsfdd_node.is_zero()) {
-        // rule 1.(d)
-        e1.first = normalization_2(*v.lt, false_);
-        e1.second = normalization_1(*v.rt, false_);
-        sfdd_node.elements.push_back(e1);
-        return make_or_find(sfdd_node);
-    } else if (rsfdd_node.is_one()) {
-        // rule 1.(c)
-        e1.first = normalization_1(*v.lt, true_);
-        e1.second = normalization_1(*v.rt, true_);  // normalization
-        e2.first = normalization_2(*v.lt, true_);
-        e2.second = normalization_1(*v.rt, false_);
-    } else if (rsfdd_node.vtree_index < v.index) {
-        // rule 1.(a)
-        e1.first = normalization_1(*v.lt, rsfdd_id);  // normalization
-        e1.second = normalization_1(*v.rt, true_);
-        e2.first = normalization_2(*v.lt, rsfdd_id);
-        e2.second = normalization_1(*v.rt, false_);
-    } else {
-        // rule 1.(b)
-        e1.first = normalization_1(*v.lt, true_);
-        e1.second = normalization_1(*v.rt, rsfdd_id);  // normalization
-        e2.first = normalization_2(*v.lt, true_);
-        e2.second = normalization_1(*v.rt, false_);
-    }
-    if (e1.first != false_) sfdd_node.elements.push_back(e1);
-    if (e2.first != false_) sfdd_node.elements.push_back(e2);
-    return make_or_find(sfdd_node);
-}
-
-/*
- * @para: v - vtree, rsfdd_node - in compiling rules 2 and 3, there
- *        are formulas like $f \oplus g$, rsfdd_node means 'g' in
- *        this kind format.
- */
-addr_t Manager::normalization_2(const Vtree& v, const addr_t rsfdd_id) {
-    SfddNode sfdd_node, rsfdd_node=sfdd_nodes_[rsfdd_id];
-    sfdd_node.vtree_index = v.index;
-    // check if constant
-    if (v.var) {
-        if (rsfdd_node.is_one()) sfdd_node.value = v.var*2;
-        else if (rsfdd_node.is_zero()) sfdd_node.value = v.var*2+1;
-        else if (rsfdd_node.value%2 == 0) { sfdd_node.value = 1; sfdd_node.vtree_index = 0; }
-        else return false_;
-        return make_or_find(sfdd_node);
-    }
-    if (v.index == rsfdd_node.vtree_index)
-        return Xor(normalization_2(v, false_), rsfdd_id);
-
-    Element e1, e2;
-    if (rsfdd_node.is_zero()) {
-        // rule 2.(d)
-        e1.first = normalization_2(*v.lt, false_);
-        e1.second = normalization_2(*v.rt, false_);
-        sfdd_node.elements.push_back(e1);
-        return make_or_find(sfdd_node);
-    } else if (rsfdd_node.is_one()) {
-        // rule 2.(c)
-        e1.first = normalization_1(*v.lt, true_);
-        e1.second = normalization_2(*v.rt, true_);  // normalization
-        e2.first = normalization_2(*v.lt, true_);
-        e2.second = normalization_2(*v.rt, false_);
-    } else if (rsfdd_node.vtree_index < v.index) {
-        // rule 2.(a)
-        e1.first = normalization_1(*v.lt, rsfdd_id);  // normalization
-        e1.second = normalization_2(*v.rt, true_);
-        e2.first = normalization_2(*v.lt, rsfdd_id);
-        e2.second = normalization_2(*v.rt, false_);
-    } else {
-        // rule 2.(b) 
-        e1.first = normalization_1(*v.lt, true_);
-        e1.second = normalization_2(*v.rt, rsfdd_id);  // normalization
-        e2.first = normalization_2(*v.lt, true_);
-        e2.second = normalization_2(*v.rt, false_);
-    }
-    if (e1.first != false_) sfdd_node.elements.push_back(e1);
-    if (e2.first != false_) sfdd_node.elements.push_back(e2);
-    return make_or_find(sfdd_node);
-}
-
 void Manager::print(const addr_t addr_, int indent) const {
     SfddNode sfdd_node = sfdd_nodes_[addr_];
     if (sfdd_node.elements.empty()) {
@@ -732,6 +736,8 @@ addr_t Manager::cnf_to_sfdd(const std::string cnf_file, const std::string vtree_
 std::unordered_set<addr_t> Manager::verilog_to_sfdds(char* cnf_file, const std::string vtree_file) {
     logicNet *net = readVerilog(cnf_file);
 
+    // std::cout << "readVerilog done;" << std::endl;
+
     if (vtree_file.empty()) {
         std::vector<int> vars_order;
         for (unsigned int i = 1; i <= net->Nin; ++i) vars_order.push_back(i);
@@ -739,14 +745,15 @@ std::unordered_set<addr_t> Manager::verilog_to_sfdds(char* cnf_file, const std::
     } else {
         vtree = new Vtree(vtree_file);
     }
-    // int var_count = net->Nin;
+
+    // std::cout << "readVerilog done;" << std::endl;
 
     std::unordered_set<addr_t> ids;
-    // int  clause_counter = 1;
+    int  output_counter = 1;
     for(unsigned int i = 0; i < net->Nout; ++i){
         output_one_sfdd(&(net->output[i]));
         addr_t node_id = (addr_t)((net->output[i]).func);
-        // std::cout << "output " << clause_counter++ << ": node_id: " << node_id << " done; " << size(node_id) << std::endl;
+        // std::cout << "output " << output_counter++ << " done, size: " << size(node_id) << std::endl;
         ids.emplace(node_id);
     }
     // print_sfdd_nodes();
