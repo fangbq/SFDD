@@ -463,39 +463,52 @@ addr_t Manager::And(const addr_t lhs, const addr_t rhs) {
             return false_;
         }
     } else {
-        for (const auto e1 : normalized_sfdd1.elements) {
-            for (const auto e2 : normalized_sfdd2.elements) {
+        // get pre decompositions
+        std::vector<Element> pre_decomp, alpha_;
+        for (const auto& e1 : normalized_sfdd1.elements) {
+            for (const auto& e2 : normalized_sfdd2.elements) {
                 addr_t prime_product = And(e1.first, e2.first);
-                if (prime_product == false_)
-                    continue;
-                addr_t sub_product = And(e1.second, e2.second);
-                std::vector<Element> tmp_elements;
-                for (const auto new_e : new_node.elements) {
-                    Element inter_e;
-                    inter_e.first = Intersection(new_e.first, prime_product);
-                    if (inter_e.first != false_) {
-                        inter_e.second = Xor(new_e.second, sub_product);
-                        tmp_elements.push_back(inter_e);  // add inter-ele
-                        Element origin_e;
-                        origin_e.first = Xor(new_e.first, inter_e.first);
-                        if (origin_e.first != false_) {
-                            origin_e.second = new_e.second;
-                            tmp_elements.push_back(origin_e);  // add orig-ele
-                        }
-                        prime_product = Xor(prime_product, inter_e.first);
-                    } else {
-                        tmp_elements.push_back(new_e);
-                    }
-                }
                 if (prime_product != false_) {
-                    Element last_e;  // last element that has removed all common parts with others
-                    last_e.first = prime_product;
-                    last_e.second = sub_product;
-                    tmp_elements.push_back(last_e);  // add last element
+                    addr_t sub_product = And(e1.second, e2.second);
+                    Element new_e(prime_product, sub_product);
+                    pre_decomp.push_back(new_e);
                 }
-                new_node.elements = tmp_elements;
             }
         }
+        sort(pre_decomp.begin(), pre_decomp.end());
+        // combine elements with same prime
+        for (const auto& e : pre_decomp) {
+            if (!alpha_.empty() && alpha_.back().first==e.first) {
+                Element new_e(e.first, Xor(alpha_.back().second, e.second));
+                alpha_.back() = new_e;
+            } else {
+                alpha_.push_back(e);
+            }
+        }
+        // ToPatition(\alpha)
+        for (const auto& ps_ : alpha_) {
+            std::vector<Element> gamma_;
+            addr_t o_ = ps_.first;
+            Element inter_e;
+            for (const auto& qr_ : new_node.elements) {
+                inter_e.first = Intersection(qr_.first, o_);
+                if (inter_e.first != false_) {
+                    inter_e.second = Xor(qr_.second, ps_.second);
+                    gamma_.push_back(inter_e);  // add inter-ele
+                }
+                Element origin_e;
+                origin_e.first = Xor(qr_.first, inter_e.first);
+                if (origin_e.first != false_) {
+                    origin_e.second = qr_.second;
+                    gamma_.push_back(origin_e);  // add orig-ele
+                }
+                o_ = Xor(o_, inter_e.first);
+            }
+                if (o_ != false_) {
+                    Element last_(o_, ps_.second);
+                    gamma_.push_back(last_);
+                }
+            new_node.elements = gamma_;
     }
     addr_t new_id = reduced(new_node);
     write_cache(AND, lhs, rhs, new_id);

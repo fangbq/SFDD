@@ -33,7 +33,6 @@ std::map<int, int> get_index_by_var = {{0,0}};  // x1 stored as "1", x4 stored a
 
 int main(int argc, char** argv) {
 
-
     Manager manager;
     // cout << "Benchmarks\tInputs\tOutputs\tWires\tNode Count\tRuntime (s)" << endl;  // table header
     clock_t start = clock();
@@ -54,8 +53,8 @@ int main(int argc, char** argv) {
     cout.setf(ios::fixed);
     cout << (input_cnf_file ? manager.size(fml) : manager.size(fmls)) << "\t\t" << ptime << endl;
 
-
 /*
+
     vector<int> vars_order;
     int var_no = 4;
     if (argv[1])
@@ -73,13 +72,14 @@ int main(int argc, char** argv) {
     addr_t x3 = m.sfddVar(3);
     addr_t x4 = m.sfddVar(4);
 
-    addr_t x5 = m.Xor(m.Xor(m.And(x1, x2), m.And(x1, x4)), m.And(x3, x4));
+    addr_t x5 = m.And(x1, x4);
     m.print(x5);
 
     // m.print_unique_table();
     // m.print_cache_table();
     cout << m.size(x5) << endl;
 */
+
 
     return 0;
 }
