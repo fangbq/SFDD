@@ -509,6 +509,7 @@ addr_t Manager::And(const addr_t lhs, const addr_t rhs) {
                     gamma_.push_back(last_);
                 }
             new_node.elements = gamma_;
+        }
     }
     addr_t new_id = reduced(new_node);
     write_cache(AND, lhs, rhs, new_id);
