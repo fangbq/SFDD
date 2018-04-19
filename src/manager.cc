@@ -76,7 +76,7 @@ unsigned long long Manager::size(const addr_t sfdd_id) const {
     }
 
     unsigned long long int size = 0LLU;
-    for (const auto i : node_ids) {
+    for (const auto& i : node_ids) {
         const SfddNode& n = sfdd_nodes_[i];
         if (n.value < 0) {
             size += n.elements.size();
@@ -88,7 +88,7 @@ unsigned long long Manager::size(const addr_t sfdd_id) const {
 unsigned long long Manager::size(const std::unordered_set<addr_t> sfdd_ids) const {
     std::unordered_set<addr_t> node_ids;
     std::stack<addr_t> unexpanded;
-    for (const auto id : sfdd_ids) {
+    for (const auto& id : sfdd_ids) {
         if (sfdd_nodes_[id].is_terminal()) continue;
         unexpanded.push(id);
     }
@@ -114,7 +114,7 @@ unsigned long long Manager::size(const std::unordered_set<addr_t> sfdd_ids) cons
     }
 
     unsigned long long int size = 0LLU;
-    for (const auto i : node_ids) {
+    for (const auto& i : node_ids) {
         const SfddNode& n = sfdd_nodes_[i];
         if (n.value < 0) {
             size += n.elements.size();
@@ -218,27 +218,27 @@ addr_t Manager::normalization_1(const Vtree& v, const addr_t rsfdd_id) {
     if (rsfdd_id == false_) {
         // rule 1.(d)
         e1.first = normalization_2(*v.lt, false_);
-        e1.second = normalization_1(*v.rt, false_);
+        e1.second = false_;
         sfdd_node.elements.push_back(e1);
         return make_or_find(sfdd_node);
     } else if (rsfdd_id == true_) {
         // rule 1.(c)
-        e1.first = normalization_1(*v.lt, true_);
-        e1.second = normalization_1(*v.rt, true_);  // normalization
+        e1.first = true_;
+        e1.second = true_;
         e2.first = normalization_2(*v.lt, true_);
-        e2.second = normalization_1(*v.rt, false_);
+        e2.second = false_;
     } else if (rsfdd_node.vtree_index < v.index) {
         // rule 1.(a)
-        e1.first = normalization_1(*v.lt, rsfdd_id);  // normalization
-        e1.second = normalization_1(*v.rt, true_);
+        e1.first = rsfdd_id;
+        e1.second = true_;
         e2.first = normalization_2(*v.lt, rsfdd_id);
-        e2.second = normalization_1(*v.rt, false_);
+        e2.second = false_;
     } else {
         // rule 1.(b)
-        e1.first = normalization_1(*v.lt, true_);
-        e1.second = normalization_1(*v.rt, rsfdd_id);  // normalization
+        e1.first = true_;
+        e1.second = rsfdd_id;
         e2.first = normalization_2(*v.lt, true_);
-        e2.second = normalization_1(*v.rt, false_);
+        e2.second = false_;
     }
     if (e1.first != false_) sfdd_node.elements.push_back(e1);
     if (e2.first != false_) sfdd_node.elements.push_back(e2);
@@ -273,20 +273,20 @@ addr_t Manager::normalization_2(const Vtree& v, const addr_t rsfdd_id) {
         return make_or_find(sfdd_node);
     } else if (rsfdd_id == true_) {
         // rule 2.(c)
-        e1.first = normalization_1(*v.lt, true_);
-        e1.second = normalization_2(*v.rt, true_);  // normalization
+        e1.first = true_;
+        e1.second = normalization_2(*v.rt, true_);
         e2.first = normalization_2(*v.lt, true_);
         e2.second = normalization_2(*v.rt, false_);
     } else if (rsfdd_node.vtree_index < v.index) {
         // rule 2.(a)
-        e1.first = normalization_1(*v.lt, rsfdd_id);  // normalization
+        e1.first = rsfdd_id;
         e1.second = normalization_2(*v.rt, true_);
         e2.first = normalization_2(*v.lt, rsfdd_id);
         e2.second = normalization_2(*v.rt, false_);
     } else {
         // rule 2.(b) 
-        e1.first = normalization_1(*v.lt, true_);
-        e1.second = normalization_2(*v.rt, rsfdd_id);  // normalization
+        e1.first = true_;
+        e1.second = normalization_2(*v.rt, rsfdd_id);
         e2.first = normalization_2(*v.lt, true_);
         e2.second = normalization_2(*v.rt, false_);
     }
@@ -308,8 +308,9 @@ addr_t Manager::Intersection(const addr_t lhs, const addr_t rhs) {
         return cache;
 
     SfddNode new_node;
-    new_node.vtree_index = sfdd_nodes_[lhs].vtree_index;
     // normalizing for both sides
+    // SfddNode normalized_sfdd1 = sfdd_nodes_[lhs], normalized_sfdd2 = sfdd_nodes_[rhs];
+    // int lca = vtree->get_lca(normalized_sfdd1.vtree_index, normalized_sfdd2.vtree_index);
     SfddNode normalized_sfdd1 = sfdd_nodes_[lhs], normalized_sfdd2 = sfdd_nodes_[rhs];
     if (normalized_sfdd1.vtree_index != normalized_sfdd2.vtree_index) {
         int lca = vtree->get_lca(normalized_sfdd1.vtree_index, normalized_sfdd2.vtree_index);
@@ -317,6 +318,8 @@ addr_t Manager::Intersection(const addr_t lhs, const addr_t rhs) {
         normalized_sfdd2 = normalized(rhs, lca);
         new_node.vtree_index = lca;
     }
+
+    new_node.vtree_index = normalized_sfdd1.vtree_index;
 
     if (normalized_sfdd1.is_terminal() && normalized_sfdd2.is_terminal()) {
         // base case
@@ -327,6 +330,22 @@ addr_t Manager::Intersection(const addr_t lhs, const addr_t rhs) {
         else
             return false_;
     } else {
+        /*if (lca == normalized_sfdd1.vtree_index) {
+            for (const auto& e : normalized_sfdd1.elements) {
+                Element new_e(Intersection(e.first, lhs), IntersectionOne(e.second));
+                new_node.elements.push_back(new_e);
+            }
+            Element new_e(, false_);
+            new_node.elements.push_back(new_e);
+        } else if (lca == normalized_sfdd2.vtree_index) {
+
+            for (const auto& e : normalized_sfdd1.elements) {
+                Element new_e(Intersection(e.first, lhs));
+                new_node.elements.push_back()
+            }
+        } else {
+
+        }*/
         for (std::vector<Element>::const_iterator e1 = normalized_sfdd1.elements.begin();
         e1 != normalized_sfdd1.elements.end(); ++e1) {
             for (std::vector<Element>::const_iterator e2 = normalized_sfdd2.elements.begin();
@@ -371,7 +390,6 @@ addr_t Manager::Xor(const addr_t lhs, const addr_t rhs) {
         return cache;
 
     SfddNode new_node;
-    new_node.vtree_index = sfdd_nodes_[lhs].vtree_index;
     SfddNode normalized_sfdd1 = sfdd_nodes_[lhs], normalized_sfdd2 = sfdd_nodes_[rhs];
     if (normalized_sfdd1.vtree_index != normalized_sfdd2.vtree_index) {
         int lca = vtree->get_lca(normalized_sfdd1.vtree_index, normalized_sfdd2.vtree_index);
@@ -379,6 +397,9 @@ addr_t Manager::Xor(const addr_t lhs, const addr_t rhs) {
         normalized_sfdd2 = normalized(rhs, lca);
         new_node.vtree_index = lca;
     }
+
+    new_node.vtree_index = normalized_sfdd1.vtree_index;
+
     if (normalized_sfdd1.is_terminal() && normalized_sfdd2.is_terminal()) {
         // base case
         if (normalized_sfdd1==normalized_sfdd2) {
@@ -445,7 +466,6 @@ addr_t Manager::And(const addr_t lhs, const addr_t rhs) {
         return cache;
 
     SfddNode new_node;
-    new_node.vtree_index = sfdd_nodes_[lhs].vtree_index;
     SfddNode normalized_sfdd1 = sfdd_nodes_[lhs], normalized_sfdd2 = sfdd_nodes_[rhs];
     if (normalized_sfdd1.vtree_index != normalized_sfdd2.vtree_index) {
         int lca = vtree->get_lca(normalized_sfdd1.vtree_index, normalized_sfdd2.vtree_index);
@@ -453,6 +473,9 @@ addr_t Manager::And(const addr_t lhs, const addr_t rhs) {
         normalized_sfdd2 = normalized(rhs, lca);
         new_node.vtree_index = lca;
     }
+
+    new_node.vtree_index = normalized_sfdd1.vtree_index;
+
     if (normalized_sfdd1.is_terminal() && normalized_sfdd2.is_terminal()) {
         // base case
         if (normalized_sfdd1.is_one() || normalized_sfdd2.is_one()) {
@@ -663,7 +686,7 @@ void Manager::print(const SfddNode& sfdd_node, int indent) const {
     std::cout << "Dec " << sfdd_node.vtree_index << ":" << std::endl;
     int counter = 1;
     indent++;
-    for (const auto e : sfdd_node.elements) {
+    for (const auto& e : sfdd_node.elements) {
         for (int i = 0; i < indent; ++i) std::cout << " ";
         std::cout << "E" << counter << "p:" << std::endl;
         print(e.first, indent+1);
