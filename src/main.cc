@@ -53,8 +53,8 @@ int main(int argc, char** argv) {
     cout.setf(ios::fixed);
     cout << (input_cnf_file ? manager.size(fml) : manager.size(fmls)) << "\t\t" << ptime << endl;
 
-/*
 
+/*
     vector<int> vars_order;
     int var_no = 4;
     if (argv[1])
@@ -73,13 +73,15 @@ int main(int argc, char** argv) {
     addr_t x4 = m.sfddVar(4);
 
     addr_t x5 = m.And(x1, x4);
-    m.print(x5);
+    addr_t x6 = m.And(x1, x2);
+    addr_t x7 = m.And(x5, x6);
+    m.print(x7);
 
     // m.print_unique_table();
     // m.print_cache_table();
-    cout << m.size(x5) << endl;
-*/
+    cout << m.size(x7) << endl;
 
+*/
 
     return 0;
 }

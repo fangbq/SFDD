@@ -307,6 +307,10 @@ addr_t Manager::Intersection(const addr_t lhs, const addr_t rhs) {
     if (cache != SFDD_NULL)
         return cache;
 
+// std::cout << "---------------------" << std::endl;
+// print(lhs);
+// std::cout << "inter with---------------------" << std::endl;
+// print(rhs);
     SfddNode new_node;
     // normalizing for both sides
     // SfddNode normalized_sfdd1 = sfdd_nodes_[lhs], normalized_sfdd2 = sfdd_nodes_[rhs];
@@ -323,29 +327,13 @@ addr_t Manager::Intersection(const addr_t lhs, const addr_t rhs) {
 
     if (normalized_sfdd1.is_terminal() && normalized_sfdd2.is_terminal()) {
         // base case
-        if (normalized_sfdd1==normalized_sfdd2 || normalized_sfdd2.is_negative())
-            new_node = normalized_sfdd1;
+        if (normalized_sfdd2.is_negative())
+            return lhs;
         else if (normalized_sfdd1.is_negative())
-            new_node = normalized_sfdd2;
+            return rhs;
         else
             return false_;
     } else {
-        /*if (lca == normalized_sfdd1.vtree_index) {
-            for (const auto& e : normalized_sfdd1.elements) {
-                Element new_e(Intersection(e.first, lhs), IntersectionOne(e.second));
-                new_node.elements.push_back(new_e);
-            }
-            Element new_e(, false_);
-            new_node.elements.push_back(new_e);
-        } else if (lca == normalized_sfdd2.vtree_index) {
-
-            for (const auto& e : normalized_sfdd1.elements) {
-                Element new_e(Intersection(e.first, lhs));
-                new_node.elements.push_back()
-            }
-        } else {
-
-        }*/
         for (std::vector<Element>::const_iterator e1 = normalized_sfdd1.elements.begin();
         e1 != normalized_sfdd1.elements.end(); ++e1) {
             for (std::vector<Element>::const_iterator e2 = normalized_sfdd2.elements.begin();
@@ -360,6 +348,8 @@ addr_t Manager::Intersection(const addr_t lhs, const addr_t rhs) {
         }
     }
     addr_t new_id = reduced(new_node);
+// std::cout << "got ---------------------" << std::endl;
+// print(new_id);
     write_cache(INTER, lhs, rhs, new_id);
     return new_id;
 }
@@ -400,19 +390,8 @@ addr_t Manager::Xor(const addr_t lhs, const addr_t rhs) {
 
     new_node.vtree_index = normalized_sfdd1.vtree_index;
 
-    if (normalized_sfdd1.is_terminal() && normalized_sfdd2.is_terminal()) {
-        // base case
-        if (normalized_sfdd1==normalized_sfdd2) {
-            return false_;
-        } else if (normalized_sfdd1.is_zero() || normalized_sfdd2.is_zero()) {
-            new_node.value = normalized_sfdd1.value+normalized_sfdd2.value;
-        } else if (normalized_sfdd1.is_one()) {
-            new_node.value = normalized_sfdd2.value^1;
-        } else if (normalized_sfdd2.is_one()) {
-            new_node.value = normalized_sfdd1.value^1;
-        } else {
-            new_node.value = 1;
-        }
+    if (normalized_sfdd1.is_terminal()) {
+        return true_;
     } else {
         for (std::vector<Element>::const_iterator e1 = normalized_sfdd1.elements.begin();
         e1 != normalized_sfdd1.elements.end(); ++e1) {
@@ -476,15 +455,8 @@ addr_t Manager::And(const addr_t lhs, const addr_t rhs) {
 
     new_node.vtree_index = normalized_sfdd1.vtree_index;
 
-    if (normalized_sfdd1.is_terminal() && normalized_sfdd2.is_terminal()) {
-        // base case
-        if (normalized_sfdd1.is_one() || normalized_sfdd2.is_one()) {
-            new_node.value = normalized_sfdd1.value*normalized_sfdd2.value;
-        } else if (normalized_sfdd1==normalized_sfdd2) {
-            new_node = normalized_sfdd1;
-        } else {
-            return false_;
-        }
+    if (normalized_sfdd1.is_terminal()) {
+        return false_;
     } else {
         // get pre decompositions
         std::vector<Element> pre_decomp, alpha_;
@@ -766,7 +738,7 @@ std::unordered_set<addr_t> Manager::verilog_to_sfdds(char* cnf_file, const std::
     // std::cout << "readVerilog done;" << std::endl;
 
     std::unordered_set<addr_t> ids;
-    int  output_counter = 1;
+    // int  output_counter = 1;
     for(unsigned int i = 0; i < net->Nout; ++i){
         output_one_sfdd(&(net->output[i]));
         addr_t node_id = (addr_t)((net->output[i]).func);
