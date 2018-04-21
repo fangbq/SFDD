@@ -134,12 +134,12 @@ addr_t Manager::reduced(const SfddNode& sfdd_node) {
     for (auto e = reduced_node.elements.begin(); \
     e != reduced_node.elements.end(); ) {
         // 1.1 removes those elements that primes are false
-        e->first = reduced(sfdd_nodes_[e->first]);
+        // e->first = reduced(sfdd_nodes_[e->first]);
         if (e->first == false_) {
             e = reduced_node.elements.erase(e);
             continue;
         }
-        e->second = reduced(sfdd_nodes_[e->second]);
+        // e->second = reduced(sfdd_nodes_[e->second]);
         if (e->second != false_) {
             valid = true;
             ++e;
@@ -306,44 +306,70 @@ addr_t Manager::Intersection(const addr_t lhs, const addr_t rhs) {
     addr_t cache = read_cache(INTER, lhs, rhs);
     if (cache != SFDD_NULL)
         return cache;
-
-// std::cout << "---------------------" << std::endl;
-// print(lhs);
-// std::cout << "inter with---------------------" << std::endl;
-// print(rhs);
+    
     SfddNode new_node;
     // normalizing for both sides
-    // SfddNode normalized_sfdd1 = sfdd_nodes_[lhs], normalized_sfdd2 = sfdd_nodes_[rhs];
-    // int lca = vtree->get_lca(normalized_sfdd1.vtree_index, normalized_sfdd2.vtree_index);
     SfddNode normalized_sfdd1 = sfdd_nodes_[lhs], normalized_sfdd2 = sfdd_nodes_[rhs];
-    if (normalized_sfdd1.vtree_index != normalized_sfdd2.vtree_index) {
-        int lca = vtree->get_lca(normalized_sfdd1.vtree_index, normalized_sfdd2.vtree_index);
-        normalized_sfdd1 = normalized(lhs, lca);
-        normalized_sfdd2 = normalized(rhs, lca);
-        new_node.vtree_index = lca;
-    }
+    int lca = vtree->get_lca(normalized_sfdd1.vtree_index, normalized_sfdd2.vtree_index);
 
     new_node.vtree_index = normalized_sfdd1.vtree_index;
 
-    if (normalized_sfdd1.is_terminal() && normalized_sfdd2.is_terminal()) {
-        // base case
-        if (normalized_sfdd2.is_negative())
+    if (normalized_sfdd1.vtree_index == normalized_sfdd2.vtree_index) {
+        if (normalized_sfdd1.is_terminal()) {
             return lhs;
-        else if (normalized_sfdd1.is_negative())
-            return rhs;
-        else
-            return false_;
-    } else {
-        for (std::vector<Element>::const_iterator e1 = normalized_sfdd1.elements.begin();
-        e1 != normalized_sfdd1.elements.end(); ++e1) {
-            for (std::vector<Element>::const_iterator e2 = normalized_sfdd2.elements.begin();
-            e2 != normalized_sfdd2.elements.end(); ++e2) {
-                Element new_e;
-                new_e.first = Intersection(e1->first, e2->first);
-                if (new_e.first != false_) {
-                    new_e.second = Intersection(e1->second, e2->second);
-                    new_node.elements.push_back(new_e);
+            // base case
+        } else {
+            for (std::vector<Element>::const_iterator e1 = normalized_sfdd1.elements.begin();
+            e1 != normalized_sfdd1.elements.end(); ++e1) {
+                for (std::vector<Element>::const_iterator e2 = normalized_sfdd2.elements.begin();
+                e2 != normalized_sfdd2.elements.end(); ++e2) {
+                    Element new_e;
+                    new_e.first = Intersection(e1->first, e2->first);
+                    if (new_e.first != false_) {
+                        new_e.second = Intersection(e1->second, e2->second);
+                        new_node.elements.push_back(new_e);
+                    }
                 }
+            }
+        }
+    } else {
+        if (lca != normalized_sfdd1.vtree_index && lca != normalized_sfdd2.vtree_index) {
+            if (IntersectionOne(lhs) == false_ || IntersectionOne(rhs) == false_)
+                return false_;
+            else
+                return true_;
+        } else {
+            addr_t descendant_ = rhs;
+            // set normalized_sfdd1 as higher one (\alpha in paper)
+            if (lca == normalized_sfdd2.vtree_index) {
+                descendant_ = lhs;
+                SfddNode aux_node;
+                aux_node = normalized_sfdd1;
+                normalized_sfdd1 = normalized_sfdd2;
+                normalized_sfdd2 = aux_node;
+            }
+            if (normalized_sfdd2.vtree_index < normalized_sfdd1.vtree_index) {
+                // normalized_sfdd2 is a left descendant of normalized_sfdd1 (1)
+                for (const auto& e : normalized_sfdd1.elements) {
+                    addr_t inter_ = Intersection(e.first, descendant_);
+                    if (inter_ != false_) {
+                        Element new_e(inter_, IntersectionOne(e.second));
+                        new_node.elements.push_back(new_e);
+                    }
+                }
+                Element new_e(normalization_2(vtree->subvtree(lca), descendant_), false_);
+                new_node.elements.push_back(new_e);
+            } else {
+                // normalized_sfdd2 is a right descendant of normalized_sfdd1 (2)
+                for (const auto& e : normalized_sfdd1.elements) {
+                    addr_t inter_ = IntersectionOne(e.first);
+                    if (inter_ != false_) {
+                        Element new_e(inter_, Intersection(e.second, descendant_));
+                        new_node.elements.push_back(new_e);
+                    }
+                }
+                Element new_e(normalization_2(vtree->subvtree(lca), true_), false_);
+                new_node.elements.push_back(new_e);
             }
         }
     }

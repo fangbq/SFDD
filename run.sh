@@ -28,6 +28,6 @@ test_cases_file="./benchmarks/test_cases"
 program="./src/sfdd"
 cat $test_cases_file | while read verilog_and_vtree_
 do
-    timeout 300 "$program $verilog_and_vtree_"
+    timeout 5 "$program $verilog_and_vtree_"
 done
 exit 0
