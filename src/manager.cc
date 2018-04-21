@@ -16,18 +16,33 @@ extern std::map<int, int> get_index_by_var;
 
 namespace sfdd {
 
-Manager::Manager() : cache_table_(INIT_SIZE) {
+Manager::Manager() : cache_table_(INIT_SIZE), sfdd_nodes_(INIT_SIZE) {
     SfddNode true_node(1), false_node(0);
-    true_ = make_or_find(true_node);
-    false_ = make_or_find(false_node);
+    false_ = make_sfdd(false_node);
+    true_ = make_sfdd(true_node);
+    // std::cout << "Manager bad initialization !!!" << std::endl;
 }
 
-Manager::Manager(const Vtree& v) : cache_table_(INIT_SIZE) {
+Manager::Manager(const Vtree& v) : cache_table_(INIT_SIZE), sfdd_nodes_(INIT_SIZE) {
     SfddNode true_node(1), false_node(0);
-    true_ = make_or_find(true_node);
-    false_ = make_or_find(false_node);
+    false_ = make_sfdd(false_node);
+    true_ = make_sfdd(true_node);
     vtree = new Vtree(v);
+    initial_node_table_and_piterms_map();
 };
+
+void Manager::initial_node_table_and_piterms_map() {
+    for (int i = 1; i <= (vtree->size+1)/2; ++i) {
+        SfddNode pos_literal(i*2, get_index_by_var[abs(i)]), neg_literal(i*2+1, get_index_by_var[abs(i)]);
+        make_sfdd(pos_literal);
+        make_sfdd(neg_literal);
+    }
+    // create a map for vtree_node and bigoplus_piterms
+    generate_bigoplus_piterms(*vtree);
+    // for (auto pi : bigoplus_piterms) {
+    //     std::cout << pi.first << " " << pi.second << std::endl;
+    // }
+}
 
 Manager& Manager::operator=(const Manager& m_) {
     true_ = m_.true_;
@@ -35,6 +50,7 @@ Manager& Manager::operator=(const Manager& m_) {
     sfdd_nodes_ = m_.sfdd_nodes_;
     uniq_table_ = m_.uniq_table_;
     cache_table_ = m_.cache_table_;
+    bigoplus_piterms = m_.bigoplus_piterms;
     return *this;
 }
 
@@ -43,9 +59,8 @@ Manager::~Manager() {
 };
 
 addr_t Manager::sfddVar(const int tmp_var) {
-    assert(tmp_var != 0);
-    SfddNode sfdd_node(tmp_var < 0 ? (0-tmp_var)*2+1 : tmp_var*2, get_index_by_var[abs(tmp_var)]);
-    return make_or_find(sfdd_node);
+    // in the case of the initial sfdd_nodes_[] is settel
+    return (tmp_var < 0 ? (-tmp_var)*2+1 : tmp_var*2);
 }
 
 unsigned long long Manager::size(const addr_t sfdd_id) const {
@@ -59,7 +74,7 @@ unsigned long long Manager::size(const addr_t sfdd_id) const {
         addr_t e = unexpanded.top();
         unexpanded.pop();
 
-        node_ids.insert(e);      
+        node_ids.insert(e);
         const SfddNode& n = sfdd_nodes_[e];
         if (n.value < 0) {
             for (const Element e : n.elements) {
@@ -97,7 +112,7 @@ unsigned long long Manager::size(const std::unordered_set<addr_t> sfdd_ids) cons
         addr_t e = unexpanded.top();
         unexpanded.pop();
 
-        node_ids.insert(e);      
+        node_ids.insert(e);
         const SfddNode& n = sfdd_nodes_[e];
         if (n.value < 0) {
             for (const Element e : n.elements) {
@@ -126,31 +141,18 @@ unsigned long long Manager::size(const std::unordered_set<addr_t> sfdd_ids) cons
 addr_t Manager::reduced(const SfddNode& sfdd_node) {
 // cout << "reduced..." << endl;
     SfddNode reduced_node = sfdd_node;
-    if (reduced_node.is_terminal()) {
-        reduced_node.vtree_index = get_index_by_var[reduced_node.value/2];
-        return make_or_find(reduced_node);
-    }
-    bool valid = false;
+    bool isFalse = true;
     for (auto e = reduced_node.elements.begin(); \
-    e != reduced_node.elements.end(); ) {
-        // 1.1 removes those elements that primes are false
-        // e->first = reduced(sfdd_nodes_[e->first]);
-        if (e->first == false_) {
-            e = reduced_node.elements.erase(e);
-            continue;
-        }
-        // e->second = reduced(sfdd_nodes_[e->second]);
+    e != reduced_node.elements.end(); ++e) {
         if (e->second != false_) {
-            valid = true;
-            ++e;
-        } else {
-            ++e;
+            isFalse = false;
+            break;
         }
     }
 
     // 1.2 return false if all elements' subs are false
-    if (!valid) return false_;
-    if (reduced_node.elements.size()==0) return false_;
+    if (isFalse)
+        return false_;
 
     // 2 compressing
     for (auto e1 = reduced_node.elements.begin(); \
@@ -176,30 +178,30 @@ addr_t Manager::reduced(const SfddNode& sfdd_node) {
     if (reduced_node.elements.size() == 1) {
         // {(f, 1)} -> f
         if (reduced_node.elements[0].second == true_) {
-            reduced_node = sfdd_nodes_[tmp_node.elements[0].first];
+            return tmp_node.elements[0].first;
         }
     } else if (reduced_node.elements.size() == 2) {
         // {(f, 1), (other-pi-terms\f, 0)} -> f
         // {(1, f), (other-pi-terms\1, 0)} -> f
         if (reduced_node.elements[0].second == false_) {
             if (reduced_node.elements[1].second == true_) {
-                reduced_node = sfdd_nodes_[tmp_node.elements[1].first];
+                return tmp_node.elements[1].first;
             } else if (reduced_node.elements[1].first == true_) {
-                reduced_node = sfdd_nodes_[tmp_node.elements[1].second];
+                return tmp_node.elements[1].second;
             }
         } else if (reduced_node.elements[1].second == false_) {
             if (reduced_node.elements[0].second == true_) {
-                reduced_node = sfdd_nodes_[tmp_node.elements[0].first];
+                return tmp_node.elements[0].first;
             } else if (reduced_node.elements[0].first == true_) {
-                reduced_node = sfdd_nodes_[tmp_node.elements[0].second];
+                return tmp_node.elements[0].second;
             }
         }
     }
 
-    if (reduced_node.is_terminal()) reduced_node.vtree_index = get_index_by_var[reduced_node.value/2];
+    // if (reduced_node.is_terminal()) reduced_node.vtree_index = get_index_by_var[reduced_node.value/2];
     return make_or_find(reduced_node);
 }
-
+/*
 SfddNode Manager::normalized(const addr_t sfdd_id, int lca) {
 // cout << "normalized..." << endl;
     addr_t normalized_id = normalization_1(vtree->subvtree(lca), sfdd_id);
@@ -249,7 +251,7 @@ addr_t Manager::normalization_1(const Vtree& v, const addr_t rsfdd_id) {
  * @para: v - vtree, rsfdd_node - in compiling rules 2 and 3, there
  *        are formulas like $f \oplus g$, rsfdd_node means 'g' in
  *        this kind format.
- */
+ *
 addr_t Manager::normalization_2(const Vtree& v, const addr_t rsfdd_id) {
     SfddNode sfdd_node, rsfdd_node=sfdd_nodes_[rsfdd_id];
     sfdd_node.vtree_index = v.index;
@@ -284,7 +286,7 @@ addr_t Manager::normalization_2(const Vtree& v, const addr_t rsfdd_id) {
         e2.first = normalization_2(*v.lt, rsfdd_id);
         e2.second = normalization_2(*v.rt, false_);
     } else {
-        // rule 2.(b) 
+        // rule 2.(b)
         e1.first = true_;
         e1.second = normalization_2(*v.rt, rsfdd_id);
         e2.first = normalization_2(*v.lt, true_);
@@ -294,6 +296,24 @@ addr_t Manager::normalization_2(const Vtree& v, const addr_t rsfdd_id) {
     if (e2.first != false_) sfdd_node.elements.push_back(e2);
     return make_or_find(sfdd_node);
 }
+*/
+addr_t Manager::generate_bigoplus_piterms(const Vtree& v) {
+   // check if constant
+   addr_t result;
+   if (v.var) {
+       result = v.var*2 + 1;
+   } else {
+       SfddNode sfdd_node;
+       sfdd_node.vtree_index = v.index;
+       Element e;
+       e.first = generate_bigoplus_piterms(*(v.lt));
+       e.second = generate_bigoplus_piterms(*v.rt);
+       sfdd_node.elements.push_back(e);
+       result = make_or_find(sfdd_node);
+    }
+    bigoplus_piterms.emplace(v.index, result);
+    return result;
+}
 
 addr_t Manager::Intersection(const addr_t lhs, const addr_t rhs) {
 // cout << "Intersection..." << endl;
@@ -302,19 +322,17 @@ addr_t Manager::Intersection(const addr_t lhs, const addr_t rhs) {
     if (lhs == false_) return lhs;
     if (lhs == true_) return IntersectionOne(rhs);
     if (lhs == rhs) return lhs;
-    
+
     addr_t cache = read_cache(INTER, lhs, rhs);
     if (cache != SFDD_NULL)
         return cache;
-    
+
     SfddNode new_node;
     // normalizing for both sides
     SfddNode normalized_sfdd1 = sfdd_nodes_[lhs], normalized_sfdd2 = sfdd_nodes_[rhs];
-    int lca = vtree->get_lca(normalized_sfdd1.vtree_index, normalized_sfdd2.vtree_index);
-
-    new_node.vtree_index = normalized_sfdd1.vtree_index;
 
     if (normalized_sfdd1.vtree_index == normalized_sfdd2.vtree_index) {
+		new_node.vtree_index = normalized_sfdd1.vtree_index;
         if (normalized_sfdd1.is_terminal()) {
             return lhs;
             // base case
@@ -333,11 +351,11 @@ addr_t Manager::Intersection(const addr_t lhs, const addr_t rhs) {
             }
         }
     } else {
+		int lca = vtree->get_lca(normalized_sfdd1.vtree_index, normalized_sfdd2.vtree_index);
+		new_node.vtree_index = lca;
+
         if (lca != normalized_sfdd1.vtree_index && lca != normalized_sfdd2.vtree_index) {
-            if (IntersectionOne(lhs) == false_ || IntersectionOne(rhs) == false_)
-                return false_;
-            else
-                return true_;
+			return (IntersectionOne(lhs) == false_ || IntersectionOne(rhs) == false_) ? false_ : true_;
         } else {
             addr_t descendant_ = rhs;
             // set normalized_sfdd1 as higher one (\alpha in paper)
@@ -357,8 +375,12 @@ addr_t Manager::Intersection(const addr_t lhs, const addr_t rhs) {
                         new_node.elements.push_back(new_e);
                     }
                 }
-                Element new_e(normalization_2(vtree->subvtree(lca), descendant_), false_);
-                new_node.elements.push_back(new_e);
+                // std::cout << "and" << std::endl;
+                addr_t comp_ = Xor(bigoplus_piterms.at(vtree->subvtree(lca).lt->index), descendant_);
+                if (comp_ != false_){
+                    Element new_e(comp_, false_);
+                    new_node.elements.push_back(new_e);
+                }
             } else {
                 // normalized_sfdd2 is a right descendant of normalized_sfdd1 (2)
                 for (const auto& e : normalized_sfdd1.elements) {
@@ -368,17 +390,20 @@ addr_t Manager::Intersection(const addr_t lhs, const addr_t rhs) {
                         new_node.elements.push_back(new_e);
                     }
                 }
-                Element new_e(normalization_2(vtree->subvtree(lca), true_), false_);
+                Element new_e(Xor(bigoplus_piterms.at(vtree->subvtree(lca).lt->index), true_), false_);
                 new_node.elements.push_back(new_e);
             }
         }
     }
+    // std::cout << "before reduce intered node ---------------" << std::endl;
+    // print(new_node);
     addr_t new_id = reduced(new_node);
 // std::cout << "got ---------------------" << std::endl;
 // print(new_id);
     write_cache(INTER, lhs, rhs, new_id);
     return new_id;
 }
+
 
 addr_t Manager::IntersectionOne(const addr_t sfdd_id) {
     if (sfdd_id == true_) return true_;
@@ -399,7 +424,7 @@ addr_t Manager::Xor(const addr_t lhs, const addr_t rhs) {
     if (lhs == true_) return XorOne(rhs);
 
     if (lhs == rhs) return false_;
-    
+
 
     addr_t cache = read_cache(XOR, lhs, rhs);
     if (cache != SFDD_NULL)
@@ -407,31 +432,115 @@ addr_t Manager::Xor(const addr_t lhs, const addr_t rhs) {
 
     SfddNode new_node;
     SfddNode normalized_sfdd1 = sfdd_nodes_[lhs], normalized_sfdd2 = sfdd_nodes_[rhs];
-    if (normalized_sfdd1.vtree_index != normalized_sfdd2.vtree_index) {
-        int lca = vtree->get_lca(normalized_sfdd1.vtree_index, normalized_sfdd2.vtree_index);
-        normalized_sfdd1 = normalized(lhs, lca);
-        normalized_sfdd2 = normalized(rhs, lca);
-        new_node.vtree_index = lca;
-    }
 
-    new_node.vtree_index = normalized_sfdd1.vtree_index;
-
-    if (normalized_sfdd1.is_terminal()) {
-        return true_;
-    } else {
-        for (std::vector<Element>::const_iterator e1 = normalized_sfdd1.elements.begin();
-        e1 != normalized_sfdd1.elements.end(); ++e1) {
-            for (std::vector<Element>::const_iterator e2 = normalized_sfdd2.elements.begin();
-            e2 != normalized_sfdd2.elements.end(); ++e2) {
-                Element new_e;
-                new_e.first = Intersection(e1->first, e2->first);
-                if (new_e.first != false_) {
-                    new_e.second = Xor(e1->second, e2->second);
-                    new_node.elements.push_back(new_e);
+    if (normalized_sfdd1.vtree_index == normalized_sfdd2.vtree_index) {
+        if (normalized_sfdd1.is_terminal()) {
+            return true_;
+        } else {
+            new_node.vtree_index = normalized_sfdd1.vtree_index;
+            for (std::vector<Element>::const_iterator e1 = normalized_sfdd1.elements.begin();
+            e1 != normalized_sfdd1.elements.end(); ++e1) {
+                for (std::vector<Element>::const_iterator e2 = normalized_sfdd2.elements.begin();
+                e2 != normalized_sfdd2.elements.end(); ++e2) {
+                    Element new_e;
+                    new_e.first = Intersection(e1->first, e2->first);
+                    if (new_e.first != false_) {
+                        new_e.second = Xor(e1->second, e2->second);
+                        new_node.elements.push_back(new_e);
+                    }
                 }
             }
         }
+    } else {
+		int lca = vtree->get_lca(normalized_sfdd1.vtree_index, normalized_sfdd2.vtree_index);
+		new_node.vtree_index = lca;
+
+        if (lca != normalized_sfdd1.vtree_index && lca != normalized_sfdd2.vtree_index) {
+			addr_t left_descendant_, right_descendant_;
+			if (normalized_sfdd1.vtree_index < lca) {
+                left_descendant_ = lhs;
+				right_descendant_ = rhs;
+            }
+			else
+			{
+				left_descendant_ = rhs;
+				right_descendant_ = lhs;
+			}
+
+			Element e1;
+			e1.first = true_;
+			e1.second = (IntersectionOne(left_descendant_) == true_) ? XorOne(right_descendant_) : right_descendant_;
+			new_node.elements.push_back(e1);
+
+			Element e2;
+			e2.first = Intersection(left_descendant_, Xor(bigoplus_piterms.at((vtree->subvtree(lca).lt)->index), true_));
+			e2.second = true_;
+			new_node.elements.push_back(e2);
+
+            addr_t comp_ = Intersection(Xor(bigoplus_piterms.at((vtree->subvtree(lca).lt)->index), left_descendant_), \
+                Xor(bigoplus_piterms.at((vtree->subvtree(lca).lt)->index), true_));
+            if (comp_ != false_) {
+    			Element e3(comp_, false_);
+    			new_node.elements.push_back(e3);
+            }
+
+
+
+        } else {
+            addr_t descendant_ = rhs;
+            // set normalized_sfdd1 as higher one (\alpha in paper)
+            if (lca == normalized_sfdd2.vtree_index) {
+                descendant_ = lhs;
+                SfddNode aux_node;
+                aux_node = normalized_sfdd1;
+                normalized_sfdd1 = normalized_sfdd2;
+                normalized_sfdd2 = aux_node;
+            }
+
+            if (normalized_sfdd2.vtree_index < normalized_sfdd1.vtree_index) {
+                // normalized_sfdd2 is a left descendant of normalized_sfdd1 (1)
+				addr_t comp_beta = Xor(bigoplus_piterms.at(vtree->subvtree(lca).lt->index), descendant_);
+
+                for (const auto& e : normalized_sfdd1.elements) {
+                    addr_t inter_ = Intersection(e.first, descendant_);
+                    if (inter_ != false_) {
+                        Element new_e(inter_, XorOne(e.second));
+                        new_node.elements.push_back(new_e);
+                    }
+
+					inter_ = Intersection(e.first, comp_beta);
+                    if (inter_ != false_) {
+                        Element new_e(inter_, e.second);
+                        new_node.elements.push_back(new_e);
+                    }
+                }
+
+            } else {
+                // normalized_sfdd2 is a right descendant of normalized_sfdd1 (2)
+                for (const auto& e : normalized_sfdd1.elements) {
+                    addr_t inter_ = IntersectionOne(e.first);
+                    if (inter_ != false_) {
+                        Element new_e(inter_, Xor(e.second, descendant_));
+                        new_node.elements.push_back(new_e);
+						break;
+                    }
+                }
+
+				addr_t comp_true = Xor(bigoplus_piterms.at(vtree->subvtree(lca).lt->index), true_);
+				for (const auto& e : normalized_sfdd1.elements) {
+                    addr_t inter_ = Intersection(e.first, comp_true);
+                    if (inter_ != false_) {
+                        Element new_e(inter_, e.second);
+                        new_node.elements.push_back(new_e);
+                    }
+                }
+            }
+
+        }
     }
+
+    // std::cout << "before reduce xored node ---------------" << std::endl;
+    // print(new_node);
     addr_t new_id = reduced(new_node);
     write_cache(XOR, lhs, rhs, new_id);
     return new_id;
@@ -443,18 +552,64 @@ addr_t Manager::XorOne(const addr_t sfdd_id) {
     SfddNode sfdd_node = sfdd_nodes_[sfdd_id], new_node;
     new_node.vtree_index = sfdd_node.vtree_index;
     if (sfdd_node.is_terminal()) {
-        new_node.value = sfdd_node.value^1;
+        return sfdd_node.value^1;  // a trick
     }
     for (const auto& e : sfdd_node.elements) {
         if (IntersectionOne(e.first) == true_) {
-            Element new_e1(true_, XorOne(e.second)), new_e2(XorOne(e.first), e.second);
+            Element new_e1(true_, XorOne(e.second));
             new_node.elements.push_back(new_e1);
-            new_node.elements.push_back(new_e2);
+            addr_t prime_ = XorOne(e.first);
+            if (prime_ != false_) {
+                Element new_e2(prime_, e.second);
+                new_node.elements.push_back(new_e2);
+            }
         } else {
             new_node.elements.push_back(e);
         }
     }
+    // std::cout << "before reduce xoroneed node ---------------" << std::endl;
+    // print(new_node);
     return reduced(new_node);
+}
+std::vector<Element> Manager::to_partition(std::vector<Element>& alpha_) {
+    std::vector<Element> beta_, prime_combined_;
+
+    sort(alpha_.begin(), alpha_.end());
+    // combine elements with same prime
+    for (const auto& e : alpha_) {
+        if (!prime_combined_.empty() && prime_combined_.back().first==e.first) {
+            Element new_e(e.first, Xor(prime_combined_.back().second, e.second));
+            prime_combined_.back() = new_e;
+        } else {
+            prime_combined_.push_back(e);
+        }
+    }
+
+    for (const auto& ps_ : prime_combined_) {
+        std::vector<Element> gamma_;
+        addr_t o_ = ps_.first;
+        Element inter_e;
+        for (const auto& qr_ : beta_) {
+            inter_e.first = Intersection(qr_.first, o_);
+            if (inter_e.first != false_) {
+                inter_e.second = Xor(qr_.second, ps_.second);
+                gamma_.push_back(inter_e);  // add inter-ele
+            }
+            Element origin_e;
+            origin_e.first = Xor(qr_.first, inter_e.first);
+            if (origin_e.first != false_) {
+                origin_e.second = qr_.second;
+                gamma_.push_back(origin_e);  // add orig-ele
+            }
+            o_ = Xor(o_, inter_e.first);
+        }
+        if (o_ != false_) {
+            Element last_(o_, ps_.second);
+            gamma_.push_back(last_);
+        }
+        beta_ = gamma_;
+    }
+    return beta_;
 }
 
 addr_t Manager::And(const addr_t lhs, const addr_t rhs) {
@@ -472,66 +627,85 @@ addr_t Manager::And(const addr_t lhs, const addr_t rhs) {
 
     SfddNode new_node;
     SfddNode normalized_sfdd1 = sfdd_nodes_[lhs], normalized_sfdd2 = sfdd_nodes_[rhs];
-    if (normalized_sfdd1.vtree_index != normalized_sfdd2.vtree_index) {
-        int lca = vtree->get_lca(normalized_sfdd1.vtree_index, normalized_sfdd2.vtree_index);
-        normalized_sfdd1 = normalized(lhs, lca);
-        normalized_sfdd2 = normalized(rhs, lca);
-        new_node.vtree_index = lca;
-    }
+    if (normalized_sfdd1.vtree_index == normalized_sfdd2.vtree_index) {
+        if (normalized_sfdd1.is_terminal()) {
+            return false_;
+        }
+        new_node.vtree_index = normalized_sfdd1.vtree_index;
 
-    new_node.vtree_index = normalized_sfdd1.vtree_index;
-
-    if (normalized_sfdd1.is_terminal()) {
-        return false_;
-    } else {
         // get pre decompositions
-        std::vector<Element> pre_decomp, alpha_;
+        std::vector<Element> alpha_;
         for (const auto& e1 : normalized_sfdd1.elements) {
             for (const auto& e2 : normalized_sfdd2.elements) {
                 addr_t prime_product = And(e1.first, e2.first);
                 if (prime_product != false_) {
                     addr_t sub_product = And(e1.second, e2.second);
                     Element new_e(prime_product, sub_product);
-                    pre_decomp.push_back(new_e);
+                    alpha_.push_back(new_e);
                 }
             }
         }
-        sort(pre_decomp.begin(), pre_decomp.end());
-        // combine elements with same prime
-        for (const auto& e : pre_decomp) {
-            if (!alpha_.empty() && alpha_.back().first==e.first) {
-                Element new_e(e.first, Xor(alpha_.back().second, e.second));
-                alpha_.back() = new_e;
+        // ToPartition(\alpha)
+        new_node.elements = to_partition(alpha_);
+    } else {
+        int lca = vtree->get_lca(normalized_sfdd1.vtree_index, normalized_sfdd2.vtree_index);
+        addr_t full_piterms = bigoplus_piterms.at(vtree->subvtree(lca).lt->index);
+        new_node.vtree_index = lca;
+
+        if (lca != normalized_sfdd1.vtree_index && lca != normalized_sfdd2.vtree_index) {
+            addr_t left_descendant_, right_descendant_;
+			if (normalized_sfdd1.vtree_index < lca) {
+                left_descendant_ = lhs;
+				right_descendant_ = rhs;
+            }
+			else
+			{
+				left_descendant_ = rhs;
+				right_descendant_ = lhs;
+			}
+
+			Element e1(left_descendant_, right_descendant_);
+			new_node.elements.push_back(e1);
+
+            if (left_descendant_ != full_piterms) {
+            	Element e2(Xor(left_descendant_, full_piterms), false_);
+    			new_node.elements.push_back(e2);
+            }
+        } else {
+            addr_t descendant_ = rhs;
+            // set normalized_sfdd1 as higher one (\alpha in paper)
+            if (lca == normalized_sfdd2.vtree_index) {
+                descendant_ = lhs;
+                SfddNode aux_node;
+                aux_node = normalized_sfdd1;
+                normalized_sfdd1 = normalized_sfdd2;
+                normalized_sfdd2 = aux_node;
+            }
+            if (normalized_sfdd2.vtree_index < normalized_sfdd1.vtree_index) {
+                std::vector<Element> decomps;
+                for (const auto& e : normalized_sfdd1.elements) {
+                    addr_t prime_ = And(e.first, descendant_);
+                    if (prime_ != false_) {
+                        Element new_e(prime_, e.second);
+                        decomps.push_back(new_e);
+                    }
+                }
+                if (descendant_ != full_piterms) {
+                    Element e(And(Xor(descendant_, full_piterms), full_piterms), false_);
+        			decomps.push_back(e);
+                }
+                // ToPartition
+                new_node.elements = to_partition(decomps);
             } else {
-                alpha_.push_back(e);
+                for (const auto& e : normalized_sfdd1.elements) {
+                    Element new_e(e.first, And(e.second, descendant_));
+                    new_node.elements.push_back(new_e);
+                }
             }
-        }
-        // ToPatition(\alpha)
-        for (const auto& ps_ : alpha_) {
-            std::vector<Element> gamma_;
-            addr_t o_ = ps_.first;
-            Element inter_e;
-            for (const auto& qr_ : new_node.elements) {
-                inter_e.first = Intersection(qr_.first, o_);
-                if (inter_e.first != false_) {
-                    inter_e.second = Xor(qr_.second, ps_.second);
-                    gamma_.push_back(inter_e);  // add inter-ele
-                }
-                Element origin_e;
-                origin_e.first = Xor(qr_.first, inter_e.first);
-                if (origin_e.first != false_) {
-                    origin_e.second = qr_.second;
-                    gamma_.push_back(origin_e);  // add orig-ele
-                }
-                o_ = Xor(o_, inter_e.first);
-            }
-                if (o_ != false_) {
-                    Element last_(o_, ps_.second);
-                    gamma_.push_back(last_);
-                }
-            new_node.elements = gamma_;
         }
     }
+    // std::cout << "before reduce anded node ---------------" << std::endl;
+    // print(new_node);
     addr_t new_id = reduced(new_node);
     write_cache(AND, lhs, rhs, new_id);
     return new_id;
@@ -597,7 +771,7 @@ void Manager::print_unique_table() const {
     }
 }
 
-void Manager::write_cache(const OPERATOR_TYPE op, const addr_t lhs, 
+void Manager::write_cache(const OPERATOR_TYPE op, const addr_t lhs,
                  const addr_t rhs, const addr_t res) {
     auto key = calc_key(op, lhs, rhs);
     cache_table_[key] = std::make_tuple(op, lhs, rhs, res);
@@ -612,7 +786,7 @@ void Manager::clear_cache() {
 addr_t Manager::read_cache(const OPERATOR_TYPE op, const addr_t lhs, const addr_t rhs) {
     auto key = calc_key(op, lhs, rhs);
     auto res = cache_table_[key];
-    
+
     if (std::get<0>(res) == op &&
         std::get<1>(res) == lhs &&
         std::get<2>(res) == rhs) {
@@ -726,6 +900,7 @@ addr_t Manager::cnf_to_sfdd(const std::string cnf_file, const std::string vtree_
     } else {
         vtree = new Vtree(vtree_file);
     }
+    initial_node_table_and_piterms_map();
 
     // v.save_vtree_file("s27_ balanced.vtree");
 
@@ -760,7 +935,7 @@ std::unordered_set<addr_t> Manager::verilog_to_sfdds(char* cnf_file, const std::
     } else {
         vtree = new Vtree(vtree_file);
     }
-
+    initial_node_table_and_piterms_map();
     // std::cout << "readVerilog done;" << std::endl;
 
     std::unordered_set<addr_t> ids;
@@ -796,7 +971,7 @@ void Manager::output_one_sfdd(logicVar *var) {
     }else{  // INV or BUF
         output_one_sfdd(var->A);
         addr_t funcA = (addr_t)(var->A->func);
-        
+
         if(gateType == _INV_)       { var->func = Not(funcA); }
         else                { var->func = funcA; }
     }

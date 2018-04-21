@@ -25,11 +25,15 @@ public:
     std::unordered_map<SfddNode, addr_t> uniq_table_;
 
     // for cache table
-    const unsigned int INIT_SIZE = 1U<<8;
+    const unsigned int INIT_SIZE = 1U<<10;
     std::vector<cache_entry> cache_table_;
+
+    // for bigoplus_piterms
+    std::unordered_map<int, addr_t> bigoplus_piterms;
 public:
     Manager();
     Manager(const Vtree& v);
+    void initial_node_table_and_piterms_map();
     Manager& operator=(const Manager& m_);
     ~Manager();
     addr_t sfddVar(const int var);
@@ -40,17 +44,22 @@ public:
 
     // operations
     addr_t reduced(const SfddNode& sfdd_node);  // reducing
-    SfddNode normalized(const addr_t sfdd_id, int lca);  // lca must be ancestor of this SFDD!!!
-    addr_t normalization_1(const Vtree& v, const addr_t rsfdd_id);
-    addr_t normalization_2(const Vtree& v, const addr_t rsfdd_id);
+    // SfddNode normalized(const addr_t sfdd_id, int lca);  // lca must be ancestor of this SFDD!!!
+    // addr_t normalization_1(const Vtree& v, const addr_t rsfdd_id);
+    // addr_t normalization_2(const Vtree& v, const addr_t rsfdd_id);
+    addr_t generate_bigoplus_piterms(const Vtree& v);
+
     addr_t Intersection(const addr_t lhs, const addr_t rhs);
     addr_t IntersectionOne(const addr_t sfdd_id);
+
     /*
      * must nml for the first time, example, x1 xor x2, if not
      * they will be calculated directly, it's not what we want
      */
     addr_t Xor(const addr_t lhs, const addr_t rhs);
     addr_t XorOne(const addr_t sfdd_id);
+
+    std::vector<Element> to_partition(std::vector<Element>& alpha_);
     addr_t And(const addr_t lhs, const addr_t rhs);
     // SFDD& operator^(const SFDD& s) { return Xor(s); }
     addr_t Or(const addr_t lhs, const addr_t rhs);
@@ -63,7 +72,7 @@ public:
     void print_unique_table() const;
 
     // for cache table
-    void write_cache(const OPERATOR_TYPE op, const addr_t lhs, 
+    void write_cache(const OPERATOR_TYPE op, const addr_t lhs,
                      const addr_t rhs, const addr_t res);
     void clear_cache();
     addr_t read_cache(const OPERATOR_TYPE op, const addr_t lhs, const addr_t rhs);

@@ -14,7 +14,7 @@ timeout() {
     # (spawn accepts one command)
     command="/bin/sh -c \"$2\""
 
-    expect -c "set echo \"-noecho\"; set timeout $time; spawn -noecho $command; expect timeout { exit 1 } eof { exit 0 }"    
+    expect -c "set echo \"-noecho\"; set timeout $time; spawn -noecho $command; expect timeout { exit 1 } eof { exit 0 }"
 
     if [ $? = 1 ] ; then
         echo "Timeout after ${time} seconds"
@@ -28,6 +28,6 @@ test_cases_file="./benchmarks/test_cases"
 program="./src/sfdd"
 cat $test_cases_file | while read verilog_and_vtree_
 do
-    timeout 5 "$program $verilog_and_vtree_"
+    timeout 10 "$program $verilog_and_vtree_"
 done
 exit 0

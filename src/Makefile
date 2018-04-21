@@ -1,7 +1,7 @@
-CXX = clang++
+CXX = g++
 
 
-CXXFLAGS +=  -O3 -Wall -Wextra -std=c++11 --stdlib=libc++  
+CXXFLAGS +=  -O3 -Wall -Wextra -std=c++11
 
 
 APPS =  sfdd
@@ -9,7 +9,7 @@ APPS =  sfdd
 
 SRC=$(shell ls *.cc)
 
-all :  $(APPS) 
+all :  $(APPS)
 
 
 
@@ -30,5 +30,3 @@ sfdd : main.o manager.o sfdd_vtree.o sfdd_node.o readVerilog.o
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS)  $^ -o $@
 
 -include makefile.depend
-
-

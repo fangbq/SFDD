@@ -14,7 +14,7 @@ namespace sfdd {
 
 class Vtree {
 public:
-    int index = 0;  // index of vtree node
+    int index = 0;  // index of vtree node. 0: true/false; var start from 1
     int var = 0;  // var number
     Vtree* lt = NULL;
     Vtree* rt = NULL;

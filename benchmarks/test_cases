@@ -1,5 +1,15 @@
+./benchmarks/bbdd_verilog/C1355.v
+./benchmarks/bbdd_verilog/C2670.v
+./benchmarks/bbdd_verilog/C499.v
+./benchmarks/bbdd_verilog/C1908.v
+./benchmarks/bbdd_verilog/C5315.v
+./benchmarks/bbdd_verilog/C880.v
+./benchmarks/bbdd_verilog/C3540.v
 ./benchmarks/bbdd_verilog/C17.v
+./benchmarks/bbdd_verilog/misex3.v
+./benchmarks/bbdd_verilog/too_large.v
 ./benchmarks/bbdd_verilog/my_adder.v
+
 ./benchmarks/bbdd_verilog/sin.v
 ./benchmarks/bbdd_verilog/cosin.v
 ./benchmarks/bbdd_verilog/logsig.v
