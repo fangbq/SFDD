@@ -1,0 +1,25 @@
+./output_vtree/bbdd_verilog_vtree/C1355.v.vtree		./benchmarks/bbdd_verilog/C1355.v
+./output_vtree/bbdd_verilog_vtree/C2670.v.vtree		./benchmarks/bbdd_verilog/C2670.v			~
+./output_vtree/bbdd_verilog_vtree/C499.v.vtree		./benchmarks/bbdd_verilog/C499.v
+./output_vtree/bbdd_verilog_vtree/C1908.v.vtree		./benchmarks/bbdd_verilog/C1908.v			~
+./output_vtree/bbdd_verilog_vtree/C5315.v.vtree		./benchmarks/bbdd_verilog/C5315.v			~
+./output_vtree/bbdd_verilog_vtree/C880.v.vtree		./benchmarks/bbdd_verilog/C880.v			~
+./output_vtree/bbdd_verilog_vtree/C3540.v.vtree		./benchmarks/bbdd_verilog/C3540.v
+./output_vtree/bbdd_verilog_vtree/C17.v.vtree		./benchmarks/bbdd_verilog/C17.v				~
+./output_vtree/bbdd_verilog_vtree/misex3.v.vtree		./benchmarks/bbdd_verilog/misex3.v			~
+./output_vtree/bbdd_verilog_vtree/too_large.v.vtree	./benchmarks/bbdd_verilog/too_large.v			~
+./output_vtree/bbdd_verilog_vtree/my_adder.v.vtree		./benchmarks/bbdd_verilog/my_adder.v			~
+./output_vtree/bbdd_verilog_vtree/sin.v.vtree		./benchmarks/bbdd_verilog/sin.v				~
+./output_vtree/bbdd_verilog_vtree/cosin.v.vtree		./benchmarks/bbdd_verilog/cosin.v			~
+./output_vtree/bbdd_verilog_vtree/logsig.v.vtree		./benchmarks/bbdd_verilog/logsig.v			~
+./output_vtree/bbdd_verilog_vtree/minmax.v.vtree		./benchmarks/bbdd_verilog/minmax.v			~
+./output_vtree/bbdd_verilog_vtree/h264.v.vtree		./benchmarks/bbdd_verilog/h264.v			~
+./output_vtree/bbdd_verilog_vtree/voter31.v.vtree		./benchmarks/bbdd_verilog/voter31.v			~
+./output_vtree/bbdd_verilog_vtree/tern_add.v.vtree		./benchmarks/bbdd_verilog/tern_add.v
+./output_vtree/bbdd_verilog_vtree/parallel_search.v.vtree	./benchmarks/bbdd_verilog/parallel_search.v		~
+./output_vtree/bbdd_verilog_vtree/cmul8.v.vtree		./benchmarks/bbdd_verilog/cmul8.v			~
+./output_vtree/bbdd_verilog_vtree/fpunorm.v.vtree		./benchmarks/bbdd_verilog/fpunorm.v
+./output_vtree/bbdd_verilog_vtree/sqrt32.v.vtree		./benchmarks/bbdd_verilog/sqrt32.v
+./output_vtree/bbdd_verilog_vtree/revx.v.vtree		./benchmarks/bbdd_verilog/revx.v
+./output_vtree/bbdd_verilog_vtree/mul20.v.vtree		./benchmarks/bbdd_verilog/mul20.v
+./output_vtree/bbdd_verilog_vtree/div16.v.vtree		./benchmarks/bbdd_verilog/div16.v

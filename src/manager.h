@@ -8,6 +8,7 @@
 #include <vector>
 #include <stack>
 #include <functional>
+#include <map>
 #include "readVerilog.h"
 
 
@@ -20,9 +21,10 @@ public:
     addr_t true_ = -1;
     addr_t false_ = -1;
     Vtree* vtree = NULL;
+    addr_t max_addr_for_lit_ = 0;
     // for unique table
-    std::vector<SfddNode> sfdd_nodes_;
     std::unordered_map<SfddNode, addr_t> uniq_table_;
+    std::vector<SfddNode> sfdd_nodes_;
 
     // for cache table
     const unsigned int INIT_SIZE = 1U<<10;
@@ -30,6 +32,9 @@ public:
 
     // for bigoplus_piterms
     std::unordered_map<int, addr_t> bigoplus_piterms;
+
+    // fot getting lca quickly
+    std::vector<std::vector<int> > lca_table_;
 public:
     Manager();
     Manager(const Vtree& v);
@@ -44,20 +49,22 @@ public:
 
     // operations
     addr_t reduced(const SfddNode& sfdd_node);  // reducing
-    // SfddNode normalized(const addr_t sfdd_id, int lca);  // lca must be ancestor of this SFDD!!!
-    // addr_t normalization_1(const Vtree& v, const addr_t rsfdd_id);
-    // addr_t normalization_2(const Vtree& v, const addr_t rsfdd_id);
     addr_t generate_bigoplus_piterms(const Vtree& v);
 
+    inline addr_t get_compl_tmn(const addr_t addr_) const { return addr_^1; }
+    inline bool is_terminal(const addr_t addr_) const { return addr_>1 && addr_ <= max_addr_for_lit_; }
+    inline bool is_negative(const addr_t addr_) const { return (addr_ & 1) ==1; }
+    inline bool is_positive(const addr_t addr_) const { return (addr_ & 1) ==0; }
+    inline bool is_zero(const addr_t addr_) const { return addr_==0; }
+    inline bool is_one(const addr_t addr_) const { return addr_==1; }
+
     addr_t Intersection(const addr_t lhs, const addr_t rhs);
-    addr_t IntersectionOne(const addr_t sfdd_id);
 
     /*
      * must nml for the first time, example, x1 xor x2, if not
      * they will be calculated directly, it's not what we want
      */
     addr_t Xor(const addr_t lhs, const addr_t rhs);
-    addr_t XorOne(const addr_t sfdd_id);
 
     std::vector<Element> to_partition(std::vector<Element>& alpha_);
     addr_t And(const addr_t lhs, const addr_t rhs);

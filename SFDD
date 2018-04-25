@@ -1,0 +1,5 @@
+Benchmarks	Inputs	Outputs	Wires	Node Count	Runtime (s)
+C17.v		5	2	6	22		0.0001
+my_adder.v		33	17	81	290		0.0022
+h264.v		10	11	679	1245		0.0686
+Segmentation fault (core dumped)

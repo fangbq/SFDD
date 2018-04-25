@@ -52,17 +52,17 @@ namespace std {
 template <> struct hash<sfdd::SfddNode> {
     std::size_t operator()(const sfdd::SfddNode& n) const {
         size_t h = 0;
-        if (n.value < 0) {
+        if (n.value >= 0) {
             sfdd::hash_combine(h, hash<int>()(n.value));
             sfdd::hash_combine(h, hash<int>()(n.vtree_index));
             return h;
-        } else if (n.value >= 0) {
+        } else if (n.value < 0) {
             for (const auto& e : n.elements) {
                 sfdd::hash_combine(h, hash<sfdd::addr_t>()(e.first));
                 sfdd::hash_combine(h, hash<sfdd::addr_t>()(e.second));
             }
             sfdd::hash_combine(h, hash<int>()(n.vtree_index));
-        } 
+        }
         return h;
     }
 };
@@ -70,4 +70,3 @@ template <> struct hash<sfdd::SfddNode> {
 
 
 #endif
-

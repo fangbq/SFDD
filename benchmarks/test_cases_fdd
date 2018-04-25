@@ -1,0 +1,27 @@
+./benchmarks/bbdd_verilog/C1355.v ./benchmarks/bbdd_verilog_right/C1355.v.vtree
+./benchmarks/bbdd_verilog/C2670.v ./benchmarks/bbdd_verilog_right/C2670.v.vtree
+./benchmarks/bbdd_verilog/C499.v ./benchmarks/bbdd_verilog_right/C499.v.vtree
+./benchmarks/bbdd_verilog/C1908.v ./benchmarks/bbdd_verilog_right/C1908.v.vtree
+./benchmarks/bbdd_verilog/C5315.v ./benchmarks/bbdd_verilog_right/C5315.v.vtree
+./benchmarks/bbdd_verilog/C880.v ./benchmarks/bbdd_verilog_right/C880.v.vtree
+./benchmarks/bbdd_verilog/C3540.v ./benchmarks/bbdd_verilog_right/C3540.v.vtree
+./benchmarks/bbdd_verilog/C17.v ./benchmarks/bbdd_verilog_right/C17.v.vtree
+./benchmarks/bbdd_verilog/misex3.v ./benchmarks/bbdd_verilog_right/misex3.v.vtree
+./benchmarks/bbdd_verilog/too_large.v ./benchmarks/bbdd_verilog_right/too_large.v.vtree
+./benchmarks/bbdd_verilog/my_adder.v ./benchmarks/bbdd_verilog_right/my_adder.v.vtree
+
+./benchmarks/bbdd_verilog/sin.v ./benchmarks/bbdd_verilog_right/sin.v.vtree
+./benchmarks/bbdd_verilog/cosin.v ./benchmarks/bbdd_verilog_right/cosin.v.vtree
+./benchmarks/bbdd_verilog/logsig.v ./benchmarks/bbdd_verilog_right/logsig.v.vtree
+./benchmarks/bbdd_verilog/minmax.v ./benchmarks/bbdd_verilog_right/minmax.v.vtree
+./benchmarks/bbdd_verilog/h264.v ./benchmarks/bbdd_verilog_right/h264.v.vtree
+./benchmarks/bbdd_verilog/voter31.v ./benchmarks/bbdd_verilog_right/voter31.v.vtree
+./benchmarks/bbdd_verilog/tern_add.v ./benchmarks/bbdd_verilog_right/tern_add.v.vtree
+./benchmarks/bbdd_verilog/parallel_search.v ./benchmarks/bbdd_verilog_right/parallel_search.v.vtree
+./benchmarks/bbdd_verilog/cmul8.v ./benchmarks/bbdd_verilog_right/cmul8.v.vtree
+./benchmarks/bbdd_verilog/fpunorm.v ./benchmarks/bbdd_verilog_right/fpunorm.v.vtree
+
+./benchmarks/bbdd_verilog/sqrt32.v ./benchmarks/bbdd_verilog_right/sqrt32.v.vtree
+./benchmarks/bbdd_verilog/revx.v ./benchmarks/bbdd_verilog_right/revx.v.vtree
+./benchmarks/bbdd_verilog/mul20.v ./benchmarks/bbdd_verilog_right/mul20.v.vtree
+./benchmarks/bbdd_verilog/div16.v ./benchmarks/bbdd_verilog_right/div16.v.vtree
