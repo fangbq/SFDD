@@ -25,8 +25,6 @@ enum VTREE_TYPE {
 
 using addr_t = long long int;
 
-using cache_entry = std::tuple<OPERATOR_TYPE, addr_t, addr_t, addr_t>;
-
 constexpr addr_t SFDD_FALSE = -2;
 constexpr addr_t SFDD_EMPTY = -1;
 constexpr addr_t SFDD_NULL = -3;

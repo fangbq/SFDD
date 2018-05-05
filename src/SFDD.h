@@ -18,7 +18,6 @@ public:
     SFDD(const SFDD& sfdd) : addr_(sfdd.addr_), m(sfdd.m) {}
     SFDD& operator=(const SFDD& sfdd) {
         addr_ = sfdd.addr_;
-        m = sfdd.m;
         return *this;
     }
     addr_t addr() const { return addr_; }

@@ -18,19 +18,18 @@ using namespace std::chrono;
 
 namespace sfdd {
 
-Manager::Manager() : sfdd_nodes_(INIT_SIZE), \
-    cache_table_(INIT_SIZE) {
+Manager::Manager() {
     SfddNode true_node(1), false_node(0);
-    false_ = make_sfdd(false_node);
-    true_ = make_sfdd(true_node);
+    false_ = uniq_table_.make_sfdd(false_node);
+    true_ = uniq_table_.make_sfdd(true_node);
     // std::cout << "Manager bad initialization !!!" << std::endl;
 }
 
-Manager::Manager(const Vtree& v) : sfdd_nodes_(INIT_SIZE), \
-    cache_table_(INIT_SIZE) {
+Manager::Manager(const Vtree& v, const unsigned int cache_size) :
+    cache_table_(cache_size) {
     SfddNode true_node(1), false_node(0);
-    false_ = make_sfdd(false_node);
-    true_ = make_sfdd(true_node);
+    false_ = uniq_table_.make_sfdd(false_node);
+    true_ = uniq_table_.make_sfdd(true_node);
     vtree = new Vtree(v);
     initial_node_table_and_piterms_map();
 };
@@ -38,8 +37,8 @@ Manager::Manager(const Vtree& v) : sfdd_nodes_(INIT_SIZE), \
 void Manager::initial_node_table_and_piterms_map() {
     for (int i = 1; i <= (vtree->size+1)/2; ++i) {
         SfddNode pos_literal(i*2, get_index_by_var[abs(i)]), neg_literal(i*2+1, get_index_by_var[abs(i)]);
-        make_sfdd(pos_literal);
-        make_sfdd(neg_literal);
+        uniq_table_.make_sfdd(pos_literal);
+        uniq_table_.make_sfdd(neg_literal);
     }
     max_addr_for_lit_ = vtree->size+2;
     // create a map for vtree_node and bigoplus_piterms
@@ -58,17 +57,6 @@ void Manager::initial_node_table_and_piterms_map() {
     }
 }
 
-Manager& Manager::operator=(const Manager& m_) {
-    true_ = m_.true_;
-    false_ = m_.false_;
-    sfdd_nodes_ = m_.sfdd_nodes_;
-    uniq_table_ = m_.uniq_table_;
-    cache_table_ = m_.cache_table_;
-    lca_table_ = m_.lca_table_;
-    bigoplus_piterms = m_.bigoplus_piterms;
-    return *this;
-}
-
 Manager::~Manager() {
     if (vtree != NULL) { delete vtree; vtree = NULL; }
 };
@@ -79,7 +67,7 @@ addr_t Manager::sfddVar(const int tmp_var) {
 }
 
 unsigned long long Manager::size(const addr_t sfdd_id) const {
-    if (sfdd_nodes_[sfdd_id].is_terminal()) return 0;
+    if (is_terminal(sfdd_id)) return 0;
 
     std::unordered_set<addr_t> node_ids;
     std::stack<addr_t> unexpanded;
@@ -90,7 +78,7 @@ unsigned long long Manager::size(const addr_t sfdd_id) const {
         unexpanded.pop();
 
         node_ids.insert(e);
-        const SfddNode& n = sfdd_nodes_[e];
+        const SfddNode& n = uniq_table_.get_node_at(e);
         if (n.value < 0) {
             for (const Element e : n.elements) {
                 if (node_ids.find(e.first) == node_ids.end()) {
@@ -107,7 +95,7 @@ unsigned long long Manager::size(const addr_t sfdd_id) const {
 
     unsigned long long int size = 0LLU;
     for (const auto& i : node_ids) {
-        const SfddNode& n = sfdd_nodes_[i];
+        const SfddNode& n = uniq_table_.get_node_at(i);
         if (n.value < 0) {
             size += n.elements.size();
         }
@@ -119,7 +107,7 @@ unsigned long long Manager::size(const std::unordered_set<addr_t> sfdd_ids) cons
     std::unordered_set<addr_t> node_ids;
     std::stack<addr_t> unexpanded;
     for (const auto& id : sfdd_ids) {
-        if (sfdd_nodes_[id].is_terminal()) continue;
+        if (is_terminal(id)) continue;
         unexpanded.push(id);
     }
 
@@ -128,7 +116,7 @@ unsigned long long Manager::size(const std::unordered_set<addr_t> sfdd_ids) cons
         unexpanded.pop();
 
         node_ids.insert(e);
-        const SfddNode& n = sfdd_nodes_[e];
+        const SfddNode& n = uniq_table_.get_node_at(e);
         if (n.value < 0) {
             for (const Element e : n.elements) {
                 if (node_ids.find(e.first) == node_ids.end()) {
@@ -145,7 +133,7 @@ unsigned long long Manager::size(const std::unordered_set<addr_t> sfdd_ids) cons
 
     unsigned long long int size = 0LLU;
     for (const auto& i : node_ids) {
-        const SfddNode& n = sfdd_nodes_[i];
+        const SfddNode& n = uniq_table_.get_node_at(i);
         if (n.value < 0) {
             size += n.elements.size();
         }
@@ -174,7 +162,7 @@ addr_t Manager::reduced(const SfddNode& sfdd_node) {
             Element e(bigoplus_piterms.at(vtree->subvtree(sfdd_node.vtree_index).lt->index), first_sub);
             result_node.vtree_index = sfdd_node.vtree_index;
             result_node.elements.push_back(e);
-            return make_or_find(result_node);
+            return uniq_table_.make_or_find(result_node);
         }
     }
 
@@ -219,7 +207,7 @@ addr_t Manager::reduced(const SfddNode& sfdd_node) {
     }
 
     // if (result_node.is_terminal()) result_node.vtree_index = get_index_by_var[result_node.value/2];
-    return make_or_find(result_node);
+    return uniq_table_.make_or_find(result_node);
 }
 
 addr_t Manager::generate_bigoplus_piterms(const Vtree& v) {
@@ -234,7 +222,7 @@ addr_t Manager::generate_bigoplus_piterms(const Vtree& v) {
        e.first = generate_bigoplus_piterms(*(v.lt));
        e.second = generate_bigoplus_piterms(*v.rt);
        sfdd_node.elements.push_back(e);
-       result = make_sfdd(sfdd_node);
+       result = uniq_table_.make_sfdd(sfdd_node);
     }
     bigoplus_piterms.emplace(v.index, result);
     return result;
@@ -254,7 +242,7 @@ addr_t Manager::Intersection(const addr_t lhs, const addr_t rhs) {
         return (is_negative(lhs) && is_negative(rhs)) ? true_ : false_;
     }
 
-    addr_t cache = read_cache(INTER, lhs, rhs);
+    addr_t cache = cache_table_.read_cache(INTER, lhs, rhs);
     if (cache != SFDD_NULL)
         return cache;
 
@@ -264,13 +252,13 @@ addr_t Manager::Intersection(const addr_t lhs, const addr_t rhs) {
             return is_negative(rhs) ? true_ : false_;
         }
         addr_t result_ = false_;
-        SfddNode sfdd_node = sfdd_nodes_[rhs];
+        SfddNode sfdd_node = uniq_table_.get_node_at(rhs);
         for (const auto& e : sfdd_node.elements)
             if (Intersection(true_, e.first) == true_) {
                 result_ = Intersection(true_, e.second);
                 break;
             }
-        write_cache(INTER, true_, rhs, result_);
+        cache_table_.write_cache(INTER, true_, rhs, result_);
         return result_;
     }
 
@@ -279,7 +267,7 @@ addr_t Manager::Intersection(const addr_t lhs, const addr_t rhs) {
 
     SfddNode new_node;
     // normalizing for both sides
-    SfddNode normalized_sfdd1 = sfdd_nodes_[lhs], normalized_sfdd2 = sfdd_nodes_[rhs];
+    SfddNode normalized_sfdd1 = uniq_table_.get_node_at(lhs), normalized_sfdd2 = uniq_table_.get_node_at(rhs);
 
     if (normalized_sfdd1.vtree_index == normalized_sfdd2.vtree_index) {
         if (is_terminal(lhs)) {
@@ -367,7 +355,7 @@ addr_t Manager::Intersection(const addr_t lhs, const addr_t rhs) {
     addr_t new_id = reduced(new_node);
 // std::cout << "got ---------------------" << std::endl;
 // print(new_id);
-    write_cache(INTER, lhs, rhs, new_id);
+    cache_table_.write_cache(INTER, lhs, rhs, new_id);
     return new_id;
 }
 
@@ -379,7 +367,7 @@ addr_t Manager::Xor(const addr_t lhs, const addr_t rhs) {
     if (lhs == rhs) return false_;
 
 
-    addr_t cache = read_cache(XOR, lhs, rhs);
+    addr_t cache = cache_table_.read_cache(XOR, lhs, rhs);
     if (cache != SFDD_NULL)
         return cache;
 
@@ -388,7 +376,7 @@ addr_t Manager::Xor(const addr_t lhs, const addr_t rhs) {
         if (is_terminal(rhs))
             return get_compl_tmn(rhs);
 
-        SfddNode sfdd_node = sfdd_nodes_[rhs], new_node;
+        SfddNode sfdd_node = uniq_table_.get_node_at(rhs), new_node;
         new_node.vtree_index = sfdd_node.vtree_index;
         auto it_ = sfdd_node.elements.begin();
         for ( ; it_ != sfdd_node.elements.end(); ++it_) {
@@ -409,13 +397,13 @@ addr_t Manager::Xor(const addr_t lhs, const addr_t rhs) {
             new_node.elements.insert(new_node.elements.end(), ++it_, sfdd_node.elements.end());
 
         addr_t new_id = reduced(new_node);
-        write_cache(XOR, lhs, rhs, new_id);
+        cache_table_.write_cache(XOR, lhs, rhs, new_id);
         return new_id;
     }
 
 
     SfddNode new_node;
-    SfddNode normalized_sfdd1 = sfdd_nodes_[lhs], normalized_sfdd2 = sfdd_nodes_[rhs];
+    SfddNode normalized_sfdd1 = uniq_table_.get_node_at(lhs), normalized_sfdd2 = uniq_table_.get_node_at(rhs);
 
     if (normalized_sfdd1.vtree_index == normalized_sfdd2.vtree_index) {
         // when respect same vtree node
@@ -544,7 +532,7 @@ addr_t Manager::Xor(const addr_t lhs, const addr_t rhs) {
     }
 
     addr_t new_id = reduced(new_node);
-    write_cache(XOR, lhs, rhs, new_id);
+    cache_table_.write_cache(XOR, lhs, rhs, new_id);
     return new_id;
 }
 
@@ -606,12 +594,12 @@ addr_t Manager::And(const addr_t lhs, const addr_t rhs) {
 
     if (lhs == rhs) return lhs;
 
-    addr_t cache = read_cache(AND, lhs, rhs);
+    addr_t cache = cache_table_.read_cache(AND, lhs, rhs);
     if (cache != SFDD_NULL)
         return cache;
 
     SfddNode new_node;
-    SfddNode normalized_sfdd1 = sfdd_nodes_[lhs], normalized_sfdd2 = sfdd_nodes_[rhs];
+    SfddNode normalized_sfdd1 = uniq_table_.get_node_at(lhs), normalized_sfdd2 = uniq_table_.get_node_at(rhs);
     if (normalized_sfdd1.vtree_index == normalized_sfdd2.vtree_index) {
         if (normalized_sfdd1.is_terminal()) {
             return false_;
@@ -689,7 +677,7 @@ addr_t Manager::And(const addr_t lhs, const addr_t rhs) {
     }
 
     addr_t new_id = reduced(new_node);
-    write_cache(AND, lhs, rhs, new_id);
+    cache_table_.write_cache(AND, lhs, rhs, new_id);
     return new_id;
 }
 
@@ -701,14 +689,14 @@ addr_t Manager::Or(const addr_t lhs, const addr_t rhs) {
     if (lhs == true_) return true_;
     if (lhs == rhs) return lhs;
 
-    addr_t cache = read_cache(OR, lhs, rhs);
+    addr_t cache = cache_table_.read_cache(OR, lhs, rhs);
     if (cache != SFDD_NULL)
         return cache;
 
     // addr_t new_id = Xor(Xor(lhs, rhs), And(lhs, rhs));
     addr_t new_id = Not(And(Not(lhs), Not(rhs)));  // method 2, seems faster
 
-    write_cache(OR, lhs, rhs, new_id);
+    cache_table_.write_cache(OR, lhs, rhs, new_id);
     return new_id;
 }
 
@@ -716,85 +704,8 @@ addr_t Manager::Not(const addr_t sfdd_id) {
     return Xor(true_, sfdd_id);
 }
 
-addr_t Manager::make_sfdd(const SfddNode& new_node) {
-    // sfdd_nodes_.emplace_back();
-    size_t node_id = sfdd_nodes_.size();
-    uniq_table_.emplace(new_node, node_id);
-    sfdd_nodes_.push_back(new_node);
-    return node_id;
-}
-
-addr_t Manager::make_or_find(const SfddNode& new_node) {
-    SfddNode sorted_node = new_node;
-    sort(sorted_node.elements.begin(), sorted_node.elements.end());
-    auto res = uniq_table_.find(sorted_node);
-    if (res != uniq_table_.end()) {
-        return res->second;
-    }
-    return make_sfdd(sorted_node);
-}
-
-void Manager::print_sfdd_nodes() const {
-    std::cout << "sfdd_nodes_:-------------------------------" << std::endl;
-    int i = 0;
-    for (auto& sfdd_node: sfdd_nodes_) {
-        std::cout << "Node " << i++ << ":" << std::endl;
-        print(sfdd_node);
-        std::cout << std::endl;
-    }
-}
-
-void Manager::print_unique_table() const {
-    std::cout << "unique_table:-------------------------------" << std::endl;
-    for (auto& x: uniq_table_) {
-        std::cout << "Node addr_t: " << x.second << std::endl;
-        print(x.first);
-        std::cout << std::endl;
-    }
-}
-
-void Manager::write_cache(const OPERATOR_TYPE op, const addr_t lhs,
-                 const addr_t rhs, const addr_t res) {
-    auto key = calc_key(op, lhs, rhs);
-    cache_table_[key] = std::make_tuple(op, lhs, rhs, res);
-}
-
-void Manager::clear_cache() {
-    for (auto it =  cache_table_.begin(); it != cache_table_.end(); ++it) {
-        *it = std::make_tuple(OPERATOR_TYPE::NULLOP, -1, -1, -1);
-    }
-}
-
-addr_t Manager::read_cache(const OPERATOR_TYPE op, const addr_t lhs, const addr_t rhs) {
-    auto key = calc_key(op, lhs, rhs);
-    auto res = cache_table_[key];
-
-    if (std::get<0>(res) == op &&
-        std::get<1>(res) == lhs &&
-        std::get<2>(res) == rhs) {
-        return std::get<3>(res);
-    }
-    return SFDD_NULL;
-}
-
-size_t Manager::calc_key(const OPERATOR_TYPE op, const addr_t lhs,  const addr_t rhs) {
-    size_t key = 0;
-    hash_combine(key, std::hash<int>()(static_cast<int>(op)));
-    hash_combine(key, std::hash<size_t>()(lhs));
-    hash_combine(key, std::hash<size_t>()(rhs));
-    // std::cout << "cache table size: " << cache_table_.size() << std::endl;
-    return key % cache_table_.size();
-}
-
-void Manager::print_cache_table() const {
-    std::cout << "cache_table:-------------------------------" << std::endl;
-    for (auto& x: cache_table_) {
-        std::cout << std::get<0>(x) << std::get<1>(x) << std::get<2>(x) << std::get<3>(x) << std::endl;
-    }
-}
-
 void Manager::print(const addr_t addr_, int indent) const {
-    SfddNode sfdd_node = sfdd_nodes_[addr_];
+    SfddNode sfdd_node = uniq_table_.get_node_at(addr_);
     if (sfdd_node.elements.empty()) {
         for (int i = 0; i < indent; ++i) std::cout << " ";
         if (sfdd_node.value < 2) {
@@ -887,7 +798,7 @@ addr_t Manager::cnf_to_sfdd(const std::string cnf_file, const std::string vtree_
     // v.save_vtree_file("s27_ balanced.vtree");
 
     // make sfdd literal by literal
-    // addr_t fml = true_;
+    addr_t fml = true_;
     int  clause_counter = 1;
     std::vector<addr_t> clause_sfdds;
     for(int line = 0; line < col_no; ++line)  //read every line number, and save as a clause
@@ -900,13 +811,12 @@ addr_t Manager::cnf_to_sfdd(const std::string cnf_file, const std::string vtree_
             addr_t tmp_var = sfddVar(var);
             clause = Or(clause, tmp_var);
         }
-        // fml = And(fml, clause);
+        fml = And(fml, clause);
         clause_sfdds.push_back(clause);
-        std::cout << "clause : " << clause_counter++ << " done; " << size(clause) << std::endl;
+        std::cout << "clause : " << clause_counter++ << " done; " << size(fml) << std::endl;
     }
-    // return fml;
+    return fml;
     while (clause_sfdds.size() > 1) {
-        std::cout << clause_sfdds.size() << " " << sfdd_nodes_.size() << std::endl;
         std::vector<addr_t> tmp_sfdds;
         for (int i = 0; i < (int)(clause_sfdds.size() + 1) / 2; i++) {
             if (2 * i + 1 >= (int)clause_sfdds.size()) {

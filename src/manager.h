@@ -10,6 +10,8 @@
 #include <functional>
 #include <map>
 #include "readVerilog.h"
+#include "cache_table.h"
+#include "unique_table.h"
 
 
 namespace sfdd {
@@ -22,24 +24,19 @@ public:
     addr_t false_ = -1;
     Vtree* vtree = NULL;
     addr_t max_addr_for_lit_ = 0;
-    // for unique table
-    std::unordered_map<SfddNode, addr_t> uniq_table_;
-    std::vector<SfddNode> sfdd_nodes_;
-
-    // for cache table
-    const unsigned int INIT_SIZE = 1U<<10;
-    std::vector<cache_entry> cache_table_;
 
     // for bigoplus_piterms
     std::unordered_map<int, addr_t> bigoplus_piterms;
 
     // fot getting lca quickly
     std::vector<std::vector<int> > lca_table_;
+
+    UniqueTable uniq_table_;
+    CacheTable cache_table_;
 public:
     Manager();
-    Manager(const Vtree& v);
+    Manager(const Vtree& v, const unsigned int cache_size = 1U << 16);
     void initial_node_table_and_piterms_map();
-    Manager& operator=(const Manager& m_);
     ~Manager();
     addr_t sfddVar(const int var);
 
@@ -72,19 +69,6 @@ public:
     addr_t Or(const addr_t lhs, const addr_t rhs);
     addr_t Not(const addr_t sfdd_id);
 
-    // for unique table
-    addr_t make_sfdd(const SfddNode& new_node);
-    addr_t make_or_find(const SfddNode& new_node);  // to avoid storing redundant sfdds
-    void print_sfdd_nodes() const;
-    void print_unique_table() const;
-
-    // for cache table
-    void write_cache(const OPERATOR_TYPE op, const addr_t lhs,
-                     const addr_t rhs, const addr_t res);
-    void clear_cache();
-    addr_t read_cache(const OPERATOR_TYPE op, const addr_t lhs, const addr_t rhs);
-    size_t calc_key(const OPERATOR_TYPE op, const addr_t lhs,  const addr_t rhs);
-    void print_cache_table() const;
 
     // print node
     void print(const addr_t addr_, int indent = 0) const;
