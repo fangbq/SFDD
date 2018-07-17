@@ -81,13 +81,13 @@ unsigned long long Manager::size(const addr_t sfdd_id) const {
         const SfddNode& n = uniq_table_.get_node_at(e);
         if (n.value < 0) {
             for (const Element e : n.elements) {
-                if (node_ids.find(e.first) == node_ids.end()) {
-                    node_ids.insert(e.first);
-                    unexpanded.push(e.first);
+                if (node_ids.find(std::get<0>(e)) == node_ids.end()) {
+                    node_ids.insert(std::get<0>(e));
+                    unexpanded.push(std::get<0>(e));
                 }
-                if (node_ids.find(e.second) == node_ids.end()) {
-                    node_ids.insert(e.second);
-                    unexpanded.push(e.second);
+                if (node_ids.find(std::get<1>(e)) == node_ids.end()) {
+                    node_ids.insert(std::get<1>(e));
+                    unexpanded.push(std::get<1>(e));
                 }
             }
         }
@@ -119,13 +119,13 @@ unsigned long long Manager::size(const std::unordered_set<addr_t> sfdd_ids) cons
         const SfddNode& n = uniq_table_.get_node_at(e);
         if (n.value < 0) {
             for (const Element e : n.elements) {
-                if (node_ids.find(e.first) == node_ids.end()) {
-                    node_ids.insert(e.first);
-                    unexpanded.push(e.first);
+                if (node_ids.find(std::get<0>(e)) == node_ids.end()) {
+                    node_ids.insert(std::get<0>(e));
+                    unexpanded.push(std::get<0>(e));
                 }
-                if (node_ids.find(e.second) == node_ids.end()) {
-                    node_ids.insert(e.second);
-                    unexpanded.push(e.second);
+                if (node_ids.find(std::get<1>(e)) == node_ids.end()) {
+                    node_ids.insert(std::get<1>(e));
+                    unexpanded.push(std::get<1>(e));
                 }
             }
         }
@@ -144,9 +144,9 @@ unsigned long long Manager::size(const std::unordered_set<addr_t> sfdd_ids) cons
 addr_t Manager::reduced(const SfddNode& sfdd_node) {
 // cout << "reduced..." << endl;
     bool sameSub = true;
-    addr_t first_sub = sfdd_node.elements.front().second;
+    addr_t first_sub = std::get<1>(sfdd_node.elements.front());
     for (const auto& e : sfdd_node.elements) {
-        if (e.second != first_sub)
+        if (std::get<1>(e) != first_sub)
         {
             sameSub = false;
             break;
@@ -174,9 +174,9 @@ addr_t Manager::reduced(const SfddNode& sfdd_node) {
         for (auto e2 = result_node.elements.begin(); \
         e2 != result_node.elements.end(); ++e2) {
             // cout << "big equal..." << endl;
-            if (e1 != e2 && e1->second==e2->second) {
+            if (e1 != e2 && std::get<1>(*e1)==std::get<1>(*e2)) {
                 is_delete = true;
-                e2->first = Xor(e1->first, e2->first);
+                std::get<0>(*e2) = Xor(std::get<0>(*e1), std::get<0>(*e2));
                 e1 = result_node.elements.erase(e1);
                 break;
             }
@@ -191,17 +191,17 @@ addr_t Manager::reduced(const SfddNode& sfdd_node) {
     if (result_node.elements.size() == 2) {
         // {(f, 1), (other-pi-terms\f, 0)} -> f
         // {(1, f), (other-pi-terms\1, 0)} -> f
-        if (result_node.elements[0].second == false_) {
-            if (result_node.elements[1].second == true_) {
-                return tmp_node.elements[1].first;
-            } else if (result_node.elements[1].first == true_) {
-                return tmp_node.elements[1].second;
+        if (std::get<1>(result_node.elements[0]) == false_) {
+            if (std::get<1>(result_node.elements[1]) == true_) {
+                return std::get<0>(tmp_node.elements[1]);
+            } else if (std::get<0>(result_node.elements[1]) == true_) {
+                return std::get<1>(tmp_node.elements[1]);
             }
-        } else if (result_node.elements[1].second == false_) {
-            if (result_node.elements[0].second == true_) {
-                return tmp_node.elements[0].first;
-            } else if (result_node.elements[0].first == true_) {
-                return tmp_node.elements[0].second;
+        } else if (std::get<1>(result_node.elements[1]) == false_) {
+            if (std::get<1>(result_node.elements[0]) == true_) {
+                return std::get<0>(tmp_node.elements[0]);
+            } else if (std::get<0>(result_node.elements[0]) == true_) {
+                return std::get<1>(tmp_node.elements[0]);
             }
         }
     }
@@ -219,8 +219,8 @@ addr_t Manager::generate_bigoplus_piterms(const Vtree& v) {
        SfddNode sfdd_node;
        sfdd_node.vtree_index = v.index;
        Element e;
-       e.first = generate_bigoplus_piterms(*(v.lt));
-       e.second = generate_bigoplus_piterms(*v.rt);
+       std::get<0>(e) = generate_bigoplus_piterms(*(v.lt));
+       std::get<1>(e) = generate_bigoplus_piterms(*v.rt);
        sfdd_node.elements.push_back(e);
        result = uniq_table_.make_sfdd(sfdd_node);
     }
@@ -254,8 +254,8 @@ addr_t Manager::Intersection(const addr_t lhs, const addr_t rhs) {
         addr_t result_ = false_;
         SfddNode sfdd_node = uniq_table_.get_node_at(rhs);
         for (const auto& e : sfdd_node.elements)
-            if (Intersection(true_, e.first) == true_) {
-                result_ = Intersection(true_, e.second);
+            if (Intersection(true_, std::get<0>(e)) == true_) {
+                result_ = Intersection(true_, std::get<1>(e));
                 break;
             }
         cache_table_.write_cache(INTER, true_, rhs, result_);
@@ -277,13 +277,13 @@ addr_t Manager::Intersection(const addr_t lhs, const addr_t rhs) {
         if (normalized_sfdd1.elements.size() == 1) {
             for (std::vector<Element>::const_iterator e2 = normalized_sfdd2.elements.begin();
             e2 != normalized_sfdd2.elements.end(); ++e2) {
-                Element new_e(e2->first, Intersection(normalized_sfdd1.elements[0].second, e2->second));
+                Element new_e(std::get<0>(*e2), Intersection(std::get<1>(normalized_sfdd1.elements[0]), std::get<1>(*e2)));
                 new_node.elements.push_back(new_e);
             }
         } else if (normalized_sfdd2.elements.size() == 1) {
             for (std::vector<Element>::const_iterator e1 = normalized_sfdd1.elements.begin();
             e1 != normalized_sfdd1.elements.end(); ++e1) {
-                Element new_e(e1->first, Intersection(normalized_sfdd2.elements[0].second, e1->second));
+                Element new_e(std::get<0>(*e1), Intersection(std::get<1>(normalized_sfdd2.elements[0]), std::get<1>(*e1)));
                 new_node.elements.push_back(new_e);
             }
         } else {
@@ -292,9 +292,9 @@ addr_t Manager::Intersection(const addr_t lhs, const addr_t rhs) {
                 for (std::vector<Element>::const_iterator e2 = normalized_sfdd2.elements.begin();
                 e2 != normalized_sfdd2.elements.end(); ++e2) {
                     Element new_e;
-                    new_e.first = Intersection(e1->first, e2->first);
-                    if (new_e.first != false_) {
-                        new_e.second = Intersection(e1->second, e2->second);
+                    std::get<0>(new_e) = Intersection(std::get<0>(*e1), std::get<0>(*e2));
+                    if (std::get<0>(new_e) != false_) {
+                        std::get<1>(new_e) = Intersection(std::get<1>(*e1), std::get<1>(*e2));
                         new_node.elements.push_back(new_e);
                     }
                 }
@@ -321,15 +321,15 @@ addr_t Manager::Intersection(const addr_t lhs, const addr_t rhs) {
                 addr_t bigoplus_ = bigoplus_piterms.at(vtree->subvtree(lca).lt->index);
                 if (bigoplus_ == descendant_) {
                     for (const auto& e : normalized_sfdd1.elements) {
-                        Element new_e(e.first, Intersection(true_, e.second));
+                        Element new_e(std::get<0>(e), Intersection(true_, std::get<1>(e)));
                         new_node.elements.push_back(new_e);
                     }
                 } else {
                     // normalized_sfdd2 is a left descendant of normalized_sfdd1 (1)
                     for (const auto& e : normalized_sfdd1.elements) {
-                        addr_t inter_ = Intersection(e.first, descendant_);
+                        addr_t inter_ = Intersection(std::get<0>(e), descendant_);
                         if (inter_ != false_) {
-                            Element new_e(inter_, Intersection(true_, e.second));
+                            Element new_e(inter_, Intersection(true_, std::get<1>(e)));
                             new_node.elements.push_back(new_e);
                         }
                     }
@@ -339,9 +339,9 @@ addr_t Manager::Intersection(const addr_t lhs, const addr_t rhs) {
             } else {
                 // normalized_sfdd2 is a right descendant of normalized_sfdd1 (2)
                 for (const auto& e : normalized_sfdd1.elements) {
-                    addr_t inter_ = Intersection(true_, e.first);
+                    addr_t inter_ = Intersection(true_, std::get<0>(e));
                     if (inter_ != false_) {
-                        Element new_e(inter_, Intersection(e.second, descendant_));
+                        Element new_e(inter_, Intersection(std::get<1>(e), descendant_));
                         new_node.elements.push_back(new_e);
                     }
                 }
@@ -380,12 +380,12 @@ addr_t Manager::Xor(const addr_t lhs, const addr_t rhs) {
         new_node.vtree_index = sfdd_node.vtree_index;
         auto it_ = sfdd_node.elements.begin();
         for ( ; it_ != sfdd_node.elements.end(); ++it_) {
-            if (Intersection(true_, it_->first) == true_) {
-                Element new_e1(true_, Xor(true_, it_->second));
+            if (Intersection(true_, std::get<0>(*it_)) == true_) {
+                Element new_e1(true_, Xor(true_, std::get<1>(*it_)));
                 new_node.elements.push_back(new_e1);
-                addr_t prime_ = Xor(true_, it_->first);
+                addr_t prime_ = Xor(true_, std::get<0>(*it_));
                 if (prime_ != false_) {
-                    Element new_e2(prime_, it_->second);
+                    Element new_e2(prime_, std::get<1>(*it_));
                     new_node.elements.push_back(new_e2);
                     break;
                 }
@@ -414,13 +414,13 @@ addr_t Manager::Xor(const addr_t lhs, const addr_t rhs) {
         if (normalized_sfdd1.elements.size() == 1) {
             for (std::vector<Element>::const_iterator e2 = normalized_sfdd2.elements.begin();
             e2 != normalized_sfdd2.elements.end(); ++e2) {
-                Element new_e(e2->first, Xor(normalized_sfdd1.elements[0].second, e2->second));
+                Element new_e(std::get<0>(*e2), Xor(std::get<1>(normalized_sfdd1.elements[0]), std::get<1>(*e2)));
                 new_node.elements.push_back(new_e);
             }
         } else if (normalized_sfdd2.elements.size() == 1) {
             for (std::vector<Element>::const_iterator e1 = normalized_sfdd1.elements.begin();
             e1 != normalized_sfdd1.elements.end(); ++e1) {
-                Element new_e(e1->first, Xor(normalized_sfdd2.elements[0].second, e1->second));
+                Element new_e(std::get<0>(*e1), Xor(std::get<1>(normalized_sfdd2.elements[0]), std::get<1>(*e1)));
                 new_node.elements.push_back(new_e);
             }
         } else {
@@ -429,9 +429,9 @@ addr_t Manager::Xor(const addr_t lhs, const addr_t rhs) {
                 for (std::vector<Element>::const_iterator e2 = normalized_sfdd2.elements.begin();
                 e2 != normalized_sfdd2.elements.end(); ++e2) {
                     Element new_e;
-                    new_e.first = Intersection(e1->first, e2->first);
-                    if (new_e.first != false_) {
-                        new_e.second = Xor(e1->second, e2->second);
+                    std::get<0>(new_e) = Intersection(std::get<0>(*e1), std::get<0>(*e2));
+                    if (std::get<0>(new_e) != false_) {
+                        std::get<1>(new_e) = Xor(std::get<1>(*e1), std::get<1>(*e2));
                         new_node.elements.push_back(new_e);
                     }
                 }
@@ -453,13 +453,13 @@ addr_t Manager::Xor(const addr_t lhs, const addr_t rhs) {
 			}
 
 			Element e1;
-			e1.first = true_;
-			e1.second = (Intersection(true_, left_descendant_) == true_) ? Xor(true_, right_descendant_) : right_descendant_;
+			std::get<0>(e1) = true_;
+			std::get<1>(e1) = (Intersection(true_, left_descendant_) == true_) ? Xor(true_, right_descendant_) : right_descendant_;
 			new_node.elements.push_back(e1);
 
 			Element e2;
-			e2.first = Intersection(left_descendant_, Xor(true_, bigoplus_piterms.at((vtree->subvtree(lca).lt)->index)));
-			e2.second = true_;
+			std::get<0>(e2) = Intersection(left_descendant_, Xor(true_, bigoplus_piterms.at((vtree->subvtree(lca).lt)->index)));
+			std::get<1>(e2) = true_;
 			new_node.elements.push_back(e2);
 
             addr_t comp_ = Intersection(Xor(bigoplus_piterms.at((vtree->subvtree(lca).lt)->index), left_descendant_), \
@@ -486,22 +486,22 @@ addr_t Manager::Xor(const addr_t lhs, const addr_t rhs) {
                 addr_t bigoplus_ = bigoplus_piterms.at(vtree->subvtree(lca).lt->index);
                 if (bigoplus_ == descendant_) {
                     for (const auto& e : normalized_sfdd1.elements) {
-                        Element new_e(e.first, Xor(true_, e.second));
+                        Element new_e(std::get<0>(e), Xor(true_, std::get<1>(e)));
                         new_node.elements.push_back(new_e);
                     }
                 } else {
     				addr_t comp_beta = Xor(bigoplus_, descendant_);
 
                     for (const auto& e : normalized_sfdd1.elements) {
-                        addr_t inter_ = Intersection(e.first, descendant_);
+                        addr_t inter_ = Intersection(std::get<0>(e), descendant_);
                         if (inter_ != false_) {
-                            Element new_e(inter_, Xor(true_, e.second));
+                            Element new_e(inter_, Xor(true_, std::get<1>(e)));
                             new_node.elements.push_back(new_e);
                         }
 
-    					inter_ = Intersection(e.first, comp_beta);
+    					inter_ = Intersection(std::get<0>(e), comp_beta);
                         if (inter_ != false_) {
-                            Element new_e(inter_, e.second);
+                            Element new_e(inter_, std::get<1>(e));
                             new_node.elements.push_back(new_e);
                         }
                     }
@@ -511,12 +511,12 @@ addr_t Manager::Xor(const addr_t lhs, const addr_t rhs) {
                 // normalized_sfdd2 is a right descendant of normalized_sfdd1 (2)
                 auto it_ = normalized_sfdd1.elements.begin();
                 for ( ; it_ != normalized_sfdd1.elements.end(); ++it_) {
-                    if (Intersection(true_, it_->first) == true_) {
-                        Element new_e1(true_, Xor(descendant_, it_->second));
+                    if (Intersection(true_, std::get<0>(*it_)) == true_) {
+                        Element new_e1(true_, Xor(descendant_, std::get<1>(*it_)));
                         new_node.elements.push_back(new_e1);
-                        addr_t prime_ = Xor(true_, it_->first);
+                        addr_t prime_ = Xor(true_, std::get<0>(*it_));
                         if (prime_ != false_) {
-                            Element new_e2(prime_, it_->second);
+                            Element new_e2(prime_, std::get<1>(*it_));
                             new_node.elements.push_back(new_e2);
                             break;
                         }
@@ -542,8 +542,8 @@ std::vector<Element> Manager::to_partition(std::vector<Element>& alpha_) {
     sort(alpha_.begin(), alpha_.end());
     // combine elements with same prime
     for (const auto& e : alpha_) {
-        if (!prime_combined_.empty() && prime_combined_.back().first==e.first) {
-            Element new_e(e.first, Xor(prime_combined_.back().second, e.second));
+        if (!prime_combined_.empty() && std::get<0>(prime_combined_.back())==std::get<0>(e)) {
+            Element new_e(std::get<0>(e), Xor(std::get<1>(prime_combined_.back()), std::get<1>(e)));
             prime_combined_.back() = new_e;
         } else {
             prime_combined_.push_back(e);
@@ -552,22 +552,22 @@ std::vector<Element> Manager::to_partition(std::vector<Element>& alpha_) {
 
     for (const auto& ps_ : prime_combined_) {
         std::vector<Element> gamma_;
-        addr_t o_ = ps_.first;
+        addr_t o_ = std::get<0>(ps_);
         Element inter_e;
         auto it_ = beta_.begin();
         for ( ; it_ != beta_.end(); ++it_) {
-            inter_e.first = Intersection(it_->first, o_);
-            if (inter_e.first != false_) {
-                inter_e.second = Xor(it_->second, ps_.second);
+            std::get<0>(inter_e) = Intersection(std::get<0>(*it_), o_);
+            if (std::get<0>(inter_e) != false_) {
+                std::get<1>(inter_e) = Xor(std::get<1>(*it_), std::get<1>(ps_));
                 gamma_.push_back(inter_e);  // add inter-ele
             }
             Element origin_e;
-            origin_e.first = Xor(it_->first, inter_e.first);
-            if (origin_e.first != false_) {
-                origin_e.second = it_->second;
+            std::get<0>(origin_e) = Xor(std::get<0>(*it_), std::get<0>(inter_e));
+            if (std::get<0>(origin_e) != false_) {
+                std::get<1>(origin_e) = std::get<1>(*it_);
                 gamma_.push_back(origin_e);  // add orig-ele
             }
-            o_ = Xor(o_, inter_e.first);
+            o_ = Xor(o_, std::get<0>(inter_e));
             if (o_ == false_) {
                 break;
             }
@@ -576,7 +576,7 @@ std::vector<Element> Manager::to_partition(std::vector<Element>& alpha_) {
             gamma_.insert(gamma_.end(), ++it_, beta_.end());
 
         if (o_ != false_) {
-            Element last_(o_, ps_.second);
+            Element last_(o_, std::get<1>(ps_));
             gamma_.push_back(last_);
         }
         beta_ = gamma_;
@@ -610,9 +610,9 @@ addr_t Manager::And(const addr_t lhs, const addr_t rhs) {
         std::vector<Element> alpha_;
         for (const auto& e1 : normalized_sfdd1.elements) {
             for (const auto& e2 : normalized_sfdd2.elements) {
-                addr_t prime_product = And(e1.first, e2.first);
+                addr_t prime_product = And(std::get<0>(e1), std::get<0>(e2));
                 if (prime_product != false_) {
-                    addr_t sub_product = And(e1.second, e2.second);
+                    addr_t sub_product = And(std::get<1>(e1), std::get<1>(e2));
                     Element new_e(prime_product, sub_product);
                     alpha_.push_back(new_e);
                 }
@@ -655,9 +655,9 @@ addr_t Manager::And(const addr_t lhs, const addr_t rhs) {
             if (normalized_sfdd2.vtree_index < normalized_sfdd1.vtree_index) {
                 std::vector<Element> decomps;
                 for (const auto& e : normalized_sfdd1.elements) {
-                    addr_t prime_ = And(e.first, descendant_);
+                    addr_t prime_ = And(std::get<0>(e), descendant_);
                     if (prime_ != false_) {
-                        Element new_e(prime_, e.second);
+                        Element new_e(prime_, std::get<1>(e));
                         decomps.push_back(new_e);
                     }
                 }
@@ -669,7 +669,7 @@ addr_t Manager::And(const addr_t lhs, const addr_t rhs) {
                 new_node.elements = to_partition(decomps);
             } else {
                 for (const auto& e : normalized_sfdd1.elements) {
-                    Element new_e(e.first, And(e.second, descendant_));
+                    Element new_e(std::get<0>(e), And(std::get<1>(e), descendant_));
                     new_node.elements.push_back(new_e);
                 }
             }
@@ -725,10 +725,10 @@ void Manager::print(const addr_t addr_, int indent) const {
     for (const auto e : sfdd_node.elements) {
         for (int i = 0; i < indent; ++i) std::cout << " ";
         std::cout << "E" << counter << "p:" << std::endl;
-        print(e.first, indent+1);
+        print(std::get<0>(e), indent+1);
         for (int i = 0; i < indent; ++i) std::cout << " ";
         std::cout << "E" << counter++ << "s:" << std::endl;
-        print(e.second, indent+1);
+        print(std::get<1>(e), indent+1);
     }
     return;
 }
@@ -753,10 +753,10 @@ void Manager::print(const SfddNode& sfdd_node, int indent) const {
     for (const auto& e : sfdd_node.elements) {
         for (int i = 0; i < indent; ++i) std::cout << " ";
         std::cout << "E" << counter << "p:" << std::endl;
-        print(e.first, indent+1);
+        print(std::get<0>(e), indent+1);
         for (int i = 0; i < indent; ++i) std::cout << " ";
         std::cout << "E" << counter++ << "s:" << std::endl;
-        print(e.second, indent+1);
+        print(std::get<1>(e), indent+1);
     }
     return;
 }

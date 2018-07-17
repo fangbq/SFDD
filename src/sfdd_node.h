@@ -13,7 +13,7 @@ namespace sfdd {
 
 class Manager;
 
-using Element = std::pair<addr_t, addr_t>;
+using Element = std::tuple<addr_t, addr_t>;
 
 class SfddNode {
 public:
@@ -58,8 +58,8 @@ template <> struct hash<sfdd::SfddNode> {
             return h;
         } else if (n.value < 0) {
             for (const auto& e : n.elements) {
-                sfdd::hash_combine(h, hash<sfdd::addr_t>()(e.first));
-                sfdd::hash_combine(h, hash<sfdd::addr_t>()(e.second));
+                sfdd::hash_combine(h, hash<sfdd::addr_t>()(std::get<0>(e)));
+                sfdd::hash_combine(h, hash<sfdd::addr_t>()(std::get<1>(e)));
             }
             sfdd::hash_combine(h, hash<int>()(n.vtree_index));
         }
